@@ -1,0 +1,1 @@
+var Template = Template || {};var Template.Button = '	<div class="component" 		 style="left: {{=it.left}}%; 	 	     	top: {{=it.top}}%;">		{{=it.text}}	</div>';

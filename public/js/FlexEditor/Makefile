@@ -1,19 +1,36 @@
-dir = src/
-files = 	$(dir)_start.js\
-		 	$(dir)Main.js\
-			$(dir)Renderer.js\
-			$(dir)_end.js
+src = src
+tpl = src/tpl
+
+start = 	$(src)/_start.js
+end =		$(src)/_end.js
+
+files = 	$(src)/Main.js\
+			$(src)/TestPerformance.js\
+			$(src)/Renderer.js\
+			
+templates = $(tpl)/button.tpl
 
 FlexEditor.js: ${files}
-	@cat > $@ $^
+
+	# Add the function wrapper
+	cat ${start} > $@
+
+	# Append the modules
+	cat ${files} >> $@
+
+	# HTML Templates (remove newlines to support multiline strings in source)
+	cat ${templates} | tr -d "\n" >> $@
+	
+	# And finally exposing public objects
+	cat ${end} >> $@
 
 watch:
 	echo Watching for changes and automatically merging FlexEditor.js
 	$(MAKE) -s FlexEditor.js
 	while true ; do \
-		inotifywait -qqr .; \
+		inotifywait -qqr src; \
 		$(MAKE) -s FlexEditor.js; \
 	done
 
-.PHONY: watch
+.PHONY: watch, FlexEditor.js
 .SILENT: watch FlexEditor.js 
