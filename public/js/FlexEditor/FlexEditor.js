@@ -3,23 +3,24 @@ var Main = me;
 
 function me() {
 
-}	
+};
 
 me.prototype.load = function() {
-	
-}
 
+	var renderer = new Renderer();
+	renderer.render();
 
-
-var Renderer = me;
+};var Renderer = me;
 
 function me() {
 
-}	
+};
 
 me.prototype.render = function() {
 
-}
+
+
+};
 
 	/**
 	 * Make Open Ratio a global object
