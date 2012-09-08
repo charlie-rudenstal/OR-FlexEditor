@@ -1,9 +1,20 @@
-/* Makefile will compress this into one line, watch out with your comments */
-var Templates = Templates || {}; Templates.Button = '
+/* Will be compressed into one line by Makefile */
+var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; 
+Templates.Raw.Button = '
+
+	{{##def.unit:
+		{{? it.position == "relative" }}
+		%
+		{{?? it.position == "absolute" }}
+		px
+		{{??}} 
+		px
+		{{?}}
+	#}}
 
 	<div class="component" 
-		 style="left: {{=it.left}}%; 
-	 	     	top: {{=it.top}}%;">
+		 style="left: {{=it.left}}{{#def.unit}};
+	 	     	top: {{=it.top}}{{#def.unit}};">
 
 		{{=it.text}}
 

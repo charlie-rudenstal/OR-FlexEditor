@@ -1,28 +1,40 @@
 function Renderer() {
-	
-	var htmlBtn = Templates.Button;
-	this.btn = doT.template(htmlBtn);
 
 };
 
 (function(me) {
 	
 	/**
-	 * Transform an array of buttons to HTML
+	 * Transform an array to HTML
+	 * @param func  pre-compiled template function
 	 * @param array buttons of {
-	 * 	 position: 'relative'	
-	 * 	 left: 30,
-	 * 	 top: 10,
-	 * 	 width: 30,
-	 *   height: 20 
+	 * 	 position: 'relative',	
+	 * 	 left: 30,  top: 10,
+	 * 	 width: 30, height: 20 
 	 * }
 	 */
-	me.prototype.render = function(buttons) {
+	me.prototype.render = function(template, buttons) {
 		var html = '', i = -1, len = buttons.length - 1;
 		while(i < len) {
-			html += this.btn(buttons[i += 1]);			
+			html += template(buttons[i += 1]);			
 		}
 		return html;
+	}
+
+	me.prototype.write = function(template, buttons, toElement)
+	{		
+		// Creating empty div, set innerHTML and then replaceChild
+		// is a major performance boost compared to just innerHTML
+		var div = document.createElement('div');
+		div.innerHTML = this.render(template, buttons);
+
+		// We need to replace a child within the element,
+		// if there doesn't already exist one - create it.
+		if(!toElement.firstChild) {
+			toElement.appendChild(document.createElement('div'));
+		}
+		
+		toElement.replaceChild(div, toElement.firstChild);
 	}
 
 })(Renderer);

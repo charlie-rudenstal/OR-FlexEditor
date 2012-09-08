@@ -7,6 +7,7 @@ end =		$(src)/_end.js
 files = 	$(src)/Main.js\
 			$(src)/TestPerformance.js\
 			$(src)/Renderer.js\
+			$(src)/Templates.js
 			
 templates = $(tpl)/button.tpl
 

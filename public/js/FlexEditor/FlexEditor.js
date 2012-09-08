@@ -5,35 +5,38 @@
 
 function Main(options) {
 	this.domContainer = document.getElementById(options.containerId);
-	this.renderer = new Renderer();	
+	this.renderer = new Renderer();
+	Templates.init();
 };
 
 (function(me) {
 
 	me.prototype.load = function(domContainer) {
 		domContainer = domContainer || this.domContainer;
-		domContainer.appendChild(document.createElement('div'));
+	
+		var buttons = [
+			  { position: 'relative', left: 30, top: 10, width: 20, height: 20, text: 'Hello'}
+			, { position: 'relative', left: 40, top: 10, width: 20, height: 20, text: 'World'}
+			, { position: 'absolute', left: 50, top: 50, width: 20, height: 20, text: 'Again'}
+		];
 
+		var start = (new Date).getTime();
+		for(var i = 0; i < 10000; i++)		
+			this.renderer.write(Templates.Button, buttons, domContainer);	
+		console.log('time', ((new Date).getTime() - start), ' ms');		
+	};
+
+	me.prototype.test = function(domContainer) {
 		var buttons = [
 			  { left: 50, top: 50, width: 20, height: 20, text: 'Hello'}
 			, { left: 19, top: 10, width: 20, height: 20, text: 'World'}
 		];
 
 		var start = (new Date).getTime();
-		
-		for(var i = 0; i < 30000; i++ ) {
-			var html = this.renderer.render(buttons);
-		}
-
-		console.log('time', ((new Date).getTime() - start), ' ms');		
-		
-
-		// Creating empty div, set innerHTML and then replaceChild
-		// is a major performance boost compared to just innerHTML
-		var div = document.createElement('div');
-		div.innerHTML = html;
-		domContainer.replaceChild(div, domContainer.firstChild);
-	};
+		for(var i = 0; i < 10000; i++)		
+			this.renderer.write(Templates.Button, buttons, domContainer);	
+		console.log('time', ((new Date).getTime() - start), ' ms');
+	}
 
 }(Main));
 
@@ -116,33 +119,53 @@ function TestPerformance() {};
 }(TestPerformance));
 
 function Renderer() {
-	
-	var htmlBtn = Templates.Button;
-	this.btn = doT.template(htmlBtn);
 
 };
 
 (function(me) {
 	
 	/**
-	 * Transform an array of buttons to HTML
+	 * Transform an array to HTML
+	 * @param func  pre-compiled template function
 	 * @param array buttons of {
-	 * 	 position: 'relative'	
-	 * 	 left: 30,
-	 * 	 top: 10,
-	 * 	 width: 30,
-	 *   height: 20 
+	 * 	 position: 'relative',	
+	 * 	 left: 30,  top: 10,
+	 * 	 width: 30, height: 20 
 	 * }
 	 */
-	me.prototype.render = function(buttons) {
+	me.prototype.render = function(template, buttons) {
 		var html = '', i = -1, len = buttons.length - 1;
 		while(i < len) {
-			html += this.btn(buttons[i += 1]);			
+			html += template(buttons[i += 1]);			
 		}
 		return html;
 	}
 
-})(Renderer);/* Makefile will compress this into one line, watch out with your comments */var Templates = Templates || {}; Templates.Button = '	<div class="component" 		 style="left: {{=it.left}}%; 	 	     	top: {{=it.top}}%;">		{{=it.text}}	</div>';
+	me.prototype.write = function(template, buttons, toElement)
+	{		
+		// Creating empty div, set innerHTML and then replaceChild
+		// is a major performance boost compared to just innerHTML
+		var div = document.createElement('div');
+		div.innerHTML = this.render(template, buttons);
+
+		// We need to replace a child within the element,
+		// if there doesn't already exist one - create it.
+		if(!toElement.firstChild) {
+			toElement.appendChild(document.createElement('div'));
+		}
+		
+		toElement.replaceChild(div, toElement.firstChild);
+	}
+
+})(Renderer);var Templates = Templates || {};
+
+(function() {
+	
+	Templates.init = function() {	
+		Templates.Button = doT.template(Templates.Raw.Button);
+	}
+
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};">		{{=it.text}}	</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor
