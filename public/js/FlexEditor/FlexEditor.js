@@ -1,27 +1,30 @@
 (function($) {
-var Main = me;
+function Main(options) {
+	this.domContainer = $(options.container);	
+};
 
-function me() {
+(function(me) {
+
+	me.prototype.load = function() {
+
+		var renderer = new Renderer();
+		renderer.render();
+
+		console.log(this.domContainer);
+
+	};
+
+}(Main));function Renderer() {
 
 };
 
-me.prototype.load = function() {
+(function(me) {
+	
+	me.prototype.render = function() {
 
-	var renderer = new Renderer();
-	renderer.render();
+	};
 
-};var Renderer = me;
-
-function me() {
-
-};
-
-me.prototype.render = function() {
-
-
-
-};
-
+})(Renderer);
 	/**
 	 * Make Open Ratio a global object
 	 * and export the Main module of FlexEditor

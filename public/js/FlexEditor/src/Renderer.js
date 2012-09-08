@@ -1,11 +1,11 @@
-var Renderer = me;
-
-function me() {
+function Renderer() {
 
 };
 
-me.prototype.render = function() {
+(function(me) {
+	
+	me.prototype.render = function() {
 
+	};
 
-
-};
+})(Renderer);

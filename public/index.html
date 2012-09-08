@@ -2,12 +2,16 @@
 <html>
 	<head>
 		<script type="text/javascript" src="js/jquery.js"></script>		
-		<script type="text/javascript" src="js/FlexEditor/FlexEditor.js"></script>		
+		<script type="text/javascript" src="js/FlexEditor/FlexEditor.js"></script>
+
+		<!-- Live reload during development -->
+		<script type="text/javascript" src="js/live.js"></script>
 	</head>
 	<body>
 		<div id="editor"></div>
 		<script type="text/javascript">
 			var editor = new OR.FlexEditor({container: '#editor'});
+			console.log(editor);
 			editor.load();
 		</script>
 	</body>

@@ -1,12 +1,16 @@
-var Main = me;
-
-function me() {
-
+function Main(options) {
+	this.domContainer = $(options.container);	
 };
 
-me.prototype.load = function() {
+(function(me) {
 
-	var renderer = new Renderer();
-	renderer.render();
+	me.prototype.load = function() {
 
-};
+		var renderer = new Renderer();
+		renderer.render();
+
+		console.log(this.domContainer);
+
+	};
+
+}(Main));
