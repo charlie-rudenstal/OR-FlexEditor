@@ -1,20 +1,31 @@
 (function($) {
+var Main = me;
 
-	var me = function() {
+function me() {
 
-	}	
+}	
 
-	me.prototype.load = function() {
-			
-	}
+me.prototype.load = function() {
+	
+}
 
+
+
+var Renderer = me;
+
+function me() {
+
+}	
+
+me.prototype.render = function() {
+
+}
 
 	/**
 	 * Make Open Ratio a global object
-	 * and export this module
+	 * and export the Main module of FlexEditor
 	 */
 	window.OR = window.OR || {};
-	OR.FlexEditor = me;
+	OR.FlexEditor = Main;
 
 })(jQuery);
-

@@ -1,20 +1,12 @@
-(function($) {
+var Main = me;
 
-	var me = function() {
+function me() {
 
-	}	
+}	
 
-	me.prototype.load = function() {
-			
-	}
+me.prototype.load = function() {
+	
+}
 
 
-	/**
-	 * Make Open Ratio a global object
-	 * and export this module
-	 */
-	window.OR = window.OR || {};
-	OR.FlexEditor = me;
-
-})(jQuery);
 
