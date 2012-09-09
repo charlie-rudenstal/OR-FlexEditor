@@ -110,41 +110,35 @@ function MouseHandler(element, cellSize, renderer, model) {
 		
 		// Store size of the container once when loaded 
 		// (needed to calculate relative mouse position)
-		var position = $(element).position();			
-		var elmRect = {
-			  x: position.left
-			, y: position.top
-			, width: $(element).width()
-			, height: $(element).height()
-		};
- 
-		return eventHandler(elmRect, element, cellSize, renderer, model);
-	}
+		var elmRect = getElementRect(element);
 
-	function eventHandler(elmRect, element, cellSize, renderer, model) {
 		return function(e) {
 			eventEmitter(e, elmRect, element, cellSize, renderer, model);			
 		}
 	}
 
-	function eventEmitter(e, elmRect, element, cellSize, renderer, model) {
+	function eventEmitter(e, elementRect, element, cellSize, renderer, model) {
 		
-		var mousePosition    = { x: e.pageX, y: e.pageY };
+		var mouse = { x: e.pageX, y: e.pageY };
 		
-		var absolutePosition = subtract(mousePosition, elmRect);
-		var relativePosition = percentage(absolutePosition, elmRect);		
-		var snappedRect      = getSnappedRect(relativePosition, cellSize);
-
-		var position = {
-			  absolute: absolutePosition
-			, relative: relativePosition
-			, snapped: snappedRect
-		};
-		
+		var absolute  = subtract(mouse, elementRect);
+		var relative  = percentage(absolute, elementRect);		
+		var snapRect  = getSnappedRect(relative, cellSize);
+ 		
 		switch(e.type) {
-			case 'mousemove': onMouseMove.call(this, position, element, renderer, model); break;
-			case 'mousedown': onMouseDown.call(this, position, element, renderer, model); break;
+			case 'mousemove': onMouseMove.call(this, snapRect, element, renderer, model); break;
+			case 'mousedown': onMouseDown.call(this, snapRect, element, renderer, model); break;
 		}
+	}
+
+	function getElementRect(element) {
+		var position = $(element).position();			
+		return {
+			  x: position.left
+			, y: position.top
+			, width: $(element).width()
+			, height: $(element).height()
+		};
 	}
 
 	function subtract(point1, point2) {
@@ -183,16 +177,16 @@ function MouseHandler(element, cellSize, renderer, model) {
 	 *               relativeX/relativeY - Percentage relative to editor
 	 *               cell 				 - Relative position and size of cell
 	 */
-	var onMouseMove = function(position, element, renderer, model) {
+	var onMouseMove = function(snapRect, element, renderer, model) {
 		//console.log(e.cell.left, e.cell.top);
 	}
 
-	var onMouseDown = function(position, element, renderer, model) {
+	var onMouseDown = function(snapRect, element, renderer, model) {
 		var button = {
 			  position: 'relative'
 			, text: 'Button'
-			, left: position.snapped.x, width:  position.snapped.width
-			, top:  position.snapped.y, height: position.snapped.height
+			, left: snapRect.x, width:  snapRect.width
+			, top:  snapRect.y, height: snapRect.height
 		};
 
 		model.add(button);		
