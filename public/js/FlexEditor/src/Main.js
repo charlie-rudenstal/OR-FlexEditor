@@ -28,7 +28,7 @@ function Main(options) {
 		cellSize = cellSize || this.cellSize;
 
 		// Init mouse handler
-		this.bindMouse(element, cellSize);
+		this.mouseHandler = new MouseHandler(element, cellSize, this.renderer, this.model);
 
 		// Render grid
 		this.gridRenderer.render(element, cellSize);
@@ -40,16 +40,6 @@ function Main(options) {
 		this.renderer.write(Templates.Button, buttons, element);
 	}
 
-	me.prototype.bindMouse = function(element, cellSize) {
-		element = element || this.element;
-		cellSize = cellSize || this.cellSize;
-
-		var mouseHandler = new MouseHandler(element, cellSize, this.renderer, this.model);
-
-		$(element).on('mousemove', mouseHandler);
-		$(element).on('mousedown', mouseHandler);
-	}
-	
 	//var start = (new Date).getTime();
 	//for(var i = 0; i < 10000; i++)		
 	//console.log('time', ((new Date).getTime() - start), ' ms');
