@@ -27,12 +27,34 @@ function Main(options) {
 		element = element || this.element;
 		cellSize = cellSize || this.cellSize;
 
+		var model = this.model;
+		var renderer = this.renderer;
+
 		// Init mouse handler
-		this.mouseHandler = new MouseHandler(element, cellSize, this.renderer, this.model);
+		this.mouseHandler = new MouseHandler(element, cellSize, { 
+			onSelected: onSelectedHandler(element, model, renderer)
+		});
 
 		// Render grid
 		this.gridRenderer.render(element, cellSize);
 	};
+
+	var onSelectedHandler = function(element, model, renderer) {
+		return function(rect) {
+			onSelected(rect, element, model, renderer);
+		}
+	}
+
+	var onSelected = function(rect, element, model, renderer) {
+		var button = {
+			  position: 'relative'
+			, text: 'Button'
+			, left: rect.x, width:  rect.width
+			, top:  rect.y, height: rect.height
+		};
+		model.add(button);		
+		renderer.write(Templates.Button, model.getButtons(), element);				
+	}
 
 	me.prototype.render = function(element, buttons)
 	{
