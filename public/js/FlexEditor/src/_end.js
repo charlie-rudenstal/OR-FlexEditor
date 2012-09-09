@@ -5,6 +5,6 @@
 	 */
 	window.OR = window.OR || {};
 	OR.FlexEditor = Main;
-	OR.TestPerformance = TestPerformance;
+	//OR.TestPerformance = TestPerformance;
 
 })(jQuery);

@@ -1,14 +1,49 @@
-body {
-	background-color: #111;	
+* {
+	padding: 0px;
+	margin: 0px;
 }
+
+body {
+}
+
 
 #editor, #editor > div {
 	width: 600px;
 	height: 400px;
-	background-color: #999;
 	position: relative;
+}
+
+.grid-single
+{
+	background-color: #269;
+	background-image: -webkit-linear-gradient(rgba(255, 255, 255, .3) 1px, transparent 1px), 
+					  -webkit-linear-gradient(0deg, rgba(255, 255, 255, .3) 1px, transparent 1px);
+	
+	/*background-size: 20px 20px, 
+					 20px 20px;*/
+					 
+	/*background-size: 10% 10%, 
+					 10% 10%;*/
+}
+
+.grid-double
+{
+	background-color: #269;
+	background-image: -webkit-linear-gradient(white 2px, transparent 2px), 
+					  -webkit-linear-gradient(0deg, white 2px, transparent 2px), 
+					  -webkit-linear-gradient(rgba(255, 255, 255, .3) 1px, transparent 1px), 
+					  -webkit-linear-gradient(0deg, rgba(255, 255, 255, .3) 1px, transparent 1px);
+
+	background-size: 100px 100px, 
+					 100px 100px, 
+					 20px 20px, 
+					 20px 20px;
+
+	/*background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;*/
 }
 
 .component {
 	position: absolute;
+	background-color: green;
 }
+

@@ -3,7 +3,7 @@
  */
 
 function Main(options) {
-	
+
 	// Fetch options or defaults
 	this.element = document.getElementById(options.elementId);
 	this.cellSize = options.cellSize || { width: 10, height: 10 };
@@ -13,6 +13,9 @@ function Main(options) {
 
 	// Init renderer
 	this.renderer = options.renderer || new Renderer();
+
+	// Init Grid renderer
+	this.gridRenderer = options.gridRenderer || new GridRenderer();
 
 	// Compile templates from the tpl folder
 	Templates.init();
@@ -26,12 +29,15 @@ function Main(options) {
 
 		// Init mouse handler
 		this.bindMouse(element, cellSize);
+
+		// Render grid
+		this.gridRenderer.render(element, cellSize);
 	};
 
 	me.prototype.render = function(element, buttons)
 	{
 		element = element || this.element;
-		this.renderer.write(Templates.Button, buttons, this.element);
+		this.renderer.write(Templates.Button, buttons, element);
 	}
 
 	me.prototype.bindMouse = function(element, cellSize) {

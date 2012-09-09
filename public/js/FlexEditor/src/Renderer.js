@@ -3,7 +3,7 @@ function Renderer() {
 };
 
 (function(me) {
-	
+
 	/**
 	 * Transform an array to HTML
 	 * @param func  pre-compiled template function
@@ -13,6 +13,7 @@ function Renderer() {
 	 * 	 width: 30, height: 20 
 	 * }
 	 */
+	
 	me.prototype.render = function(template, buttons) {
 		var html = '', i = -1, len = buttons.length - 1;
 		while(i < len) {
@@ -28,8 +29,8 @@ function Renderer() {
 		var div = document.createElement('div');
 		div.innerHTML = this.render(template, buttons);
 
-		// We need to replace a child within the element,
-		// if there doesn't already exist one - create it.
+		// We need a child element inside the Editor div which 
+		// we can replace, create if not existing
 		if(!toElement.firstChild) {
 			toElement.appendChild(document.createElement('div'));
 		}

@@ -5,5 +5,4 @@ var Templates = Templates || {};
 	Templates.init = function() {	
 		Templates.Button = doT.template(Templates.Raw.Button);
 	}
-
 })();

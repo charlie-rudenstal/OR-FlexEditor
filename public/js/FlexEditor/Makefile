@@ -4,9 +4,12 @@ tpl = src/tpl
 start = 	$(src)/_start.js
 end =		$(src)/_end.js
 
+#$(src)/TestPerformance.js
+			
+
 files = 	$(src)/Main.js\
 	 	 	$(src)/View.js\
-			$(src)/TestPerformance.js\
+			$(src)/GridRenderer.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js
 			
@@ -33,6 +36,14 @@ watch:
 		inotifywait -qqr src; \
 		$(MAKE) -s FlexEditor.js; \
 	done
+
+watchmac:
+	echo Watching for changes and automatically merging FlexEditor.js
+	$(MAKE) -s FlexEditor.js
+	while kqwait src; do \
+		echo build \
+		$(MAKE) -s FlexEditor.js; \
+	done	
 
 .PHONY: watch, FlexEditor.js
 .SILENT: watch FlexEditor.js 

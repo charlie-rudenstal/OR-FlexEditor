@@ -14,10 +14,12 @@ Templates.Raw.Button = '
 
 	<div class="component" 
 		 style="left: {{=it.left}}{{#def.unit}};
-	 	     	top: {{=it.top}}{{#def.unit}};">
+	 	     	top: {{=it.top}}{{#def.unit}};
+	 	     	width: {{=it.width}}{{#def.unit}};
+	 	     	height: {{=it.height}}{{#def.unit}};">
 
 		{{=it.text}}
-
+		
 	</div>
 
 ';
