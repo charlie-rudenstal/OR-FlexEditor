@@ -1,14 +1,14 @@
 body {
-	background-color: #111;
+	background-color: #111;	
 }
 
-.component {
-	position: absolute;
-}
-
-#editor > div {
+#editor, #editor > div {
 	width: 600px;
 	height: 400px;
 	background-color: #999;
 	position: relative;
+}
+
+.component {
+	position: absolute;
 }

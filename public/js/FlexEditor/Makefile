@@ -5,6 +5,7 @@ start = 	$(src)/_start.js
 end =		$(src)/_end.js
 
 files = 	$(src)/Main.js\
+	 	 	$(src)/View.js\
 			$(src)/TestPerformance.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js
