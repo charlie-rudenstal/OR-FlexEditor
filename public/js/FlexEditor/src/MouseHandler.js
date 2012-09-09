@@ -17,8 +17,7 @@ function MouseHandler(element, cellSize, callbacks) {
 		}
 	}
 
-	function eventHandler(e, elementRect, cellSize, callbacks) {
-		
+	function eventHandler(e, elementRect, cellSize, callbacks) {		
 		var mouse = { x: e.pageX, y: e.pageY };		
 		var absolute  = subtract(mouse, elementRect);
 		var relative  = percentage(absolute, elementRect);		
@@ -29,7 +28,7 @@ function MouseHandler(element, cellSize, callbacks) {
 				onMouseMove.call(this, snapRect); 
 				break;
 			case 'mousedown': 
-				callbacks.onSelected(snapRect);
+				callbacks.onSelected({rect: snapRect});
 				onMouseDown.call(this, snapRect);				
 				break;		
 		}

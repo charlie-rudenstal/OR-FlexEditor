@@ -32,28 +32,30 @@ function Main(options) {
 
 		// Init mouse handler
 		this.mouseHandler = new MouseHandler(element, cellSize, { 
-			onSelected: onSelectedHandler(element, model, renderer)
+			onSelected: eventHandler(onSelected, { element: element, 
+												   model: model, 
+												   renderer: renderer })
 		});
 
 		// Render grid
 		this.gridRenderer.render(element, cellSize);
 	};
 
-	var onSelectedHandler = function(element, model, renderer) {
-		return function(rect) {
-			onSelected(rect, element, model, renderer);
+	var eventHandler = function(action, dependencies) {
+		return function(e) {
+			action(e, dependencies);
 		}
 	}
 
-	var onSelected = function(rect, element, model, renderer) {
+	var onSelected = function(e, context) {
 		var button = {
 			  position: 'relative'
 			, text: 'Button'
-			, left: rect.x, width:  rect.width
-			, top:  rect.y, height: rect.height
+			, left: e.rect.x, width:  e.rect.width
+			, top:  e.rect.y, height: e.rect.height
 		};
-		model.add(button);		
-		renderer.write(Templates.Button, model.getButtons(), element);				
+		context.model.add(button);		
+		context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
 	}
 
 	me.prototype.render = function(element, buttons)
