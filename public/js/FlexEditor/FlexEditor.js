@@ -82,12 +82,12 @@ function Main(options) {
 	};
 
 	var onMouseDown = function(e) {
-		var c = e.cell;
+		var cell = e.cell;
 		var button = {
 			  position: 'relative'
 			, text: 'Button'
-			, left: c.left, width:  c.width
-			, top:  c.top,  height: c.height
+			, left: cell.left, width:  cell.width
+			, top:  cell.top,  height: cell.height
 		};
 
 		this.model.add(button);
@@ -138,11 +138,25 @@ function GridRenderer() {
 
 (function(me) {
 
+	// Beware: Vertical gridlines disappear for unknown reason
+	// around 644-750 (caused by pixel rounding?) 
 	me.prototype.render = function(element, cellSize) {
 		$(element).addClass('grid-single');
 
-		var width = cellSize.width + '%';
-		var height = cellSize.height + '%';
+		// var unit = '%';
+		var unit = '%';
+
+		// var elementWidth = $(element).width();
+		// var elementHeight = $(element).height();
+
+		// var absoluteWidth = (cellSize.width / 100) * elementWidth;
+		// var absoluteHeight = (cellSize.height / 100) * elementHeight;
+
+		// var width = ~~absoluteWidth + unit;
+		// var height = ~~absoluteHeight + unit;
+
+		var width = cellSize.width + unit;
+		var height = cellSize.height + unit;
 
 		var css = height +  ' ' + height + ', ' +
 				  width  +  ' ' + width;

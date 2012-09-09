@@ -4,13 +4,26 @@
 }
 
 body {
+	width: 100%;
+	height: 100%;
 }
 
 
 #editor, #editor > div {
+
 	width: 600px;
 	height: 400px;
-	position: relative;
+/*
+	width: 100%;
+	height: 100%;*/
+
+	/*position: relative;*/
+	position: absolute;
+}
+
+.component {
+	position: absolute;
+	background-color: green;
 }
 
 .grid-single
@@ -24,6 +37,7 @@ body {
 					 
 	/*background-size: 10% 10%, 
 					 10% 10%;*/
+
 }
 
 .grid-double
@@ -41,9 +55,3 @@ body {
 
 	/*background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;*/
 }
-
-.component {
-	position: absolute;
-	background-color: green;
-}
-

@@ -81,12 +81,12 @@ function Main(options) {
 	};
 
 	var onMouseDown = function(e) {
-		var c = e.cell;
+		var cell = e.cell;
 		var button = {
 			  position: 'relative'
 			, text: 'Button'
-			, left: c.left, width:  c.width
-			, top:  c.top,  height: c.height
+			, left: cell.left, width:  cell.width
+			, top:  cell.top,  height: cell.height
 		};
 
 		this.model.add(button);
