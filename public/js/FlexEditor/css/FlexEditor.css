@@ -23,7 +23,12 @@ body {
 
 .component {
 	position: absolute;
-	background-color: green;
+	background-color: #3276a9;
+	color: #ccc;
+	font-family: helvetica;
+	font-size: 14px;
+	text-align: center;
+	line-height: 41px;
 }
 
 .grid-single
