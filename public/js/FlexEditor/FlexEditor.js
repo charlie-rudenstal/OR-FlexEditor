@@ -110,43 +110,47 @@ function GridRenderer() {
 		element.style.backgroundSize = css;
 	}
 
-})(GridRenderer);// background-size: 10% 10%, 10% 10%;
+})(GridRenderer);// TODO: Move to common location/helper
+var eventHandler = function(action, context) {
+	return function(e) {
+		action(e, context);
+	}
+}
 
 function MouseHandler(element, cellSize, callbacks) {
-	var eventHandler = MouseHandler.getEventHandler(element, cellSize, callbacks);		
-	$(element).on('mousemove', eventHandler);
-	$(element).on('mousedown', eventHandler);
+	
+	var elementRect = MouseHandler.getElementRect(element);
+
+	$(element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, {
+		element: element, 
+		elementRect: elementRect, 
+		cellSize: cellSize, 
+		callbacks: callbacks
+	}));
+
 };
 
 (function(me) {
 
-	me.getEventHandler = function(element, cellSize, callbacks) {		
-		// Store size of the container once when loaded 
-		// (needed to calculate relative mouse position)
-		var elementRect = getElementRect(element);
-		return function(e) {
-			eventHandler(e, elementRect, cellSize, callbacks);			
-		}
-	}
+	me.onMouseEvent = function(e, context) {
 
-	function eventHandler(e, elementRect, cellSize, callbacks) {		
-		var mouse = { x: e.pageX, y: e.pageY };		
-		var absolute  = subtract(mouse, elementRect);
-		var relative  = percentage(absolute, elementRect);		
-		var snapRect  = getSnappedRect(relative, cellSize);
+		var mouse     = { x: e.pageX, y: e.pageY };
+		var absolute  = subtract(mouse, context.elementRect);
+		var relative  = percentage(absolute, context.elementRect);		
+		var snapRect  = getSnappedRect(relative, context.cellSize);
  		
-		switch(e.type) {		
+		switch (e.type) {		
 			case 'mousemove': 
 				onMouseMove.call(this, snapRect); 
 				break;
-			case 'mousedown': 
-				callbacks.onSelected({rect: snapRect});
-				onMouseDown.call(this, snapRect);				
+			case 'mousedown':
+				context.callbacks.onSelected({rect: snapRect});
+				//$(context.element).on('mousemove', eventHandler(onMouseEvent, context));
 				break;		
 		}
 	}
 
-	function getElementRect(element) {
+	me.getElementRect = function(element) {
 		var position = $(element).position();			
 		return {
 			  x: position.left
@@ -183,14 +187,6 @@ function MouseHandler(element, cellSize, callbacks) {
 			width:  cellSize.width,
 			height: cellSize.height
 		};
-	}
-
-	var onMouseMove = function(snapRect) {
-
-	}
-
-	var onMouseDown = function(snapRect) {
-	
 	}
 
 })(MouseHandler);function Renderer() {
