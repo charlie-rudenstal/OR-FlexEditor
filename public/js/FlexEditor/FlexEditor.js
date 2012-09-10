@@ -119,16 +119,12 @@ var eventHandler = function(action, context) {
 }
 
 function MouseHandler(element, cellSize, callbacks) {
-	
-	var elementRect = MouseHandler.getElementRect(element);
-
 	var context = {
 		element: element, 
-		elementRect: elementRect, 
+		elementRect: MouseHandler.getElementRect(element), 
 		cellSize: cellSize, 
 		callbacks: callbacks	
 	};
-
 	$(element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, context));
 	$(element).on('mouseup', eventHandler(MouseHandler.onMouseEvent, context));
 };
@@ -136,7 +132,6 @@ function MouseHandler(element, cellSize, callbacks) {
 (function(me) {
 
 	me.onMouseEvent = function(e, context) {
-
 		var mouse     = { x: e.pageX, y: e.pageY };
 		var absolute  = subtract(mouse, context.elementRect);
 		var relative  = percentage(absolute, context.elementRect);		
@@ -168,35 +163,13 @@ function MouseHandler(element, cellSize, callbacks) {
 		};
 	}
 
-	/*function rect(x1, y1, x2, y2) {		
-		var x = Math.min(x1, x2)
-		  , y = Math.min(y1, y2);
-
-		var	width = Math.max(x1, x2) - x
-		  , height = Math.max(y1, y2) - y;
-
-		return { 
-			x: x, 
-			y: y, 
-			width: width,
-			height: height
-		};
-	}*/
-
-	// w70 h70 x10 y10
 	function rectFrom(rect1, rect2) {
-		
-		var x = Math.min(rect1.x, rect2.x);
-		var y = Math.min(rect1.y, rect2.y);
-		var width = Math.max(rect1.x + rect1.width, rect2.x + rect2.width) - x;
-		var height = Math.max(rect1.y + rect1.height, rect2.y + rect2.height) - y;
-
-		return {
-			x: x,
-			y: y,
-			width: width,
-			height: height
-		};
+		var rect = {};
+		rect.x = Math.min(rect1.x, rect2.x);
+		rect.y = Math.min(rect1.y, rect2.y);
+		rect.width = Math.max(rect1.x + rect1.width, rect2.x + rect2.width) - rect.x;
+		rect.height = Math.max(rect1.y + rect1.height, rect2.y + rect2.height) - rect.y;
+		return rect;
 	}
 
 	function subtract(point1, point2) {
