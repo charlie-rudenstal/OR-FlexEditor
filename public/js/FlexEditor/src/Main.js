@@ -3,49 +3,40 @@
  */
 
 function Main(options) {
-
-	// Fetch options or defaults
-	this.element = document.getElementById(options.elementId);
-	this.cellSize = options.cellSize || { width: 10, height: 10 };
-	
-	// Init view model
-	this.model = options.view || new View();	
-
-	// Init renderer
-	this.renderer = options.renderer || new Renderer();
-
-	// Init Grid renderer
-	this.gridRenderer = options.gridRenderer || new GridRenderer();
-
-	// Compile templates from the tpl folder
-	Templates.init();
+	this.options = options;
 };
 
 (function(me) {
 
-	me.prototype.load = function(element, cellSize) {
-		element = element || this.element;
-		cellSize = cellSize || this.cellSize;
+	me.prototype.load = function(options) {
+		
+		// Merge parameter-options with the constructor-options
+		var options = $.extend({}, this.options, options);
 
-		var model = this.model;
-		var renderer = this.renderer;
+		// Fetch options or defaults
+		var element = document.getElementById(options.elementId);
+		var cellSize = options.cellSize || { width: 10, height: 10 };
+		
+		// Init view model
+		var model = options.view || new View();	
+
+		// Init renderer
+		var renderer = options.renderer || new Renderer();
+
+		// Init Grid renderer and render the grid
+		var gridRenderer = options.gridRenderer || new GridRenderer();
+		gridRenderer.render(element, cellSize);
+
+		// Compile templates from the tpl folder
+		Templates.init();
 
 		// Init mouse handler
-		this.mouseHandler = new MouseHandler(element, cellSize, { 
+		var mouseHandler = new MouseHandler(element, cellSize, { 
 			onSelected: eventHandler(onSelected, { element: element, 
 												   model: model, 
 												   renderer: renderer })
 		});
-
-		// Render grid
-		this.gridRenderer.render(element, cellSize);
 	};
-
-	var eventHandler = function(action, dependencies) {
-		return function(e) {
-			action(e, dependencies);
-		}
-	}
 
 	var onSelected = function(e, context) {
 		var button = {
@@ -58,10 +49,10 @@ function Main(options) {
 		context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
 	}
 
-	me.prototype.render = function(element, buttons)
-	{
-		element = element || this.element;
-		this.renderer.write(Templates.Button, buttons, element);
+	var eventHandler = function(action, dependencies) {
+		return function(e) {
+			action(e, dependencies);
+		}
 	}
 
 	//var start = (new Date).getTime();
