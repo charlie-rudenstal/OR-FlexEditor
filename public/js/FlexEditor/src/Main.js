@@ -41,12 +41,13 @@ function Main(options) {
 	var onSelected = function(e, context) {
 		var button = {
 			  position: 'relative'
-			, text: 'Button'
+			, text: ''
 			, left: e.rect.x, width:  e.rect.width
 			, top:  e.rect.y, height: e.rect.height
 		};
-		context.model.add(button);		
-		context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
+		context.renderer.write(Templates.Button, [button], context.element);
+		//context.model.add(button);		
+		//context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
 	}
 
 	var eventHandler = function(action, context) {
