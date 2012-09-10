@@ -30,11 +30,14 @@ function Main(options) {
 		var gridRenderer = options.gridRenderer || new GridRenderer();
 		gridRenderer.render(element, cellSize);
 
-		// Init mouse handler
-		var mouseHandler = new MouseHandler(element, cellSize, { 
-			onSelected: eventHandler(onSelected, { element: element, 
-												   model: model, 
-												   renderer: renderer })
+		// Init mouse handler and handle onSelected (grid selection)
+		var mouseHandler = new MouseHandler({
+			  element: element
+			, cellSize: cellSize 
+			, onSelected: eventHandler(onSelected, { 
+				  element: element 
+				, model: model
+				, renderer: renderer })
 		});
 	};
 
@@ -46,14 +49,12 @@ function Main(options) {
 			, top:  e.rect.y, height: e.rect.height
 		};
 		context.renderer.write(Templates.Button, [button], context.element);
+		
+		// Idea: Call a new function when a new button is created 
+		// where the new button is injected to a button array 
+		// instead of using this storage?
 		//context.model.add(button);		
 		//context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
-	}
-
-	var eventHandler = function(action, context) {
-		return function(e) {
-			action(e, context);
-		}
 	}
 
 	//var start = (new Date).getTime();

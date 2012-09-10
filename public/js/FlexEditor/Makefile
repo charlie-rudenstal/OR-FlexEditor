@@ -11,6 +11,7 @@ files = 	$(src)/Main.js\
 	 	 	$(src)/View.js\
 			$(src)/GridRenderer.js\
 			$(src)/MouseHandler.js\
+			$(src)/EventHandler.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js
 			

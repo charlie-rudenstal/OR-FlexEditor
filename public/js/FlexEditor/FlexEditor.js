@@ -31,11 +31,14 @@ function Main(options) {
 		var gridRenderer = options.gridRenderer || new GridRenderer();
 		gridRenderer.render(element, cellSize);
 
-		// Init mouse handler
-		var mouseHandler = new MouseHandler(element, cellSize, { 
-			onSelected: eventHandler(onSelected, { element: element, 
-												   model: model, 
-												   renderer: renderer })
+		// Init mouse handler and handle onSelected (grid selection)
+		var mouseHandler = new MouseHandler({
+			  element: element
+			, cellSize: cellSize 
+			, onSelected: eventHandler(onSelected, { 
+				  element: element 
+				, model: model
+				, renderer: renderer })
 		});
 	};
 
@@ -47,14 +50,12 @@ function Main(options) {
 			, top:  e.rect.y, height: e.rect.height
 		};
 		context.renderer.write(Templates.Button, [button], context.element);
+		
+		// Idea: Call a new function when a new button is created 
+		// where the new button is injected to a button array 
+		// instead of using this storage?
 		//context.model.add(button);		
 		//context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
-	}
-
-	var eventHandler = function(action, context) {
-		return function(e) {
-			action(e, context);
-		}
 	}
 
 	//var start = (new Date).getTime();
@@ -111,27 +112,29 @@ function GridRenderer() {
 		element.style.backgroundSize = css;
 	}
 
-})(GridRenderer);// TODO: Move to common location/helper
-var eventHandler = function(action, context) {
-	return function(e) {
-		action(e, context);
-	}
-}
-
-function MouseHandler(element, cellSize, callbacks) {
-	var context = {
-		element: element, 
-		elementRect: MouseHandler.getElementRect(element), 
-		cellSize: cellSize, 
-		callbacks: callbacks	
-	};
-	$(element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, context));
-	$(element).on('mouseup', eventHandler(MouseHandler.onMouseEvent, context));
+})(GridRenderer);function MouseHandler(options) {
+	$(options.element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, {
+		element: options.element,  
+		cellSize: options.cellSize,
+		onSelected: options.onSelected	
+	}));
 };
 
 (function(me) {
 
+	/**
+	 * Handle a mouse event and call onSelected(rect) when user interacts
+	 * @param  obj e       Mouse Event
+	 * @param  obj context Current Context {element, cellSize, onSelected}
+	 */
 	me.onMouseEvent = function(e, context) {
+
+		// Retrieve element size (rectangle) if not supplied
+		if(context.elementRect == null) {
+			return me.onMouseEvent(e, $.extend(context, {elementRect: getElementRect(context.element)}));
+		}
+
+		// Retrieve mouse position and a rectangle it snaps to given cellsize
 		var mouse     = { x: e.pageX, y: e.pageY };
 		var absolute  = subtract(mouse, context.elementRect);
 		var relative  = percentage(absolute, context.elementRect);		
@@ -139,13 +142,15 @@ function MouseHandler(element, cellSize, callbacks) {
 
 		switch (e.type) {		
 			case 'mousemove':
-				var totalRect = rectFrom(context.snapRectStart, snapRect);
-				context.callbacks.onSelected({rect: totalRect});
+				context.onSelected({
+					rect: rectFrom(context.snapRectStart, snapRect)
+				});
 				break;
 			case 'mousedown':			
-				context.callbacks.onSelected({rect: snapRect}); 
-				context.snapRectStart = snapRect;
-				$(context.element).on('mousemove', eventHandler(me.onMouseEvent, context));
+				context.onSelected({rect: snapRect});
+				newContext = $.extend(context, {snapRectStart: snapRect});
+				$(context.element).on('mousemove', eventHandler(me.onMouseEvent, newContext));
+				$(context.element).on('mouseup', eventHandler(me.onMouseEvent, newContext));
 				break;		
 			case 'mouseup': 
 				$(context.element).off('mousemove');
@@ -153,7 +158,7 @@ function MouseHandler(element, cellSize, callbacks) {
 		}
 	}
 
-	me.getElementRect = function(element) {
+	function getElementRect(element) {
 		var position = $(element).position();			
 		return {
 			  x: position.left
@@ -191,7 +196,7 @@ function MouseHandler(element, cellSize, callbacks) {
 	 * @param  object cellSize  Expects {width, height} for snapping  
 	 * @return object           {left, top, width, height}
 	 */
-	var getSnappedRect = function(point, cellSize) {
+	function getSnappedRect(point, cellSize) {
 		return {
 			// 					      ~~ is a fast way to trim decimals
 			x:      cellSize.width  * ~~(point.x / cellSize.width),
@@ -201,7 +206,11 @@ function MouseHandler(element, cellSize, callbacks) {
 		};
 	}
 
-})(MouseHandler);function Renderer() {
+})(MouseHandler);function eventHandler(action, context) {
+	return function(e) {
+		action(e, context);
+	}
+};function Renderer() {
 
 };
 
