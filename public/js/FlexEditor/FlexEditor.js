@@ -50,9 +50,9 @@ function Main(options) {
 		context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
 	}
 
-	var eventHandler = function(action, dependencies) {
+	var eventHandler = function(action, context) {
 		return function(e) {
-			action(e, dependencies);
+			action(e, context);
 		}
 	}
 
