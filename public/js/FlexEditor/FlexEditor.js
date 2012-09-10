@@ -24,12 +24,12 @@ function Main(options) {
 		// Init renderer
 		var renderer = options.renderer || new Renderer();
 
+		// Init templates from the tpl folder
+		Templates.init();
+
 		// Init Grid renderer and render the grid
 		var gridRenderer = options.gridRenderer || new GridRenderer();
 		gridRenderer.render(element, cellSize);
-
-		// Compile templates from the tpl folder
-		Templates.init();
 
 		// Init mouse handler
 		var mouseHandler = new MouseHandler(element, cellSize, { 
