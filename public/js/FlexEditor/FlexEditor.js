@@ -31,24 +31,29 @@ function Main(options) {
 		var gridRenderer = options.gridRenderer || new GridRenderer();
 		gridRenderer.render(element, cellSize);
 
-		// Init mouse handler and handle onSelected (grid selection)
+		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler({
 			  element: element
 			, cellSize: cellSize 
-			, onSelected: eventHandler(onSelected, { 
+			, onPreSelection: eventHandler(onPreSelection, { 
 				  element: element 
+				, model: model
+				, renderer: renderer })
+			, onSelection: eventHandler(onSelection, {
+				  element: element
 				, model: model
 				, renderer: renderer })
 		});
 	};
 
-	var onSelected = function(e, context) {
+	var onPreSelection = function(e, context) {
 		var button = {
 			  position: 'relative'
 			, text: ''
 			, left: e.rect.x, width:  e.rect.width
 			, top:  e.rect.y, height: e.rect.height
 		};
+
 		context.renderer.write(Templates.Button, [button], context.element);
 		
 		// Idea: Call a new function when a new button is created 
@@ -56,6 +61,15 @@ function Main(options) {
 		// instead of using this storage?
 		//context.model.add(button);		
 		//context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
+	}
+
+	var onSelection = function(e, context) {
+			
+		Modal.getResults(Templates.CreateButtonModal, context.renderer);
+
+		//context.renderer.write(Templates.CreateButtonModal, [{}], document.body);
+		//$('.modal').modal();
+		//console.log($('.modal'));
 	}
 
 	//var start = (new Date).getTime();
@@ -116,16 +130,17 @@ function GridRenderer() {
 	$(options.element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, {
 		element: options.element,  
 		cellSize: options.cellSize,
-		onSelected: options.onSelected	
+		onPreSelection: options.onPreSelection,
+		onSelection: options.onSelection
 	}));
 };
 
 (function(me) {
 
 	/**
-	 * Handle a mouse event and call onSelected(rect) when user interacts
+	 * Handle a mouse event and call onPreSelection(rect) when user interacts
 	 * @param  obj e       Mouse Event
-	 * @param  obj context Current Context {element, cellSize, onSelected}
+	 * @param  obj context Current Context {element, cellSize, onPreSelection}
 	 */
 	me.onMouseEvent = function(e, context) {
 
@@ -142,18 +157,22 @@ function GridRenderer() {
 
 		switch (e.type) {		
 			case 'mousemove':
-				context.onSelected({
+				context.onPreSelection({
 					rect: rectFrom(context.snapRectStart, snapRect)
 				});
 				break;
 			case 'mousedown':			
-				context.onSelected({rect: snapRect});
+				context.onPreSelection({rect: snapRect});
 				newContext = $.extend(context, {snapRectStart: snapRect});
 				$(context.element).on('mousemove', eventHandler(me.onMouseEvent, newContext));
 				$(context.element).on('mouseup', eventHandler(me.onMouseEvent, newContext));
 				break;		
 			case 'mouseup': 
 				$(context.element).off('mousemove');
+				$(context.element).off('mouseup');
+				context.onSelection({
+					rect: rectFrom(context.snapRectStart, snapRect)
+				});
 				break;
 		}
 	}
@@ -210,36 +229,75 @@ function GridRenderer() {
 	return function(e) {
 		action(e, context);
 	}
-};function Renderer() {
+};function Modal(options) {
+	return {
+		getResults: Model.getResults.bind(Model, options.contentsTemplate,
+												 options.renderer,
+												 options.onRetrieved)
+	};
+};
+
+(function(me) {
+
+	me.getResults = function(contentsTemplate, renderer, onRetrieved) {
+		var contents = renderer.render(Templates.CreateButtonModal, [{}]);
+			
+		renderer.write(Templates.Modal, [{
+
+			header: "Modal",
+			body: contents
+
+		}], document.body);
+
+		// Retrieve a reference to the generated modal element
+		var modal = $('.modal');
+
+		// Enable js behaviors for twitter bootstrap
+		modal.modal();
+		
+		modal.find('.btn-primary').click(function() {
+			// Serialize form data with jquery
+			
+			var results = modal.find('form').serializeObject();
+
+			//console.log(modal.find('form'));
+
+			console.log(results);
+
+		})
+	}
+
+})(Modal);function Renderer() {
 
 };
 
 (function(me) {
 
 	/**
-	 * Transform an array to HTML
+	 * Transform an array of data objects to HTML using
+	 * the provided template function
 	 * @param func  pre-compiled template function
-	 * @param array buttons of {
+	 * @param array array of {
 	 * 	 position: 'relative',	
 	 * 	 left: 30,  top: 10,
 	 * 	 width: 30, height: 20 
 	 * }
 	 */
 	
-	me.prototype.render = function(template, buttons) {
-		var html = '', i = -1, len = buttons.length - 1;
+	me.prototype.render = function(template, array) {
+		var html = '', i = -1, len = array.length - 1;
 		while(i < len) {
-			html += template(buttons[i += 1]);			
+			html += template(array[i += 1]);			
 		}
 		return html;
 	}
 
-	me.prototype.write = function(template, buttons, toElement)
+	me.prototype.write = function(template, array, toElement)
 	{		
 		// Creating empty div, set innerHTML and then replaceChild
 		// is a major performance boost compared to just innerHTML
 		var div = document.createElement('div');
-		div.innerHTML = this.render(template, buttons);
+		div.innerHTML = this.render(template, array);
 
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing
@@ -253,11 +311,13 @@ function GridRenderer() {
 })(Renderer);var Templates = Templates || {};
 
 (function() {
-	
 	Templates.init = function() {	
+		// TODO: Loop Templates.Raw and do this automatically
 		Templates.Button = doT.template(Templates.Raw.Button);
+		Templates.Modal = doT.template(Templates.Raw.Modal);
+		Templates.CreateButtonModal = doT.template(Templates.Raw.CreateButtonModal);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal">    <div class="control-group">      <label class="control-label" for="inputText">Text</label>      <div class="controls">        <input type="text" name="inputText" id="inputText" placeholder="Text" />      </div>    </div>  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  <div class="modal-body">    {{=it.body}}  </div>  <div class="modal-footer">    <a href="#" class="btn" data-dismiss="modal">Close</a>    <a href="#" class="btn btn-primary">Save changes</a>  </div></div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

@@ -12,10 +12,13 @@ files = 	$(src)/Main.js\
 			$(src)/GridRenderer.js\
 			$(src)/MouseHandler.js\
 			$(src)/EventHandler.js\
+			$(src)/Modal.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js
 			
-templates = $(tpl)/button.tpl
+templates = $(tpl)/button.tpl\
+			$(tpl)/createButton.modal.tpl\
+			$(tpl)/modal.tpl
 
 FlexEditor.js: ${files}
 

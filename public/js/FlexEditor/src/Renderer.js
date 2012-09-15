@@ -5,29 +5,30 @@ function Renderer() {
 (function(me) {
 
 	/**
-	 * Transform an array to HTML
+	 * Transform an array of data objects to HTML using
+	 * the provided template function
 	 * @param func  pre-compiled template function
-	 * @param array buttons of {
+	 * @param array array of {
 	 * 	 position: 'relative',	
 	 * 	 left: 30,  top: 10,
 	 * 	 width: 30, height: 20 
 	 * }
 	 */
 	
-	me.prototype.render = function(template, buttons) {
-		var html = '', i = -1, len = buttons.length - 1;
+	me.prototype.render = function(template, array) {
+		var html = '', i = -1, len = array.length - 1;
 		while(i < len) {
-			html += template(buttons[i += 1]);			
+			html += template(array[i += 1]);			
 		}
 		return html;
 	}
 
-	me.prototype.write = function(template, buttons, toElement)
+	me.prototype.write = function(template, array, toElement)
 	{		
 		// Creating empty div, set innerHTML and then replaceChild
 		// is a major performance boost compared to just innerHTML
 		var div = document.createElement('div');
-		div.innerHTML = this.render(template, buttons);
+		div.innerHTML = this.render(template, array);
 
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing

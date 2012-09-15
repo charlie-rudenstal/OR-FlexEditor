@@ -30,24 +30,29 @@ function Main(options) {
 		var gridRenderer = options.gridRenderer || new GridRenderer();
 		gridRenderer.render(element, cellSize);
 
-		// Init mouse handler and handle onSelected (grid selection)
+		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler({
 			  element: element
 			, cellSize: cellSize 
-			, onSelected: eventHandler(onSelected, { 
+			, onPreSelection: eventHandler(onPreSelection, { 
 				  element: element 
+				, model: model
+				, renderer: renderer })
+			, onSelection: eventHandler(onSelection, {
+				  element: element
 				, model: model
 				, renderer: renderer })
 		});
 	};
 
-	var onSelected = function(e, context) {
+	var onPreSelection = function(e, context) {
 		var button = {
 			  position: 'relative'
 			, text: ''
 			, left: e.rect.x, width:  e.rect.width
 			, top:  e.rect.y, height: e.rect.height
 		};
+
 		context.renderer.write(Templates.Button, [button], context.element);
 		
 		// Idea: Call a new function when a new button is created 
@@ -55,6 +60,15 @@ function Main(options) {
 		// instead of using this storage?
 		//context.model.add(button);		
 		//context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
+	}
+
+	var onSelection = function(e, context) {
+			
+		Modal.getResults(Templates.CreateButtonModal, context.renderer);
+
+		//context.renderer.write(Templates.CreateButtonModal, [{}], document.body);
+		//$('.modal').modal();
+		//console.log($('.modal'));
 	}
 
 	//var start = (new Date).getTime();
