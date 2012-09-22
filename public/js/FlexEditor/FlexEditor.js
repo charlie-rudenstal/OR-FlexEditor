@@ -22,7 +22,7 @@ function Main(options) {
 		var model = options.view || new View();	
 
 		// Init renderer
-		var renderer = options.renderer || new Renderer();
+		var renderer = options.renderer || new Renderer({toElement: element});
 
 		// Init templates from the tpl folder
 		Templates.init();
@@ -35,16 +35,11 @@ function Main(options) {
 		var mouseHandler = new MouseHandler({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onPreSelection, { 
-				  element: element 
-				, model: model
-				, renderer: renderer })
-			, onSelection: eventHandler(onSelection, {
-				  element: element
-				, model: model
-				, renderer: renderer })
+			, onPreSelection: eventHandler(onPreSelection, { renderer: renderer })
+			, onSelection: eventHandler(onSelection, { renderer: renderer })
 		});
 	};
+
 
 	var onPreSelection = function(e, context) {
 		var button = {
@@ -64,12 +59,19 @@ function Main(options) {
 	}
 
 	var onSelection = function(e, context) {
-			
-		Modal.getResults(Templates.CreateButtonModal, context.renderer);
+		
+		Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
 
-		//context.renderer.write(Templates.CreateButtonModal, [{}], document.body);
-		//$('.modal').modal();
-		//console.log($('.modal'));
+			var button = {
+				  position: 'relative'
+				, text: results.inputText
+				, left: e.rect.x, width:  e.rect.width
+				, top:  e.rect.y, height: e.rect.height
+			};
+
+			context.renderer.write(Templates.Button, button, context.element);
+
+		});
 	}
 
 	//var start = (new Date).getTime();
@@ -156,20 +158,25 @@ function GridRenderer() {
 		var snapRect  = getSnappedRect(relative, context.cellSize);
 
 		switch (e.type) {		
+			case 'mousedown':			
+				context.onPreSelection({rect: snapRect});
+				newContext = $.extend(context, {snapRectStart: snapRect});
+
+				// two available events when mouse is down: mousemove, mouseup
+				$(context.element).off('mousedown');
+				$(context.element).on('mousemove', eventHandler(me.onMouseEvent, newContext));
+				$(context.element).on('mouseup', eventHandler(me.onMouseEvent, newContext));
+				break;
 			case 'mousemove':
 				context.onPreSelection({
 					rect: rectFrom(context.snapRectStart, snapRect)
 				});
 				break;
-			case 'mousedown':			
-				context.onPreSelection({rect: snapRect});
-				newContext = $.extend(context, {snapRectStart: snapRect});
-				$(context.element).on('mousemove', eventHandler(me.onMouseEvent, newContext));
-				$(context.element).on('mouseup', eventHandler(me.onMouseEvent, newContext));
-				break;		
 			case 'mouseup': 
+				// one available events when mouse is up: (mousedown)
 				$(context.element).off('mousemove');
 				$(context.element).off('mouseup');
+				$(context.element).on('mousedown', eventHandler(me.onMouseEvent, context));
 				context.onSelection({
 					rect: rectFrom(context.snapRectStart, snapRect)
 				});
@@ -254,21 +261,28 @@ function GridRenderer() {
 
 		// Enable js behaviors for twitter bootstrap
 		modal.modal();
+
+		// Give focus to first text area (autofocus don't work with twitter bootstraps modal)
+		modal.find('input:first-child').focus();
 		
-		modal.find('.btn-primary').click(function() {
+		var onSubmit = function() {
 			// Serialize form data with jquery
-			
 			var results = modal.find('form').serializeObject();
+			// Pass form data to callback and close modal
+			onRetrieved(results);
+			modal.modal('hide');
+		}		
 
-			//console.log(modal.find('form'));
-
-			console.log(results);
-
+		modal.find('.btn-primary').click(onSubmit);
+		modal.find('form').submit(function(e) {
+			onSubmit();
+			e.preventDefault();
 		})
+
 	}
 
-})(Modal);function Renderer() {
-
+})(Modal);function Renderer(options) {
+	this.options = options;
 };
 
 (function(me) {
@@ -285,6 +299,13 @@ function GridRenderer() {
 	 */
 	
 	me.prototype.render = function(template, array) {
+		array = array || this.options.array;
+
+		// Allow a single element by turning it into an array
+		if($.isArray(array) === false) {
+			array = [array];
+		}		
+
 		var html = '', i = -1, len = array.length - 1;
 		while(i < len) {
 			html += template(array[i += 1]);			
@@ -292,8 +313,9 @@ function GridRenderer() {
 		return html;
 	}
 
-	me.prototype.write = function(template, array, toElement)
-	{		
+	me.prototype.write = function(template, array, toElement) {
+		toElement = toElement || this.options.toElement;
+
 		// Creating empty div, set innerHTML and then replaceChild
 		// is a major performance boost compared to just innerHTML
 		var div = document.createElement('div');
@@ -304,7 +326,7 @@ function GridRenderer() {
 		if(!toElement.firstChild) {
 			toElement.appendChild(document.createElement('div'));
 		}
-		
+
 		toElement.replaceChild(div, toElement.firstChild);
 	}
 

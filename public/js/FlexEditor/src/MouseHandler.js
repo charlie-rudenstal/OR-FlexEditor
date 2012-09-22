@@ -28,20 +28,25 @@ function MouseHandler(options) {
 		var snapRect  = getSnappedRect(relative, context.cellSize);
 
 		switch (e.type) {		
+			case 'mousedown':			
+				context.onPreSelection({rect: snapRect});
+				newContext = $.extend(context, {snapRectStart: snapRect});
+
+				// two available events when mouse is down: mousemove, mouseup
+				$(context.element).off('mousedown');
+				$(context.element).on('mousemove', eventHandler(me.onMouseEvent, newContext));
+				$(context.element).on('mouseup', eventHandler(me.onMouseEvent, newContext));
+				break;
 			case 'mousemove':
 				context.onPreSelection({
 					rect: rectFrom(context.snapRectStart, snapRect)
 				});
 				break;
-			case 'mousedown':			
-				context.onPreSelection({rect: snapRect});
-				newContext = $.extend(context, {snapRectStart: snapRect});
-				$(context.element).on('mousemove', eventHandler(me.onMouseEvent, newContext));
-				$(context.element).on('mouseup', eventHandler(me.onMouseEvent, newContext));
-				break;		
 			case 'mouseup': 
+				// one available events when mouse is up: (mousedown)
 				$(context.element).off('mousemove');
 				$(context.element).off('mouseup');
+				$(context.element).on('mousedown', eventHandler(me.onMouseEvent, context));
 				context.onSelection({
 					rect: rectFrom(context.snapRectStart, snapRect)
 				});

@@ -21,7 +21,7 @@ function Main(options) {
 		var model = options.view || new View();	
 
 		// Init renderer
-		var renderer = options.renderer || new Renderer();
+		var renderer = options.renderer || new Renderer({toElement: element});
 
 		// Init templates from the tpl folder
 		Templates.init();
@@ -34,16 +34,11 @@ function Main(options) {
 		var mouseHandler = new MouseHandler({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onPreSelection, { 
-				  element: element 
-				, model: model
-				, renderer: renderer })
-			, onSelection: eventHandler(onSelection, {
-				  element: element
-				, model: model
-				, renderer: renderer })
+			, onPreSelection: eventHandler(onPreSelection, { renderer: renderer })
+			, onSelection: eventHandler(onSelection, { renderer: renderer })
 		});
 	};
+
 
 	var onPreSelection = function(e, context) {
 		var button = {
@@ -63,12 +58,19 @@ function Main(options) {
 	}
 
 	var onSelection = function(e, context) {
-			
-		Modal.getResults(Templates.CreateButtonModal, context.renderer);
+		
+		Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
 
-		//context.renderer.write(Templates.CreateButtonModal, [{}], document.body);
-		//$('.modal').modal();
-		//console.log($('.modal'));
+			var button = {
+				  position: 'relative'
+				, text: results.inputText
+				, left: e.rect.x, width:  e.rect.width
+				, top:  e.rect.y, height: e.rect.height
+			};
+
+			context.renderer.write(Templates.Button, button, context.element);
+
+		});
 	}
 
 	//var start = (new Date).getTime();
