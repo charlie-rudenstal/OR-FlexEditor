@@ -11,28 +11,26 @@ function Main(options) {
 
 	me.prototype.load = function(options) {
 		
-		// Merge parameter-options with the constructor-options
+		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = $.extend({}, this.options, options);
-
-		// Fetch options or defaults
 		var element = document.getElementById(options.elementId);
 		var cellSize = options.cellSize || { width: 10, height: 10 };
 		
-		// Init renderer
+		// Init button and grid renderer
 		var renderer = options.renderer || new Renderer({toElement: element});
-
-		// Init templates from the tpl folder
-		Templates.init();
-
-		// Init Grid renderer and render the grid
 		var gridRenderer = options.gridRenderer || new GridRenderer();
+
+		// Render the grid
 		gridRenderer.render(element, cellSize);
+
+		// Compile templates from the tpl folder (and store in the Templates namespace)
+		Templates.compile();
 
 		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onEvent, { event: 'preSelection', renderer: renderer })
+			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer })
 			,    onSelection: eventHandler(onEvent, { event: 'selection', renderer: renderer })
 		});
 	};
@@ -40,7 +38,7 @@ function Main(options) {
 
 	var onEvent = function(e, context) {
 		switch(context.event) {
-			case 'preSelection':
+			case 'preselection':
 				var button = {
 					  position: 'relative'
 					, text: ''
@@ -63,42 +61,10 @@ function Main(options) {
 				break;
 		}
 	}
-
-	var onPreSelection = function(e, context) {
-		
-		// Idea: Call a new function when a new button is created 
-		// where the new button is injected to a button array 
-		// instead of using this storage?
-		//context.model.add(button);		
-		//context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
-	}
-
-	var onSelection = function(e, context) {
-		
-
-	}
-
-	//var start = (new Date).getTime();
-	//for(var i = 0; i < 10000; i++)		
-	//console.log('time', ((new Date).getTime() - start), ' ms');
 	
 }(Main));
 
-function View() {
-	this.buttons = [];
-};
-
-(function(me) {
-	
-	me.prototype.add = function(button) {
-		this.buttons.push(button);
-	}
-
-	me.prototype.getButtons = function() {
-		return this.buttons;
-	}
-
-})(View);// background-size: 10% 10%, 10% 10%;
+// background-size: 10% 10%, 10% 10%;
 
 function GridRenderer() {
 
@@ -337,7 +303,7 @@ function GridRenderer() {
 })(Renderer);var Templates = Templates || {};
 
 (function() {
-	Templates.init = function() {	
+	Templates.compile = function() {	
 		// TODO: Loop Templates.Raw and do this automatically
 		Templates.Button = doT.template(Templates.Raw.Button);
 		Templates.Modal = doT.template(Templates.Raw.Modal);

@@ -8,8 +8,7 @@ end =		$(src)/_end.js
 			
 
 files = 	$(src)/Main.js\
-	 	 	$(src)/View.js\
-			$(src)/GridRenderer.js\
+	 	 	$(src)/GridRenderer.js\
 			$(src)/MouseHandler.js\
 			$(src)/EventHandler.js\
 			$(src)/Modal.js\

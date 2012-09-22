@@ -29,7 +29,7 @@ function Main(options) {
 		var mouseHandler = new MouseHandler({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onEvent, { event: 'preSelection', renderer: renderer })
+			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer })
 			,    onSelection: eventHandler(onEvent, { event: 'selection', renderer: renderer })
 		});
 	};
@@ -37,7 +37,7 @@ function Main(options) {
 
 	var onEvent = function(e, context) {
 		switch(context.event) {
-			case 'preSelection':
+			case 'preselection':
 				var button = {
 					  position: 'relative'
 					, text: ''
