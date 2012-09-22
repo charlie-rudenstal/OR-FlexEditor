@@ -6,5 +6,6 @@ var Templates = Templates || {};
 		Templates.Button = doT.template(Templates.Raw.Button);
 		Templates.Modal = doT.template(Templates.Raw.Modal);
 		Templates.CreateButtonModal = doT.template(Templates.Raw.CreateButtonModal);
+		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
 })();

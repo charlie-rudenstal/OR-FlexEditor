@@ -16,6 +16,7 @@ files = 	$(src)/Main.js\
 			$(src)/Templates.js
 			
 templates = $(tpl)/button.tpl\
+templates = $(tpl)/preselection.tpl\
 			$(tpl)/createButton.modal.tpl\
 			$(tpl)/modal.tpl
 

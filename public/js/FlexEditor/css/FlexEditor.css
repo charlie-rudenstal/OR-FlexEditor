@@ -42,6 +42,16 @@ body {
 	user-select: none;
 }
 
+.component.preselection {
+
+}
+
+.component.button {
+
+	background-color: #999;
+	
+}
+
 .grid-single
 {
 	background-color: #269;

@@ -12,7 +12,7 @@ Templates.Raw.Button = '
 		{{?}}
 	#}}
 
-	<div class="component" 
+	<div class="component button" 
 		 style="left: {{=it.left}}{{#def.unit}};
 	 	     	top: {{=it.top}}{{#def.unit}};
 	 	     	width: {{=it.width}}{{#def.unit}};

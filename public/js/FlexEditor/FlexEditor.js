@@ -29,19 +29,17 @@ function Main(options) {
 		mouseHandler.register({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer, handler: mouseHandler })
-			,    onSelection: eventHandler(onEvent, { event: 'selection',    renderer: renderer, handler: mouseHandler })
+			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer, handler: mouseHandler, buttons: [] })
+			,    onSelection: eventHandler(onEvent, { event: 'selection',    renderer: renderer, handler: mouseHandler, buttons: [] })
 		});
 	};
 
 	var onEvent = function(e, context) {
 
-		var buttons = context.buttons || [];
-
 		switch(context.event) {
-			case 'preselection':				
-				var button = 
-				context.renderer.write(Templates.Button, buttons.concat({ 
+			case 'preselection':
+				// Render a new context with the new button pre-selection appended
+				context.renderer.write(Templates.Preselection, context.buttons.concat({ 
 					  position: 'relative'
 					, text: ''
 					, left: e.rect.x, width:  e.rect.width
@@ -53,7 +51,7 @@ function Main(options) {
 				Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
 					
 					// Create a new context with the new button appended
-					var newContext = $.extend({}, context, { buttons: buttons.concat({
+					var newContext = $.extend({}, context, { buttons: context.buttons.concat({
 						  position: 'relative'
 					  	, text: results.inputText
 					  	, left: e.rect.x, width:  e.rect.width
@@ -330,8 +328,9 @@ function GridRenderer() {
 		Templates.Button = doT.template(Templates.Raw.Button);
 		Templates.Modal = doT.template(Templates.Raw.Modal);
 		Templates.CreateButtonModal = doT.template(Templates.Raw.CreateButtonModal);
+		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal">    <div class="control-group">      <label class="control-label" for="inputText">Text</label>      <div class="controls">        <input type="text" name="inputText" id="inputText" placeholder="Text" />      </div>    </div>  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  <div class="modal-body">    {{=it.body}}  </div>  <div class="modal-footer">    <a href="#" class="btn" data-dismiss="modal">Close</a>    <a href="#" class="btn btn-primary">Save changes</a>  </div></div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		<span class="label label-info">			{{=it.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal">    <div class="control-group">      <label class="control-label" for="inputText">Text</label>      <div class="controls">        <input type="text" name="inputText" id="inputText" placeholder="Text" />      </div>    </div>  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  <div class="modal-body">    {{=it.body}}  </div>  <div class="modal-footer">    <a href="#" class="btn" data-dismiss="modal">Close</a>    <a href="#" class="btn btn-primary">Save changes</a>  </div></div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

@@ -28,19 +28,17 @@ function Main(options) {
 		mouseHandler.register({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer, handler: mouseHandler })
-			,    onSelection: eventHandler(onEvent, { event: 'selection',    renderer: renderer, handler: mouseHandler })
+			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer, handler: mouseHandler, buttons: [] })
+			,    onSelection: eventHandler(onEvent, { event: 'selection',    renderer: renderer, handler: mouseHandler, buttons: [] })
 		});
 	};
 
 	var onEvent = function(e, context) {
 
-		var buttons = context.buttons || [];
-
 		switch(context.event) {
-			case 'preselection':				
-				var button = 
-				context.renderer.write(Templates.Button, buttons.concat({ 
+			case 'preselection':
+				// Render a new context with the new button pre-selection appended
+				context.renderer.write(Templates.Preselection, context.buttons.concat({ 
 					  position: 'relative'
 					, text: ''
 					, left: e.rect.x, width:  e.rect.width
@@ -52,7 +50,7 @@ function Main(options) {
 				Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
 					
 					// Create a new context with the new button appended
-					var newContext = $.extend({}, context, { buttons: buttons.concat({
+					var newContext = $.extend({}, context, { buttons: context.buttons.concat({
 						  position: 'relative'
 					  	, text: results.inputText
 					  	, left: e.rect.x, width:  e.rect.width
