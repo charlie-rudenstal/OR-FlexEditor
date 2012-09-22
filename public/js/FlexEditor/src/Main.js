@@ -10,72 +10,56 @@ function Main(options) {
 
 	me.prototype.load = function(options) {
 		
-		// Merge parameter-options with the constructor-options
+		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = $.extend({}, this.options, options);
-
-		// Fetch options or defaults
 		var element = document.getElementById(options.elementId);
 		var cellSize = options.cellSize || { width: 10, height: 10 };
 		
-		// Init view model
-		var model = options.view || new View();	
-
-		// Init renderer
+		// Init button and grid renderer
 		var renderer = options.renderer || new Renderer({toElement: element});
-
-		// Init templates from the tpl folder
-		Templates.init();
-
-		// Init Grid renderer and render the grid
 		var gridRenderer = options.gridRenderer || new GridRenderer();
+
+		// Render the grid
 		gridRenderer.render(element, cellSize);
+
+		// Compile templates from the tpl folder (and store in the Templates namespace)
+		Templates.compile();
 
 		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onPreSelection, { renderer: renderer })
-			, onSelection: eventHandler(onSelection, { renderer: renderer })
+			, onPreSelection: eventHandler(onEvent, { event: 'preSelection', renderer: renderer })
+			,    onSelection: eventHandler(onEvent, { event: 'selection', renderer: renderer })
 		});
 	};
 
 
-	var onPreSelection = function(e, context) {
-		var button = {
-			  position: 'relative'
-			, text: ''
-			, left: e.rect.x, width:  e.rect.width
-			, top:  e.rect.y, height: e.rect.height
-		};
+	var onEvent = function(e, context) {
+		switch(context.event) {
+			case 'preSelection':
+				var button = {
+					  position: 'relative'
+					, text: ''
+					, left: e.rect.x, width:  e.rect.width
+					, top:  e.rect.y, height: e.rect.height
+				};
+				context.renderer.write(Templates.Button, [button], context.element);
+				break;
 
-		context.renderer.write(Templates.Button, [button], context.element);
-		
-		// Idea: Call a new function when a new button is created 
-		// where the new button is injected to a button array 
-		// instead of using this storage?
-		//context.model.add(button);		
-		//context.renderer.write(Templates.Button, context.model.getButtons(), context.element);				
+			case 'selection': 
+				Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
+					var button = {
+						  position: 'relative'
+						, text: results.inputText
+						, left: e.rect.x, width:  e.rect.width
+						, top:  e.rect.y, height: e.rect.height
+					};
+					context.renderer.write(Templates.Button, button, context.element);
+				});
+				break;
+		}
 	}
-
-	var onSelection = function(e, context) {
-		
-		Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
-
-			var button = {
-				  position: 'relative'
-				, text: results.inputText
-				, left: e.rect.x, width:  e.rect.width
-				, top:  e.rect.y, height: e.rect.height
-			};
-
-			context.renderer.write(Templates.Button, button, context.element);
-
-		});
-	}
-
-	//var start = (new Date).getTime();
-	//for(var i = 0; i < 10000; i++)		
-	//console.log('time', ((new Date).getTime() - start), ' ms');
 	
 }(Main));
 
