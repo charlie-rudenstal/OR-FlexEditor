@@ -1,7 +1,5 @@
 (function($) {
-	/**
- * TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
- */
+	// TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
 
 function Main(options) {
 	this.options = options;
@@ -20,44 +18,58 @@ function Main(options) {
 		var renderer = options.renderer || new Renderer({toElement: element});
 		var gridRenderer = options.gridRenderer || new GridRenderer();
 
-		// Render the grid
+		// Render grid lines
 		gridRenderer.render(element, cellSize);
 
 		// Compile templates from the tpl folder (and store in the Templates namespace)
 		Templates.compile();
 
 		// Init mouse handler and handle onPreSelection (grid selection)
-		var mouseHandler = new MouseHandler({
+		var mouseHandler = new MouseHandler();
+		mouseHandler.register({
 			  element: element
 			, cellSize: cellSize 
-			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer })
-			,    onSelection: eventHandler(onEvent, { event: 'selection', renderer: renderer })
+			, onPreSelection: eventHandler(onEvent, { event: 'preselection', renderer: renderer, handler: mouseHandler })
+			,    onSelection: eventHandler(onEvent, { event: 'selection',    renderer: renderer, handler: mouseHandler })
 		});
 	};
 
-
 	var onEvent = function(e, context) {
+
+		var buttons = context.buttons || [];
+
 		switch(context.event) {
-			case 'preselection':
-				var button = {
+			case 'preselection':				
+				var button = 
+				context.renderer.write(Templates.Button, buttons.concat({ 
 					  position: 'relative'
 					, text: ''
 					, left: e.rect.x, width:  e.rect.width
 					, top:  e.rect.y, height: e.rect.height
-				};
-				context.renderer.write(Templates.Button, [button], context.element);
+				}));				
 				break;
 
-			case 'selection': 
+			case 'selection': 				
 				Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
-					var button = {
+					
+					// Create a new context with the new button appended
+					var newContext = $.extend({}, context, { buttons: buttons.concat({
 						  position: 'relative'
-						, text: results.inputText
-						, left: e.rect.x, width:  e.rect.width
+					  	, text: results.inputText
+					  	, left: e.rect.x, width:  e.rect.width
 						, top:  e.rect.y, height: e.rect.height
-					};
-					context.renderer.write(Templates.Button, button, context.element);
-				});
+					})});
+					
+					// Render it
+					context.renderer.write(Templates.Button, newContext.buttons);
+
+					// And re-register selection events with the new button array
+					context.handler.register($.extend({}, context.handler.options, {
+						  onPreSelection: eventHandler(onEvent, $.extend({}, newContext, { event: 'preselection' }))
+						, onSelection: eventHandler(onEvent, $.extend({}, newContext, { event: 'selection' }))
+					}));
+
+				});				
 				break;
 		}
 	}
@@ -98,13 +110,22 @@ function GridRenderer() {
 		element.style.backgroundSize = css;
 	}
 
-})(GridRenderer);function MouseHandler(options) {
-	$(options.element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, {
-		element: options.element,  
-		cellSize: options.cellSize,
-		onPreSelection: options.onPreSelection,
-		onSelection: options.onSelection
-	}));
+})(GridRenderer);function MouseHandler() {
+	this.register = function(options) {
+		
+		this.options = options;
+
+		$(options.element).off('mousedown');
+		$(options.element).off('mousemove');
+		$(options.element).off('mouseup');
+
+		$(options.element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, {
+			element: options.element,  
+			cellSize: options.cellSize,
+			onPreSelection: options.onPreSelection,
+			onSelection: options.onSelection
+		}));
+	}
 };
 
 (function(me) {
@@ -253,6 +274,7 @@ function GridRenderer() {
 
 })(Modal);function Renderer(options) {
 	this.options = options;
+	this.toElement = options.toElement;
 };
 
 (function(me) {

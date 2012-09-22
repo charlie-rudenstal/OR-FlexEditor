@@ -1,10 +1,19 @@
-function MouseHandler(options) {
-	$(options.element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, {
-		element: options.element,  
-		cellSize: options.cellSize,
-		onPreSelection: options.onPreSelection,
-		onSelection: options.onSelection
-	}));
+function MouseHandler() {
+	this.register = function(options) {
+		
+		this.options = options;
+
+		$(options.element).off('mousedown');
+		$(options.element).off('mousemove');
+		$(options.element).off('mouseup');
+
+		$(options.element).on('mousedown', eventHandler(MouseHandler.onMouseEvent, {
+			element: options.element,  
+			cellSize: options.cellSize,
+			onPreSelection: options.onPreSelection,
+			onSelection: options.onSelection
+		}));
+	}
 };
 
 (function(me) {

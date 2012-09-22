@@ -1,5 +1,6 @@
 function Renderer(options) {
 	this.options = options;
+	this.toElement = options.toElement;
 };
 
 (function(me) {
