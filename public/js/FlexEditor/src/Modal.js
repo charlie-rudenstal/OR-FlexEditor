@@ -38,7 +38,7 @@ function Modal(options) {
 		})
 
 		modal.on('hidden', function(e) {
-			if(!accepted) callback.onCancelled();
+			if(!accepted) callbacks.onCancelled();
 		});
 
 	}
