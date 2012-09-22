@@ -17,7 +17,7 @@ function Renderer(options) {
 	 */
 	
 	me.prototype.render = function(template, array) {
-		array = array || this.options.array;
+		array = array || this.options.array || [{}];
 
 		// Allow a single element by turning it into an array
 		if($.isArray(array) === false) {

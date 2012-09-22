@@ -8,38 +8,38 @@ function Modal(options) {
 
 (function(me) {
 
-	me.getResults = function(contentsTemplate, renderer, onRetrieved) {
-		var contents = renderer.render(Templates.CreateButtonModal, [{}]);
-			
+	me.getResults = function(contentsTemplate, renderer, callbacks) {
+
+		// Render a modal using the body template with the Create Button form
 		renderer.write(Templates.Modal, [{
-
 			header: "Modal",
-			body: contents
-
+			body: renderer.render(Templates.CreateButtonModal)
 		}], document.body);
 
 		// Retrieve a reference to the generated modal element
+		// and enable js beaviors for twitter bootstrap
 		var modal = $('.modal');
-
-		// Enable js behaviors for twitter bootstrap
 		modal.modal();
 
-		// Give focus to first text area (autofocus don't work with twitter bootstraps modal)
+		// Give focus to first text area (html5 autofocus doesn't work in twitter bootstraps modal)
 		modal.find('input:first-child').focus();
-		
-		var onSubmit = function() {
-			// Serialize form data with jquery
-			var results = modal.find('form').serializeObject();
-			// Pass form data to callback and close modal
-			onRetrieved(results);
-			modal.modal('hide');
-		}		
 
-		modal.find('.btn-primary').click(onSubmit);
+		var accepted = false;
+
 		modal.find('form').submit(function(e) {
-			onSubmit();
+			
+			var results = $(this).serializeObject();
+			callbacks.onSuccess(results);
+			
+			accepted = true;
+			modal.modal('hide');
+
 			e.preventDefault();
 		})
+
+		modal.on('hidden', function(e) {
+			if(!accepted) callback.onCancelled();
+		});
 
 	}
 

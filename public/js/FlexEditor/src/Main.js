@@ -47,25 +47,30 @@ function Main(options) {
 				break;
 
 			case 'selection': 				
-				Modal.getResults(Templates.CreateButtonModal, context.renderer, function(results) {
-					
-					// Create a new context with the new button appended
-					var newContext = $.extend({}, context, { buttons: context.buttons.concat({
-						  position: 'relative'
-					  	, text: results.inputText
-					  	, left: e.rect.x, width:  e.rect.width
-						, top:  e.rect.y, height: e.rect.height
-					})});
-					
-					// Render it
-					context.renderer.write(Templates.Button, newContext.buttons);
+				Modal.getResults(Templates.CreateButtonModal, context.renderer, {
+					onSuccess: function(results) {					
+						// Create a new context with the new button appended
+						var newContext = $.extend({}, context, { buttons: context.buttons.concat({
+							  position: 'relative'
+						  	, text: results.inputText
+						  	, left: e.rect.x, width:  e.rect.width
+							, top:  e.rect.y, height: e.rect.height
+						})});
+						
+						// Render it
+						context.renderer.write(Templates.Button, newContext.buttons);
 
-					// And re-register selection events with the new button array
-					context.handler.register($.extend({}, context.handler.options, {
-						  onPreSelection: eventHandler(onEvent, $.extend({}, newContext, { event: 'preselection' }))
-						, onSelection: eventHandler(onEvent, $.extend({}, newContext, { event: 'selection' }))
-					}));
+						// And re-register selection events with the new button array
+						context.handler.register($.extend({}, context.handler.options, {
+							  onPreSelection: eventHandler(onEvent, $.extend({}, newContext, { event: 'preselection' }))
+							, onSelection: eventHandler(onEvent, $.extend({}, newContext, { event: 'selection' }))
+						}));
+					},
+					onCancelled: function() {
 
+						context.renderer.write(Templates.Button, context.buttons);
+
+					}
 				});				
 				break;
 		}
