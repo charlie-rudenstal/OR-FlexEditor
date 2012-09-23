@@ -48,8 +48,6 @@ function Main(options) {
 
 	var onEvent = function(e, context) {
 
-		console.log(context.event);
-
 		switch(context.event) {
 
 			case 'preselection':
@@ -67,8 +65,7 @@ function Main(options) {
 						    }))
 						  , onSelection: eventHandler(onEvent, merge(context, {
 								event: 'selection.moving'
-						    }))
-						  , mouseDown: true 
+						    })) 
 					}));
 
 				} else {
@@ -89,7 +86,6 @@ function Main(options) {
 					 	  onSelection: eventHandler(onEvent, merge(context, {
 					 		    event: 'selection'
 					 	  }))
-					 	, mouseDown: true
 					}));
 				}		
 			
