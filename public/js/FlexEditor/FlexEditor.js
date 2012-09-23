@@ -52,6 +52,7 @@ function Main(options) {
 		switch(context.event) {
 
 			case 'preselection':
+
 				// Is the selection overlapping an existing button?
 				// Then we should go into 'move mode'
 				// Otherwise we should create a new button preview
@@ -59,11 +60,15 @@ function Main(options) {
 				if(buttonAtPoint) {	
 					// Register a new move aware context for the preselection + selection events						
 					context.handler.register(merge(context.handler.context, {
-						  onPreSelection: eventHandler(onEvent, merge(context, { 
-						  	  event: 'preselection.moving'
-						  	, movedButton: buttonAtPoint
-						  }))
-						, mouseDown: true 
+						    onPreSelection: eventHandler(onEvent, merge(context, { 
+						  	    event: 'preselection.moving'
+						  	  , movedButton: buttonAtPoint
+						    }))
+						  , onSelection: eventHandler(onEvent, merge(context, {
+								event: 'selection.movinga'
+							  , movingButton: true
+						    }))
+						  , mouseDown: true 
 					}));
 
 				} else {
@@ -81,10 +86,12 @@ function Main(options) {
 
 					// Register a new preselection aware context for the selection event
 					context.handler.register(merge(context.handler.context, {
-						onSelection: eventHandler(onEvent, merge(context, {
-							  event: 'selection'
-							, button: button
-						}))
+					 	  onSelection: eventHandler(onEvent, merge(context, {
+					 		    event: 'selection'
+					 	  	  , button: button
+					 	  }))
+					 	, mouseDown: true
+					 	, snapRectStart: e.snapRectStart
 					}));
 				}		
 			
@@ -129,10 +136,11 @@ function Main(options) {
 
 						// And register selection events with the new context
 						context.handler.register(merge(context.handler.context, {
-							  onPreSelection: eventHandler(onEvent, merge(context, { 
-							  	  event: 'preselection'
-							  	, buttons: newButtons
-							  }))
+							    onPreSelection: eventHandler(onEvent, merge(context, { 
+							        event: 'preselection'
+							  	  , buttons: newButtons
+							    }))
+							  , mouseDown: false
 						}));
 					},
 					onCancelled: function() {
@@ -148,10 +156,11 @@ function Main(options) {
 
 				// And register selection events with the new context
 				context.handler.register(merge(context.handler.context, {
-					  onPreSelection: eventHandler(onEvent, merge(context, { 
-					  	  event: 'preselection'
-					  	, movingButton: false
-					  }))
+					    onPreSelection: eventHandler(onEvent, merge(context, { 
+					  	    event: 'preselection'
+					  	  , movingButton: false
+					    }))
+					  , mouseDown: false
 				}));
 				break;
 
@@ -226,33 +235,37 @@ function GridRenderer() {
 
 		switch (e.type) {		
 			case 'mousedown':			
-				
 				// Trigger a mouse move directly on mouse down
 				// to get preSelection rendering directly
-				me.onMouseEvent($.extend({}, e, {type: 'mousemove'}), context);
+				//me.onMouseEvent(merge(e, {type: 'mousemove'}),
+				//				merge(context, {mouseDown: true}));
 				
 				// Register a new handler and with a starting point for the selection	
-				var newHandler = eventHandler(me.onMouseEvent, $.extend(context, {
+				
+				var newContext = merge(context, {
 					  mouseDown: true
 					, snapRectStart: snapRect
-				}))
+				});
+
+				var newHandler = eventHandler(me.onMouseEvent, newContext);
 
 				$(context.element).off('mousedown mouseup mousemove');
 				$(context.element).on ('mousedown mouseup mousemove', newHandler);
-				
+
 				break;
-			case 'mousemove':
+			case 'mousemove':	
 				if(context.mouseDown) {
 					context.onPreSelection({
-						rect: rectFrom(context.snapRectStart, snapRect),
+						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
-						y: snapRect.y
+						y: snapRect.y,
+						snapRectStart: context.snapRectStart
 					});
 				}
 				break;
 			case 'mouseup': 		
 				if(context.mouseDown) {			
-					var newHandler = eventHandler(me.onMouseEvent, $.extend(context, {
+					var newHandler = eventHandler(me.onMouseEvent, merge(context, {
 						mouseDown: false	
 					}));
 
@@ -260,7 +273,7 @@ function GridRenderer() {
 					$(context.element).on ('mousedown mouseup mousemove', newHandler);
 
 					context.onSelection({
-						rect: rectFrom(context.snapRectStart, snapRect),
+						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y
 					});

@@ -51,6 +51,7 @@ function Main(options) {
 		switch(context.event) {
 
 			case 'preselection':
+
 				// Is the selection overlapping an existing button?
 				// Then we should go into 'move mode'
 				// Otherwise we should create a new button preview
@@ -58,11 +59,15 @@ function Main(options) {
 				if(buttonAtPoint) {	
 					// Register a new move aware context for the preselection + selection events						
 					context.handler.register(merge(context.handler.context, {
-						  onPreSelection: eventHandler(onEvent, merge(context, { 
-						  	  event: 'preselection.moving'
-						  	, movedButton: buttonAtPoint
-						  }))
-						, mouseDown: true 
+						    onPreSelection: eventHandler(onEvent, merge(context, { 
+						  	    event: 'preselection.moving'
+						  	  , movedButton: buttonAtPoint
+						    }))
+						  , onSelection: eventHandler(onEvent, merge(context, {
+								event: 'selection.movinga'
+							  , movingButton: true
+						    }))
+						  , mouseDown: true 
 					}));
 
 				} else {
@@ -80,10 +85,12 @@ function Main(options) {
 
 					// Register a new preselection aware context for the selection event
 					context.handler.register(merge(context.handler.context, {
-						onSelection: eventHandler(onEvent, merge(context, {
-							  event: 'selection'
-							, button: button
-						}))
+					 	  onSelection: eventHandler(onEvent, merge(context, {
+					 		    event: 'selection'
+					 	  	  , button: button
+					 	  }))
+					 	, mouseDown: true
+					 	, snapRectStart: e.snapRectStart
 					}));
 				}		
 			
@@ -128,10 +135,11 @@ function Main(options) {
 
 						// And register selection events with the new context
 						context.handler.register(merge(context.handler.context, {
-							  onPreSelection: eventHandler(onEvent, merge(context, { 
-							  	  event: 'preselection'
-							  	, buttons: newButtons
-							  }))
+							    onPreSelection: eventHandler(onEvent, merge(context, { 
+							        event: 'preselection'
+							  	  , buttons: newButtons
+							    }))
+							  , mouseDown: false
 						}));
 					},
 					onCancelled: function() {
@@ -147,10 +155,11 @@ function Main(options) {
 
 				// And register selection events with the new context
 				context.handler.register(merge(context.handler.context, {
-					  onPreSelection: eventHandler(onEvent, merge(context, { 
-					  	  event: 'preselection'
-					  	, movingButton: false
-					  }))
+					    onPreSelection: eventHandler(onEvent, merge(context, { 
+					  	    event: 'preselection'
+					  	  , movingButton: false
+					    }))
+					  , mouseDown: false
 				}));
 				break;
 
