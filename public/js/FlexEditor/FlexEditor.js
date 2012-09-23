@@ -49,6 +49,8 @@ function Main(options) {
 
 	var onEvent = function(e, context) {
 
+		console.log(context.event);
+
 		switch(context.event) {
 
 			case 'preselection':
@@ -65,8 +67,7 @@ function Main(options) {
 						  	  , movedButton: buttonAtPoint
 						    }))
 						  , onSelection: eventHandler(onEvent, merge(context, {
-								event: 'selection.movinga'
-							  , movingButton: true
+								event: 'selection.moving'
 						    }))
 						  , mouseDown: true 
 					}));
@@ -83,12 +84,11 @@ function Main(options) {
 
 					// Render a preview of the selection
 					context.renderer.write(Templates.Preselection, context.buttons.concat(button));
-
+					
 					// Register a new preselection aware context for the selection event
 					context.handler.register(merge(e.handlerContext, {
 					 	  onSelection: eventHandler(onEvent, merge(context, {
 					 		    event: 'selection'
-					 	  	  , button: button
 					 	  }))
 					 	, mouseDown: true
 					}));
@@ -126,13 +126,16 @@ function Main(options) {
 			case 'selection': 		
 				Modal.getResults(Templates.CreateButtonModal, context.renderer, {
 					onSuccess: function(results) {		
-						// Create a new button based on selection-preview-context and input from modal
-						var newButton = merge(context.button, { text: results.inputText });
-						var newButtons = context.buttons.concat(newButton);
+						// Create a new button based on selection and input from modal
+						var newButtons = context.buttons.concat({ 
+							  position: 'relative'
+							, text: results.inputText
+							, left: e.rect.x, width:  e.rect.width
+						 	, top:  e.rect.y, height: e.rect.height
+						});
 
 						// Render it
 						context.renderer.write(Templates.Button, newButtons);
-
 
 						// And register selection events with the new context
 						context.handler.register(merge(e.handlerContext, {
@@ -151,8 +154,20 @@ function Main(options) {
 				break;
 
 			case 'selection.moving':
-				// Render buttons from context
-				context.renderer.write(Templates.Button, context.buttons);
+				var before = context.buttons.slice(0, context.movedButton.index);
+				var after = context.buttons.slice(context.movedButton.index + 1);
+				
+				var newButton = merge(context.movedButton.button, {
+				      position: 'relative'
+					, left: e.x - context.movedButton.deltaX
+					, top:  e.y - context.movedButton.deltaY
+					, width: context.movedButton.button.width 
+					, height: context.movedButton.button.height
+				});
+
+				// Render the new buttons				
+				var buttons = before.concat(newButton).concat(after);
+				context.renderer.write(Templates.Button, buttons);
 
 				// And register selection events with the new context
 				context.handler.register(merge(e.handlerContext, {
@@ -205,6 +220,7 @@ function GridRenderer() {
 
 })(GridRenderer);function MouseHandler() {
 	this.register = function(context) {
+		console.log('register', context);
 		$(context.element).off('mousedown mouseup mousemove');
 		$(context.element).on('mousedown mouseup mousemove', eventHandler(MouseHandler.onMouseEvent, context));
 	}
@@ -232,22 +248,23 @@ function GridRenderer() {
 
 		switch (e.type) {		
 			case 'mousedown':			
-				// Trigger a mouse move directly on mouse down
-				// to get preSelection rendering directly
-				me.onMouseEvent(merge(e, {type: 'mousemove'}),
-								merge(context, {mouseDown: true, snapRectStart: null}));
 				
 				// Register a new handler and with a starting point for the selection	
-				
 				var newContext = merge(context, {
 					  mouseDown: true
 					, snapRectStart: snapRect
 				});
-
-				var newHandler = eventHandler(me.onMouseEvent, newContext);
-
 				$(context.element).off('mousedown mouseup mousemove');
-				$(context.element).on ('mousedown mouseup mousemove', newHandler);
+				$(context.element).on ('mousedown mouseup mousemove', 
+									   eventHandler(me.onMouseEvent, newContext));
+
+				// Trigger a preselection instantly when mouse is down
+				context.onPreSelection({
+				 	rect: rectFrom(snapRect, snapRect),
+				 	x: snapRect.x,
+				 	y: snapRect.y,
+				 	handlerContext: newContext
+				});
 
 				break;
 			case 'mousemove':	
