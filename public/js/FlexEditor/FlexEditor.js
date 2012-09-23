@@ -47,117 +47,112 @@ function Main(options) {
 		switch(context.event) {
 
 			case 'preselection':
+				// Is the selection overlapping an existing button?
+				// Then we should go into 'move mode'
+				// Otherwise we should create a new button preview
+				var buttonIndex = getButtonIndexAtPoint(context.buttons, e.rect.x, e.rect.y);
+				if(buttonIndex > -1) {	
 
-				if(context.movingButton) {
-					var before = context.buttons.slice(0, context.movedButtonIndex);
-					var after = context.buttons.slice(context.movedButtonIndex + 1);
-					var current = context.buttons[context.movedButtonIndex];
+					// Register a new move aware context for the preselection + selection events						
+					context.handler.register(merge(context.handler.context, {
+						  onPreSelection: eventHandler(onEvent, merge(context, { 
+						  	  event: 'preselection.moving'
+						  	, movedButtonIndex: buttonIndex
+						  }))
+						, mouseDown: true 
+					}));
 
-					var newButton = merge(current, {
-					      position: 'relative'
-						, left: e.x, width:  current.width
-						, top:  e.y, height: current.height
-					});
+				} else {
 
-					// Render a preview of the moved button
-					var preButtons = before.concat(newButton).concat(after);
-					context.renderer.write(Templates.Preselection, preButtons);
+					// Create a new button based on preselection rect
+					var button = { 
+						  position: 'relative'
+						, text: ''
+						, left: e.rect.x, width:  e.rect.width
+						, top:  e.rect.y, height: e.rect.height
+					};
 
-					// Register a new move aware context for the selection event
+					// Render a preview of the selection
+					context.renderer.write(Templates.Preselection, context.buttons.concat(button));
+
+					// Register a new preselection aware context for the selection event
 					context.handler.register(merge(context.handler.context, {
 						onSelection: eventHandler(onEvent, merge(context, {
-							  movingButton: true
-							, buttons: preButtons
+							  button: button
 							, event: 'selection'
-							, movedButtonIndex: null
 						}))
 					}));
-				
-				} else {
-					// Is the selection overlapping an existing button?
-					var buttonIndex = getButtonIndexAtPoint(context.buttons, e.rect.x, e.rect.y);
-					if(buttonIndex > -1) {		
-
-						// Register a new move aware context for the preselection + selection events						
-						var newContext = merge(context, {
-							  movingButton: true
-							, movedButtonIndex: buttonIndex
-						});
-
-						context.handler.register(merge(context.handler.context, {
-							  onPreSelection: eventHandler(onEvent, merge(newContext, { event: 'preselection' }))
-							, onSelection: eventHandler(onEvent, merge(newContext, { event: 'selection' }))
-							, mouseDown: true 
-						}));
-
-					} else {
-
-						var button = { 
-							  position: 'relative'
-							, text: ''
-							, left: e.rect.x, width:  e.rect.width
-							, top:  e.rect.y, height: e.rect.height
-						};
-
-						// Render a preview of the selection
-						context.renderer.write(Templates.Preselection, context.buttons.concat(button));
-
-						// Register a new preselection aware context for the selection event
-						context.handler.register(merge(context.handler.context, {
-							onSelection: eventHandler(onEvent, merge(context, {
-								  button: button
-								, event: 'selection'
-							}))
-						}));
-					}	
-				}			
+				}		
 			
 				break;
 
-			case 'selection': 		
+			case 'preselection.moving': 
+				var before = context.buttons.slice(0, context.movedButtonIndex);
+				var after = context.buttons.slice(context.movedButtonIndex + 1);
+				var current = context.buttons[context.movedButtonIndex];
 
-				if(context.movingButton) {
+				var newButton = merge(current, {
+				      position: 'relative'
+					, left: e.x, width:  current.width
+					, top:  e.y, height: current.height
+				});
 
-					// Create a new non moving context
-					var newContext = merge(context, { movingButton: false });
+				// Render a preview of the moved button
+				var preButtons = before.concat(newButton).concat(after);
+				context.renderer.write(Templates.Preselection, preButtons);
 
-					// Render it
-					context.renderer.write(Templates.Button, context.buttons);
-
-					// And register selection events with the new context
-					context.handler.register(merge(context.handler.context, {
-						  onPreSelection: eventHandler(onEvent, merge(newContext, { event: 'preselection' }))
-						, onSelection: eventHandler(onEvent, merge(newContext, { event: 'selection' }))
-					}));
-
-				} else {
-
-					Modal.getResults(Templates.CreateButtonModal, context.renderer, {
-						onSuccess: function(results) {		
-							// Create a new button based on selection-preview-context and input from modal
-							var newButton = merge(context.button, { text: results.inputText });
-
-							// Create a new context with the new button appended
-							var newContext = merge(context, { 
-								buttons: context.buttons.concat(newButton) 
-							});
-
-							// Render it
-							context.renderer.write(Templates.Button, newContext.buttons);
-
-							// And re-register selection events with the new button array
-							context.handler.register(merge(context.handler.context, {
-								  onPreSelection: eventHandler(onEvent, merge(newContext, { event: 'preselection' }))
-								, onSelection: eventHandler(onEvent, merge(newContext, { event: 'selection' }))
-							}));
-						},
-						onCancelled: function() {
-							// Just render already stored buttons to clear preselection
-							context.renderer.write(Templates.Button, context.buttons);
-						}
-					});				
-				}
+				// Register a new move aware context for the selection event
+				context.handler.register(merge(context.handler.context, {
+					onSelection: eventHandler(onEvent, merge(context, {
+						  movingButton: true
+						, buttons: preButtons
+						, event: 'selection.moving'
+						, movedButtonIndex: null
+					}))
+				}));
 				break;
+
+			case 'selection': 		
+				Modal.getResults(Templates.CreateButtonModal, context.renderer, {
+					onSuccess: function(results) {		
+						// Create a new button based on selection-preview-context and input from modal
+						var newButton = merge(context.button, { text: results.inputText });
+
+						// Create a new context with the new button appended
+						var newContext = merge(context, { 
+							buttons: context.buttons.concat(newButton) 
+						});
+
+						// Render it
+						context.renderer.write(Templates.Button, newContext.buttons);
+
+						// And re-register selection events with the new button array
+						context.handler.register(merge(context.handler.context, {
+							  onPreSelection: eventHandler(onEvent, merge(newContext, { event: 'preselection' }))
+							, onSelection: eventHandler(onEvent, merge(newContext, { event: 'selection' }))
+						}));
+					},
+					onCancelled: function() {
+						// Just render already stored buttons to clear preselection
+						context.renderer.write(Templates.Button, context.buttons);
+					}
+				});				
+				break;
+
+			case 'selection.moving':
+				// Create a new non moving context
+				var newContext = merge(context, { movingButton: false });
+
+				// Render it
+				context.renderer.write(Templates.Button, context.buttons);
+
+				// And register selection events with the new context
+				context.handler.register(merge(context.handler.context, {
+					  onPreSelection: eventHandler(onEvent, merge(newContext, { event: 'preselection' }))
+					, onSelection: eventHandler(onEvent, merge(newContext, { event: 'selection' }))
+				}));
+				break;
+
 		}
 	}
 	
