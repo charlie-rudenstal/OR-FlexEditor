@@ -33,14 +33,17 @@ function Main(options) {
 		});
 	};
 
-	var getButtonIndexAtPoint = function(buttons, x, y) {
+	var getButtonAtPoint = function(buttons, x, y) {
 		for(var i in buttons) {
 			var b = buttons[i];
 			if(x >= b.left && x < b.left + b.width && 
 			   y >= b.top && y < b.top + b.height)
-				return parseInt(i);
+				return { button: buttons[i]
+					   , index: parseInt(i)
+					   , deltaX: x - b.left
+					   , deltaY: y - b.top }
 		}
-		return -1;
+		return null;
 	}
 
 	var onEvent = function(e, context) {
@@ -51,14 +54,13 @@ function Main(options) {
 				// Is the selection overlapping an existing button?
 				// Then we should go into 'move mode'
 				// Otherwise we should create a new button preview
-				var buttonIndex = getButtonIndexAtPoint(context.buttons, e.rect.x, e.rect.y);
-				if(buttonIndex > -1) {	
-
+				var buttonAtPoint = getButtonAtPoint(context.buttons, e.rect.x, e.rect.y);
+				if(buttonAtPoint) {	
 					// Register a new move aware context for the preselection + selection events						
 					context.handler.register(merge(context.handler.context, {
 						  onPreSelection: eventHandler(onEvent, merge(context, { 
 						  	  event: 'preselection.moving'
-						  	, movedButtonIndex: buttonIndex
+						  	, movedButton: buttonAtPoint
 						  }))
 						, mouseDown: true 
 					}));
@@ -88,14 +90,15 @@ function Main(options) {
 				break;
 
 			case 'preselection.moving': 
-				var before = context.buttons.slice(0, context.movedButtonIndex);
-				var after = context.buttons.slice(context.movedButtonIndex + 1);
-				var current = context.buttons[context.movedButtonIndex];
-
-				var newButton = merge(current, {
+				var before = context.buttons.slice(0, context.movedButton.index);
+				var after = context.buttons.slice(context.movedButton.index + 1);
+				
+				var newButton = merge(context.movedButton.button, {
 				      position: 'relative'
-					, left: e.x, width:  current.width
-					, top:  e.y, height: current.height
+					, left: e.x - context.movedButton.deltaX
+					, top:  e.y - context.movedButton.deltaY
+					, width: context.movedButton.button.width 
+					, height: context.movedButton.button.height
 				});
 
 				// Render a preview of the moved button
