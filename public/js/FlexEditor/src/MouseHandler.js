@@ -1,6 +1,5 @@
 function MouseHandler() {
 	this.register = function(context) {
-		console.log('register', context);
 		$(context.element).off('mousedown mouseup mousemove');
 		$(context.element).on('mousedown mouseup mousemove', eventHandler(MouseHandler.onMouseEvent, context));
 	}
