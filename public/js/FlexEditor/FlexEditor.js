@@ -82,8 +82,8 @@ function Main(options) {
 					// Register a new preselection aware context for the selection event
 					context.handler.register(merge(context.handler.context, {
 						onSelection: eventHandler(onEvent, merge(context, {
-							  button: button
-							, event: 'selection'
+							  event: 'selection'
+							, button: button
 						}))
 					}));
 				}		
@@ -109,9 +109,9 @@ function Main(options) {
 				// Register a new move aware context for the selection event
 				context.handler.register(merge(context.handler.context, {
 					onSelection: eventHandler(onEvent, merge(context, {
-						  movingButton: true
+						  event: 'selection.moving'
+						, movingButton: true
 						, buttons: preButtons
-						, event: 'selection.moving'
 						, movedButtonIndex: null
 					}))
 				}));
@@ -122,19 +122,17 @@ function Main(options) {
 					onSuccess: function(results) {		
 						// Create a new button based on selection-preview-context and input from modal
 						var newButton = merge(context.button, { text: results.inputText });
-
-						// Create a new context with the new button appended
-						var newContext = merge(context, { 
-							buttons: context.buttons.concat(newButton) 
-						});
+						var newButtons = context.buttons.concat(newButton);
 
 						// Render it
-						context.renderer.write(Templates.Button, newContext.buttons);
+						context.renderer.write(Templates.Button, newButtons);
 
-						// And re-register selection events with the new button array
+						// And register selection events with the new context
 						context.handler.register(merge(context.handler.context, {
-							  onPreSelection: eventHandler(onEvent, merge(newContext, { event: 'preselection' }))
-							, onSelection: eventHandler(onEvent, merge(newContext, { event: 'selection' }))
+							  onPreSelection: eventHandler(onEvent, merge(context, { 
+							  	  event: 'preselection'
+							  	, buttons: newButtons
+							  }))
 						}));
 					},
 					onCancelled: function() {
@@ -145,16 +143,15 @@ function Main(options) {
 				break;
 
 			case 'selection.moving':
-				// Create a new non moving context
-				var newContext = merge(context, { movingButton: false });
-
-				// Render it
+				// Render buttons from context
 				context.renderer.write(Templates.Button, context.buttons);
 
 				// And register selection events with the new context
 				context.handler.register(merge(context.handler.context, {
-					  onPreSelection: eventHandler(onEvent, merge(newContext, { event: 'preselection' }))
-					, onSelection: eventHandler(onEvent, merge(newContext, { event: 'selection' }))
+					  onPreSelection: eventHandler(onEvent, merge(context, { 
+					  	  event: 'preselection'
+					  	, movingButton: false
+					  }))
 				}));
 				break;
 
