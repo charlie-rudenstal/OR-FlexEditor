@@ -35,7 +35,9 @@ function Main(options) {
 
 	var getButtonIndexAtPoint = function(buttons, x, y) {
 		for(var i in buttons) {
-			if(buttons[i].left == x && buttons[i].top == y)
+			var b = buttons[i];
+			if(x >= b.left && x < b.left + b.width && 
+			   y >= b.top && y < b.top + b.height)
 				return parseInt(i);
 		}
 		return -1;
