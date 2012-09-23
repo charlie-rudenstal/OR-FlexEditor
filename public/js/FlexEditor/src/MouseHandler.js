@@ -1,8 +1,5 @@
 function MouseHandler() {
 	this.register = function(context) {
-		
-		this.context = context;
-
 		$(context.element).off('mousedown mouseup mousemove');
 		$(context.element).on('mousedown mouseup mousemove', eventHandler(MouseHandler.onMouseEvent, context));
 	}
@@ -32,8 +29,8 @@ function MouseHandler() {
 			case 'mousedown':			
 				// Trigger a mouse move directly on mouse down
 				// to get preSelection rendering directly
-				//me.onMouseEvent(merge(e, {type: 'mousemove'}),
-				//				merge(context, {mouseDown: true}));
+				me.onMouseEvent(merge(e, {type: 'mousemove'}),
+								merge(context, {mouseDown: true, snapRectStart: null}));
 				
 				// Register a new handler and with a starting point for the selection	
 				
@@ -54,7 +51,7 @@ function MouseHandler() {
 						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
-						snapRectStart: context.snapRectStart
+						handlerContext: context
 					});
 				}
 				break;
@@ -70,7 +67,8 @@ function MouseHandler() {
 					context.onSelection({
 						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
-						y: snapRect.y
+						y: snapRect.y,
+						handlerContext: context
 					});
 				}
 				break;

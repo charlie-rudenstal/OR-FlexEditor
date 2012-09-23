@@ -59,7 +59,7 @@ function Main(options) {
 				var buttonAtPoint = getButtonAtPoint(context.buttons, e.rect.x, e.rect.y);
 				if(buttonAtPoint) {	
 					// Register a new move aware context for the preselection + selection events						
-					context.handler.register(merge(context.handler.context, {
+					context.handler.register(merge(e.handlerContext, {
 						    onPreSelection: eventHandler(onEvent, merge(context, { 
 						  	    event: 'preselection.moving'
 						  	  , movedButton: buttonAtPoint
@@ -85,13 +85,12 @@ function Main(options) {
 					context.renderer.write(Templates.Preselection, context.buttons.concat(button));
 
 					// Register a new preselection aware context for the selection event
-					context.handler.register(merge(context.handler.context, {
+					context.handler.register(merge(e.handlerContext, {
 					 	  onSelection: eventHandler(onEvent, merge(context, {
 					 		    event: 'selection'
 					 	  	  , button: button
 					 	  }))
 					 	, mouseDown: true
-					 	, snapRectStart: e.snapRectStart
 					}));
 				}		
 			
@@ -114,7 +113,7 @@ function Main(options) {
 				context.renderer.write(Templates.Preselection, preButtons);
 
 				// Register a new move aware context for the selection event
-				context.handler.register(merge(context.handler.context, {
+				context.handler.register(merge(e.handlerContext, {
 					onSelection: eventHandler(onEvent, merge(context, {
 						  event: 'selection.moving'
 						, movingButton: true
@@ -134,8 +133,9 @@ function Main(options) {
 						// Render it
 						context.renderer.write(Templates.Button, newButtons);
 
+
 						// And register selection events with the new context
-						context.handler.register(merge(context.handler.context, {
+						context.handler.register(merge(e.handlerContext, {
 							    onPreSelection: eventHandler(onEvent, merge(context, { 
 							        event: 'preselection'
 							  	  , buttons: newButtons
@@ -155,7 +155,7 @@ function Main(options) {
 				context.renderer.write(Templates.Button, context.buttons);
 
 				// And register selection events with the new context
-				context.handler.register(merge(context.handler.context, {
+				context.handler.register(merge(e.handlerContext, {
 					    onPreSelection: eventHandler(onEvent, merge(context, { 
 					  	    event: 'preselection'
 					  	  , movingButton: false
@@ -205,9 +205,6 @@ function GridRenderer() {
 
 })(GridRenderer);function MouseHandler() {
 	this.register = function(context) {
-		
-		this.context = context;
-
 		$(context.element).off('mousedown mouseup mousemove');
 		$(context.element).on('mousedown mouseup mousemove', eventHandler(MouseHandler.onMouseEvent, context));
 	}
@@ -237,8 +234,8 @@ function GridRenderer() {
 			case 'mousedown':			
 				// Trigger a mouse move directly on mouse down
 				// to get preSelection rendering directly
-				//me.onMouseEvent(merge(e, {type: 'mousemove'}),
-				//				merge(context, {mouseDown: true}));
+				me.onMouseEvent(merge(e, {type: 'mousemove'}),
+								merge(context, {mouseDown: true, snapRectStart: null}));
 				
 				// Register a new handler and with a starting point for the selection	
 				
@@ -259,7 +256,7 @@ function GridRenderer() {
 						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
-						snapRectStart: context.snapRectStart
+						handlerContext: context
 					});
 				}
 				break;
@@ -275,7 +272,8 @@ function GridRenderer() {
 					context.onSelection({
 						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
-						y: snapRect.y
+						y: snapRect.y,
+						handlerContext: context
 					});
 				}
 				break;
@@ -443,7 +441,7 @@ function merge(a, b) {
 		Templates.CreateButtonModal = doT.template(Templates.Raw.CreateButtonModal);
 		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		<span class="label label-info">			{{=it.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

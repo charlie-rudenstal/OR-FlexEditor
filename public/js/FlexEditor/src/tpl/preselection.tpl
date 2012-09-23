@@ -18,7 +18,11 @@ Templates.Raw.Preselection = '
 	 	     	width: {{=it.width}}{{#def.unit}};
 	 	     	height: {{=it.height}}{{#def.unit}};">
 
-		<span class="label label-info">
+		<span class="label label-info" style="position: absolute; 
+											  top: 50%; 
+											  left: 50%; 
+											  margin-top: -9px; 
+											  margin-left: -35px;">
 			{{=it.width}}{{#def.unit}} 
 			<span style="color: #2A779D;">x</span> 
 			{{=it.height}}{{#def.unit}}

@@ -58,7 +58,7 @@ function Main(options) {
 				var buttonAtPoint = getButtonAtPoint(context.buttons, e.rect.x, e.rect.y);
 				if(buttonAtPoint) {	
 					// Register a new move aware context for the preselection + selection events						
-					context.handler.register(merge(context.handler.context, {
+					context.handler.register(merge(e.handlerContext, {
 						    onPreSelection: eventHandler(onEvent, merge(context, { 
 						  	    event: 'preselection.moving'
 						  	  , movedButton: buttonAtPoint
@@ -84,13 +84,12 @@ function Main(options) {
 					context.renderer.write(Templates.Preselection, context.buttons.concat(button));
 
 					// Register a new preselection aware context for the selection event
-					context.handler.register(merge(context.handler.context, {
+					context.handler.register(merge(e.handlerContext, {
 					 	  onSelection: eventHandler(onEvent, merge(context, {
 					 		    event: 'selection'
 					 	  	  , button: button
 					 	  }))
 					 	, mouseDown: true
-					 	, snapRectStart: e.snapRectStart
 					}));
 				}		
 			
@@ -113,7 +112,7 @@ function Main(options) {
 				context.renderer.write(Templates.Preselection, preButtons);
 
 				// Register a new move aware context for the selection event
-				context.handler.register(merge(context.handler.context, {
+				context.handler.register(merge(e.handlerContext, {
 					onSelection: eventHandler(onEvent, merge(context, {
 						  event: 'selection.moving'
 						, movingButton: true
@@ -133,8 +132,9 @@ function Main(options) {
 						// Render it
 						context.renderer.write(Templates.Button, newButtons);
 
+
 						// And register selection events with the new context
-						context.handler.register(merge(context.handler.context, {
+						context.handler.register(merge(e.handlerContext, {
 							    onPreSelection: eventHandler(onEvent, merge(context, { 
 							        event: 'preselection'
 							  	  , buttons: newButtons
@@ -154,7 +154,7 @@ function Main(options) {
 				context.renderer.write(Templates.Button, context.buttons);
 
 				// And register selection events with the new context
-				context.handler.register(merge(context.handler.context, {
+				context.handler.register(merge(e.handlerContext, {
 					    onPreSelection: eventHandler(onEvent, merge(context, { 
 					  	    event: 'preselection'
 					  	  , movingButton: false
