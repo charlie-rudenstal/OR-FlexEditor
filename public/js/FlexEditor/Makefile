@@ -10,7 +10,7 @@ end =		$(src)/_end.js
 files = 	$(src)/Main.js\
 	 	 	$(src)/GridRenderer.js\
 			$(src)/MouseHandler.js\
-			$(src)/EventHandler.js\
+			$(src)/Helpers.js\
 			$(src)/Modal.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js
