@@ -26,6 +26,7 @@ Templates.Raw.Preselection = '
 			{{=it.width}}{{#def.unit}} 
 			<span style="color: #2A779D;">x</span> 
 			{{=it.height}}{{#def.unit}}
+
 		</span>
 		
 	</div>

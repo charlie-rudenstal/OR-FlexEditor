@@ -8,11 +8,11 @@ function Main(options) {
 (function(me) {
 
 	me.prototype.load = function(options) {
-		
+
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
 		var element = document.getElementById(options.elementId);
-		var cellSize = options.cellSize || { width: 10, height: 10 };
+		var cellSize = options.cellSize || { width: 5, height: 5 };
 		
 		// Init button and grid renderer
 		var renderer = options.renderer || new Renderer({toElement: element});
@@ -33,19 +33,6 @@ function Main(options) {
 			,    onSelection: eventHandler(onEvent, { event: 'selection',    renderer: renderer, handler: mouseHandler, buttons: [] })
 		});
 	};
-
-	var getButtonAtPoint = function(buttons, x, y) {
-		for(var i in buttons) {
-			var b = buttons[i];
-			if(x >= b.left && x < b.left + b.width && 
-			   y >= b.top && y < b.top + b.height)
-				return { button: buttons[i]
-					   , index: parseInt(i)
-					   , deltaX: x - b.left
-					   , deltaY: y - b.top }
-		}
-		return null;
-	}
 
 	var onEvent = function(e, context) {
 
@@ -133,6 +120,8 @@ function Main(options) {
 						// Render it
 						context.renderer.write(Templates.Button, newButtons);
 
+						console.log(newButtons);
+
 						// And register selection events with the new context
 						context.handler.register(merge(e.handlerContext, {
 							    onPreSelection: eventHandler(onEvent, merge(context, { 
@@ -178,11 +167,25 @@ function Main(options) {
 		}
 	}
 	
+	var getButtonAtPoint = function(buttons, x, y) {
+		for(var i in buttons) {
+			var b = buttons[i];
+			if(x >= b.left && x < b.left + b.width && 
+			   y >= b.top && y < b.top + b.height)
+				return { button: buttons[i]
+					   , index: parseInt(i)
+					   , deltaX: x - b.left
+					   , deltaY: y - b.top }
+		}
+		return null;
+	}
+
 }(Main));
 
 // background-size: 10% 10%, 10% 10%;
 
 function GridRenderer() {
+
 
 };
 
@@ -344,6 +347,7 @@ function GridRenderer() {
 	return function(e) {
 		action(e, context);
 	}
+    
 };
 
 function merge(a, b) {
@@ -362,7 +366,7 @@ function merge(a, b) {
 
 		// Render a modal using the body template with the Create Button form
 		renderer.write(Templates.Modal, [{
-			header: "Modal",
+			header: "Create new button",
 			body: renderer.render(Templates.CreateButtonModal)
 		}], document.body);
 
@@ -453,7 +457,7 @@ function merge(a, b) {
 		Templates.CreateButtonModal = doT.template(Templates.Raw.CreateButtonModal);
 		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height}}{{#def.unit}}			Left: {{=it.left}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

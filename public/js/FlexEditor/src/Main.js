@@ -7,11 +7,11 @@ function Main(options) {
 (function(me) {
 
 	me.prototype.load = function(options) {
-		
+
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
 		var element = document.getElementById(options.elementId);
-		var cellSize = options.cellSize || { width: 10, height: 10 };
+		var cellSize = options.cellSize || { width: 5, height: 5 };
 		
 		// Init button and grid renderer
 		var renderer = options.renderer || new Renderer({toElement: element});
@@ -32,19 +32,6 @@ function Main(options) {
 			,    onSelection: eventHandler(onEvent, { event: 'selection',    renderer: renderer, handler: mouseHandler, buttons: [] })
 		});
 	};
-
-	var getButtonAtPoint = function(buttons, x, y) {
-		for(var i in buttons) {
-			var b = buttons[i];
-			if(x >= b.left && x < b.left + b.width && 
-			   y >= b.top && y < b.top + b.height)
-				return { button: buttons[i]
-					   , index: parseInt(i)
-					   , deltaX: x - b.left
-					   , deltaY: y - b.top }
-		}
-		return null;
-	}
 
 	var onEvent = function(e, context) {
 
@@ -132,6 +119,8 @@ function Main(options) {
 						// Render it
 						context.renderer.write(Templates.Button, newButtons);
 
+						console.log(newButtons);
+
 						// And register selection events with the new context
 						context.handler.register(merge(e.handlerContext, {
 							    onPreSelection: eventHandler(onEvent, merge(context, { 
@@ -177,5 +166,18 @@ function Main(options) {
 		}
 	}
 	
+	var getButtonAtPoint = function(buttons, x, y) {
+		for(var i in buttons) {
+			var b = buttons[i];
+			if(x >= b.left && x < b.left + b.width && 
+			   y >= b.top && y < b.top + b.height)
+				return { button: buttons[i]
+					   , index: parseInt(i)
+					   , deltaX: x - b.left
+					   , deltaY: y - b.top }
+		}
+		return null;
+	}
+
 }(Main));
 

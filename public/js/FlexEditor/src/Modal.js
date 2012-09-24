@@ -12,7 +12,7 @@ function Modal(options) {
 
 		// Render a modal using the body template with the Create Button form
 		renderer.write(Templates.Modal, [{
-			header: "Modal",
+			header: "Create new button",
 			body: renderer.render(Templates.CreateButtonModal)
 		}], document.body);
 

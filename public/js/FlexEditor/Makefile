@@ -6,7 +6,6 @@ end =		$(src)/_end.js
 
 #$(src)/TestPerformance.js
 			
-
 files = 	$(src)/Main.js\
 	 	 	$(src)/GridRenderer.js\
 			$(src)/MouseHandler.js\
@@ -16,23 +15,23 @@ files = 	$(src)/Main.js\
 			$(src)/Templates.js
 			
 templates = $(tpl)/button.tpl\
-templates = $(tpl)/preselection.tpl\
+ 		    $(tpl)/preselection.tpl\
 			$(tpl)/createButton.modal.tpl\
 			$(tpl)/modal.tpl
 
-FlexEditor.js: ${files}
+FlexEditortarget.js: ${files}
 
 	# Add the function wrapper
-	cat ${start} > $@
+	cat ${start} > FlexEditor.js
 
 	# Append the modules
-	cat ${files} >> $@
+	cat ${files} >> FlexEditor.js
 
 	# HTML Templates (remove newlines to support multiline strings in source)
-	cat ${templates} | tr -d "\n" >> $@
+	cat ${templates} | tr -d "\n" >> FlexEditor.js
 	
 	# And finally exposing public objects
-	cat ${end} >> $@
+	cat ${end} >> FlexEditor.js
 
 watch:
 	echo Watching for changes and automatically merging FlexEditor.js
@@ -50,5 +49,5 @@ watchmac:
 		$(MAKE) -s FlexEditor.js; \
 	done	
 
-.PHONY: watch, FlexEditor.js
-.SILENT: watch FlexEditor.js 
+.PHONY: watch, FlexEditortarget.js
+.SILENT: watch FlexEditortarget.js 
