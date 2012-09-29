@@ -6,6 +6,10 @@ function Main(options) {
 
 (function(me) {
 
+	var buttons = [];
+	var renderer = null;
+	var state = new cursorState();
+
 	me.prototype.load = function(options) {
 
 		// Merge parameter-options with the constructor-options (or use defaults)
@@ -34,24 +38,12 @@ function Main(options) {
 		});
 	};
 
-	var state = new cursorState();
-	var buttons = [];
-	var renderer = null;
-
-	var onEvent = function(e, context) {
-		var action = state[context.event];
-		if(action) {
-			action(e);
-		}
-	}
-
 	function cursorState() {
 		this.mouseDown = function(e) {
 			var buttonAtPoint = getButtonAtPoint(buttons, e.rect.x, e.rect.y);
 			if(buttonAtPoint) {	
 				state  = new moveState(buttonAtPoint);
-			}
-			else {
+			} else {
 				state = new selectionState();
 			}
 		}
@@ -62,8 +54,7 @@ function Main(options) {
 			var previewButton = { 
 				  text: ''
 				, position: 'relative'
-				, left: e.rectFromMouseDown.x, width:  e.rectFromMouseDown.width
-				, top:  e.rectFromMouseDown.y, height: e.rectFromMouseDown.height
+				, rect: e.rectFromMouseDown
 			};
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 		}
@@ -75,8 +66,7 @@ function Main(options) {
 					buttons.push({
 						  text: results.inputText
 						, position: 'relative'
-						, left: e.rectFromMouseDown.x, width:  e.rectFromMouseDown.width
-					 	, top:  e.rectFromMouseDown.y, height: e.rectFromMouseDown.height
+						, rect: e.rectFromMouseDown
 					});
 					renderer.write(Templates.Button, buttons);
 				},
@@ -91,8 +81,8 @@ function Main(options) {
 
 	function moveState(movedButton) {
 		this.mouseMove = function(e) {
-			movedButton.button.left = e.rect.x - movedButton.deltaX;
-			movedButton.button.top = e.rect.y - movedButton.deltaY;
+			movedButton.button.rect.x = e.rect.x - movedButton.deltaX;
+			movedButton.button.rect.y = e.rect.y - movedButton.deltaY;
 			renderer.write(Templates.Button, buttons);
 		}
 
@@ -100,16 +90,21 @@ function Main(options) {
 			state = new cursorState();
 		}
 	}
+
+	var onEvent = function(e, context) {
+		var action = state[context.event];
+		if(action) action(e);
+	}
 	
 	var getButtonAtPoint = function(buttons, x, y) {
 		for(var i in buttons) {
 			var b = buttons[i];
-			if(x >= b.left && x < b.left + b.width && 
-			   y >= b.top && y < b.top + b.height)
+			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
+			   y >= b.rect.y && y < b.rect.y + b.rect.height)
 				return { button: buttons[i]
 					   , index: parseInt(i)
-					   , deltaX: x - b.left
-					   , deltaY: y - b.top }
+					   , deltaX: x - b.rect.x
+					   , deltaY: y - b.rect.y }
 		}
 		return null;
 	}

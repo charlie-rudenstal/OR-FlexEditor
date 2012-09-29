@@ -7,16 +7,16 @@ function MouseHandler() {
 
 (function(me) {
 
+	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
+	var state = states.MOUSE_UP;
+	var snapRectStart = null;
+
+
 	/**
 	 * Handle a mouse event and call onPreSelection(rect) when user interacts
 	 * @param  obj e       Mouse Event
 	 * @param  obj context Current Context {element, cellSize, onPreSelection}
 	 */
-	
-	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
-	var state = states.MOUSE_UP;
-	var snapRectStart = null;
-
 	me.onMouseEvent = function(e, context) {
 
 		// Retrieve element size (rectangle) if not supplied

@@ -7,6 +7,10 @@ function Main(options) {
 
 (function(me) {
 
+	var buttons = [];
+	var renderer = null;
+	var state = new cursorState();
+
 	me.prototype.load = function(options) {
 
 		// Merge parameter-options with the constructor-options (or use defaults)
@@ -35,24 +39,12 @@ function Main(options) {
 		});
 	};
 
-	var state = new cursorState();
-	var buttons = [];
-	var renderer = null;
-
-	var onEvent = function(e, context) {
-		var action = state[context.event];
-		if(action) {
-			action(e);
-		}
-	}
-
 	function cursorState() {
 		this.mouseDown = function(e) {
 			var buttonAtPoint = getButtonAtPoint(buttons, e.rect.x, e.rect.y);
 			if(buttonAtPoint) {	
 				state  = new moveState(buttonAtPoint);
-			}
-			else {
+			} else {
 				state = new selectionState();
 			}
 		}
@@ -63,8 +55,7 @@ function Main(options) {
 			var previewButton = { 
 				  text: ''
 				, position: 'relative'
-				, left: e.rectFromMouseDown.x, width:  e.rectFromMouseDown.width
-				, top:  e.rectFromMouseDown.y, height: e.rectFromMouseDown.height
+				, rect: e.rectFromMouseDown
 			};
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 		}
@@ -76,8 +67,7 @@ function Main(options) {
 					buttons.push({
 						  text: results.inputText
 						, position: 'relative'
-						, left: e.rectFromMouseDown.x, width:  e.rectFromMouseDown.width
-					 	, top:  e.rectFromMouseDown.y, height: e.rectFromMouseDown.height
+						, rect: e.rectFromMouseDown
 					});
 					renderer.write(Templates.Button, buttons);
 				},
@@ -92,8 +82,8 @@ function Main(options) {
 
 	function moveState(movedButton) {
 		this.mouseMove = function(e) {
-			movedButton.button.left = e.rect.x - movedButton.deltaX;
-			movedButton.button.top = e.rect.y - movedButton.deltaY;
+			movedButton.button.rect.x = e.rect.x - movedButton.deltaX;
+			movedButton.button.rect.y = e.rect.y - movedButton.deltaY;
 			renderer.write(Templates.Button, buttons);
 		}
 
@@ -101,16 +91,21 @@ function Main(options) {
 			state = new cursorState();
 		}
 	}
+
+	var onEvent = function(e, context) {
+		var action = state[context.event];
+		if(action) action(e);
+	}
 	
 	var getButtonAtPoint = function(buttons, x, y) {
 		for(var i in buttons) {
 			var b = buttons[i];
-			if(x >= b.left && x < b.left + b.width && 
-			   y >= b.top && y < b.top + b.height)
+			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
+			   y >= b.rect.y && y < b.rect.y + b.rect.height)
 				return { button: buttons[i]
 					   , index: parseInt(i)
-					   , deltaX: x - b.left
-					   , deltaY: y - b.top }
+					   , deltaX: x - b.rect.x
+					   , deltaY: y - b.rect.y }
 		}
 		return null;
 	}
@@ -161,16 +156,16 @@ function GridRenderer() {
 
 (function(me) {
 
+	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
+	var state = states.MOUSE_UP;
+	var snapRectStart = null;
+
+
 	/**
 	 * Handle a mouse event and call onPreSelection(rect) when user interacts
 	 * @param  obj e       Mouse Event
 	 * @param  obj context Current Context {element, cellSize, onPreSelection}
 	 */
-	
-	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
-	var state = states.MOUSE_UP;
-	var snapRectStart = null;
-
 	me.onMouseEvent = function(e, context) {
 
 		// Retrieve element size (rectangle) if not supplied
@@ -383,7 +378,7 @@ function merge(a, b) {
 		Templates.CreateButtonModal = doT.template(Templates.Raw.CreateButtonModal);
 		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.left}}{{#def.unit}};	 	     	top: {{=it.top}}{{#def.unit}};	 	     	width: {{=it.width}}{{#def.unit}};	 	     	height: {{=it.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.rect.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.rect.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor
