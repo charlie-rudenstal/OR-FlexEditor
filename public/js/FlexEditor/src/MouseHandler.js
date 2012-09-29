@@ -12,6 +12,11 @@ function MouseHandler() {
 	 * @param  obj e       Mouse Event
 	 * @param  obj context Current Context {element, cellSize, onPreSelection}
 	 */
+	
+	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
+	var state = states.MOUSE_UP;
+	var snapRectStart = null;
+
 	me.onMouseEvent = function(e, context) {
 
 		// Retrieve element size (rectangle) if not supplied
@@ -27,49 +32,35 @@ function MouseHandler() {
 
 		switch (e.type) {		
 			case 'mousedown':			
-				
-				// Register a new handler and with a starting point for the selection	
-				var newContext = merge(context, {
-					  mouseDown: true
-					, snapRectStart: snapRect
-				});
-				$(context.element).off('mousedown mouseup mousemove');
-				$(context.element).on ('mousedown mouseup mousemove', 
-									   eventHandler(me.onMouseEvent, newContext));
-
-				// Trigger a preselection instantly when mouse is down
-				context.onPreSelection({
-				 	rect: rectFrom(snapRect, snapRect),
-				 	x: snapRect.x,
-				 	y: snapRect.y,
-				 	handlerContext: newContext
-				});
+				if(state == states.MOUSE_UP) {
+					state = states.MOUSE_DOWN;
+					snapRectStart = snapRect;
+					context.onMouseDown({
+					 	rect: rectFrom(snapRect, snapRect),
+					 	x: snapRect.x,
+					 	y: snapRect.y,
+					});
+				}
 
 				break;
 			case 'mousemove':	
-				if(context.mouseDown) {
-					context.onPreSelection({
-						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
+				if(state == states.MOUSE_DOWN) {
+					context.onMouseMove({
+						rect: rectFrom(snapRect, snapRect),
+						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
-						handlerContext: context
 					});
 				}
 				break;
 			case 'mouseup': 		
-				if(context.mouseDown) {			
-					var newHandler = eventHandler(me.onMouseEvent, merge(context, {
-						mouseDown: false	
-					}));
-
-					$(context.element).off('mousedown mouseup mousemove');
-					$(context.element).on ('mousedown mouseup mousemove', newHandler);
-
-					context.onSelection({
-						rect: rectFrom(context.snapRectStart || snapRect, snapRect),
+				if(state == states.MOUSE_DOWN) {	
+					state = states.MOUSE_UP;		
+					context.onMouseUp({
+						rect: rectFrom(snapRect, snapRect),
+						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
-						handlerContext: context
 					});
 				}
 				break;
