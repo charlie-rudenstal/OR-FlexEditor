@@ -12,7 +12,7 @@ Templates.Raw.Preselection = '
 		{{?}}
 	#}}
 
-	<div class="component preselection {{=it.customClass || ""}}" 
+	<div class="component preselection {{=it.resizeDir || ""}} {{=it.customClass || ""}}" 
 		 style="left: {{=it.rect.x}}{{#def.unit}};
 	 	     	top: {{=it.rect.y}}{{#def.unit}};
 	 	     	width: {{=it.rect.width}}{{#def.unit}};

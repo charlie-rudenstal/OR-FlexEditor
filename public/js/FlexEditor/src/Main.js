@@ -199,20 +199,25 @@ function Main(options) {
 			var deltaY = e.y - e.yMouseDownSnapped;
 			var renderButtons = buttons;
 			var previewButton = merge({}, resizedButton.button, true);
+
 			switch(direction) {
 				case "left":
 					previewButton.rect.x = resizedButton.button.rect.x + deltaX; 
 					previewButton.rect.width = resizedButton.button.rect.width - deltaX;
+					previewButton.resizeDir = 'resizeLeft';
 					break;
 				case "top":
 					previewButton.rect.y = resizedButton.button.rect.y + deltaY;
 					previewButton.rect.height = resizedButton.button.rect.height - deltaY;
+					previewButton.resizeDir = 'resizeTop';
 					break;
 				case "right":
 					previewButton.rect.width = resizedButton.button.rect.width + deltaX;
+					previewButton.resizeDir = 'resizeRight';
 					break;
 				case "bottom":
 					previewButton.rect.height = resizedButton.button.rect.height + deltaY;
+					previewButton.resizeDir = 'resizeBottom';
 					break;
 			}
 

@@ -52,22 +52,22 @@ body {
 	box-sizing: border-box;
 }
 
-.button.resizeLeft {
+.component.resizeLeft {
 	border-left: 3px solid #bbf;
 	cursor: w-resize;
 }
 
-.button.resizeTop {
+.component.resizeTop {
 	border-top: 3px solid #bbf;
 	cursor: n-resize;
 }
 
-.button.resizeRight {
+.component.resizeRight {
 	border-right: 3px solid #bbf;
 	cursor: e-resize;
 }
 
-.button.resizeBottom {
+.component.resizeBottom {
 	border-bottom: 3px solid #bbf;
 	cursor: s-resize;
 }
