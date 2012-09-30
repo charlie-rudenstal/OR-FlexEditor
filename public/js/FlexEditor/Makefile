@@ -34,11 +34,11 @@ FlexEditortarget.js: ${files}
 	cat ${end} >> FlexEditor.js
 
 watch:
-	echo Watching for changes and automatically merging FlexEditor.js
+	echo Watching for changes and automatically merging FlexEditor.js yeah
 	$(MAKE) -s FlexEditor.js
 	while true ; do \
 		inotifywait -qqr src; \
-		$(MAKE) -s FlexEditor.js; \
+		$(MAKE) -s; \
 	done
 
 watchmac:
@@ -46,7 +46,7 @@ watchmac:
 	$(MAKE) -s FlexEditor.js
 	while kqwait src; do \
 		echo build \
-		$(MAKE) -s FlexEditor.js; \
+		$(MAKE) -s; \
 	done	
 
 .PHONY: watch, FlexEditortarget.js

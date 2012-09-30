@@ -48,8 +48,28 @@ body {
 }
 
 .component.button {
+	background-color: #4286b9;
+	box-sizing: border-box;
+}
 
-	background-color: #4286b9;	
+.button.resizeLeft {
+	border-left: 3px solid #bbf;
+	cursor: w-resize;
+}
+
+.button.resizeTop {
+	border-top: 3px solid #bbf;
+	cursor: n-resize;
+}
+
+.button.resizeRight {
+	border-right: 3px solid #bbf;
+	cursor: e-resize;
+}
+
+.button.resizeBottom {
+	border-bottom: 3px solid #bbf;
+	cursor: s-resize;
 }
 
 .grid-single
@@ -59,7 +79,7 @@ body {
 
 	background-image: -webkit-linear-gradient(rgba(255, 255, 255, .1) 1px, transparent 1px), 
 					  -webkit-linear-gradient(0deg, rgba(255, 255, 255, .1) 1px, transparent 1px)
-					  
+
 	/*background-size: 20px 20px, 
 					 20px 20px;*/
 					 

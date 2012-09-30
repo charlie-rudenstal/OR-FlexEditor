@@ -5,18 +5,20 @@ function Main(options) {
 	this.options = options;
 };
 
+
 (function(me) {
 
 	var buttons = [];
 	var renderer = null;
 	var state = new cursorState();
+	var cellSize =  { width: 5, height: 5 };
+
 
 	me.prototype.load = function(options) {
-
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
 		var element = document.getElementById(options.elementId);
-		var cellSize = options.cellSize || { width: 5, height: 5 };
+		if(options.cellSize) cellSize = options.cellSize; 
 		
 		// Init button and grid renderer
 		renderer = options.renderer || new Renderer({toElement: element});
@@ -41,12 +43,48 @@ function Main(options) {
 
 	function cursorState() {
 		this.mouseDown = function(e) {
-			var buttonAtPoint = getButtonAtPoint(buttons, e.rect.x, e.rect.y);
-			if(buttonAtPoint) {	
-				state  = new moveState(buttonAtPoint);
+			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			if(buttonAtCursor) {	
+				//state  = new moveState(buttonAtCursor);
+				var newButton = buttonAtCursor.button;
+				if (buttonAtCursor.deltaX < 2) {	
+					state = new resizeState(buttonAtCursor, "left");
+				} else if (buttonAtCursor.deltaY < 2) {
+					state = new resizeState(buttonAtCursor, "top");		
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - 2) {
+					state = new resizeState(buttonAtCursor, "right");	
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - 2) {
+					state = new resizeState(buttonAtCursor, "bottom");	
+				} else {
+					state = new moveState(buttonAtCursor);
+				}
 			} else {
 				state = new selectionState();
 			}
+		}
+
+		this.mouseMove = function(e) {
+			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			var renderButtons = buttons;
+			
+			if(buttonAtCursor) {
+				var newButton = buttonAtCursor.button;
+				var resizeDir = null;
+				if (buttonAtCursor.deltaX < 2) {	
+					resizeDir = "resizeLeft";
+				} else if (buttonAtCursor.deltaY < 2) {
+					resizeDir = "resizeTop";			
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - 2) {
+					resizeDir = "resizeRight";			
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - 2) {
+					resizeDir = "resizeBottom";			
+				}
+				if(resizeDir) {
+					newButton = merge(buttonAtCursor.button, { resizeDir: resizeDir });
+				}
+				renderButtons = replace(buttons, buttonAtCursor.button, newButton);
+			}
+			renderer.write(Templates.Button, renderButtons); 
 		}
 	}
 
@@ -82,8 +120,8 @@ function Main(options) {
 
 	function moveState(movedButton) {
 		this.mouseMove = function(e) {
-			movedButton.button.rect.x = e.rect.x - movedButton.deltaX;
-			movedButton.button.rect.y = e.rect.y - movedButton.deltaY;
+			movedButton.button.rect.x = e.rect.x - movedButton.deltaXSnapped;
+			movedButton.button.rect.y = e.rect.y - movedButton.deltaYSnapped;
 			renderer.write(Templates.Button, buttons);
 		}
 
@@ -97,18 +135,77 @@ function Main(options) {
 		if(action) action(e);
 	}
 	
-	var getButtonAtPoint = function(buttons, x, y) {
+	var getButtonAtCursor = function(buttons, x, y) {
+		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
 		for(var i in buttons) {
 			var b = buttons[i];
 			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
 			   y >= b.rect.y && y < b.rect.y + b.rect.height)
+
+
+				
 				return { button: buttons[i]
 					   , index: parseInt(i)
 					   , deltaX: x - b.rect.x
-					   , deltaY: y - b.rect.y }
+					   , deltaY: y - b.rect.y
+					   , deltaXSnapped: snappedPoint.x - b.rect.x
+					   , deltaYSnapped: snappedPoint.y - b.rect.y }
 		}
 		return null;
 	}
+
+	function resizeState(resizedButton, direction) {
+		this.mouseUp = function(e) {
+			state = new cursorState();
+
+			var deltaX = e.x - e.xMouseDownSnapped;
+			var deltaY = e.y - e.yMouseDownSnapped;
+			switch(direction) {
+				case "left":
+					resizedButton.button.rect.x = resizedButton.button.rect.x + deltaX; 
+					resizedButton.button.rect.width = resizedButton.button.rect.width - deltaX;
+					break;
+				case "top":
+					resizedButton.button.rect.y = resizedButton.button.rect.y + deltaY;
+					resizedButton.button.rect.height = resizedButton.button.rect.height - deltaY;
+					break;
+				case "right":
+					resizedButton.button.rect.width = resizedButton.button.rect.width + deltaX;
+					break;
+				case "bottom":
+					resizedButton.button.rect.height = resizedButton.button.rect.height + deltaY;
+					break;
+			}		
+		}
+
+		this.mouseMove = function(e) {
+			var deltaX = e.x - e.xMouseDownSnapped;
+			var deltaY = e.y - e.yMouseDownSnapped;
+			var renderButtons = buttons;
+			var previewButton = merge({}, resizedButton.button, true);
+			switch(direction) {
+				case "left":
+					previewButton.rect.x = resizedButton.button.rect.x + deltaX; 
+					previewButton.rect.width = resizedButton.button.rect.width - deltaX;
+					break;
+				case "top":
+					previewButton.rect.y = resizedButton.button.rect.y + deltaY;
+					previewButton.rect.height = resizedButton.button.rect.height - deltaY;
+					break;
+				case "right":
+					previewButton.rect.width = resizedButton.button.rect.width + deltaX;
+					break;
+				case "bottom":
+					previewButton.rect.height = resizedButton.button.rect.height + deltaY;
+					break;
+			}
+
+			var previewButtons = replace(buttons, resizedButton.button, previewButton);
+			renderer.write(Templates.Button, previewButtons);
+		}
+	}
+
+
 
 }(Main));
 
@@ -159,6 +256,10 @@ function GridRenderer() {
 	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
 	var state = states.MOUSE_UP;
 	var snapRectStart = null;
+	var xMouseDown = null;
+	var yMouseDown = null;
+	var xMouseDownSnapped = null;
+	var yMouseDownSnapped = null;
 
 
 	/**
@@ -174,33 +275,45 @@ function GridRenderer() {
 		}
 
 		// Retrieve mouse position and a rectangle it snaps to given cellsize
-		var mouse     = { x: e.pageX, y: e.pageY };
-		var absolute  = subtract(mouse, context.elementRect);
-		var relative  = percentage(absolute, context.elementRect);		
-		var snapRect  = getSnappedRect(relative, context.cellSize);
+		var mouse     	= { x: e.pageX, y: e.pageY };
+		var abs  		= subtract(mouse, context.elementRect);
+		var relToEditor	= percentage(abs, context.elementRect);		
+		var snapRect  	= getSnappedRect(relToEditor, context.cellSize);
 
 		switch (e.type) {		
 			case 'mousedown':			
 				if(state == states.MOUSE_UP) {
 					state = states.MOUSE_DOWN;
 					snapRectStart = snapRect;
+					xMouseDown = relToEditor.x;
+					yMouseDown = relToEditor.y;
+					xMouseDownSnapped = snapRect.x;
+					yMouseDownSnapped = snapRect.y;
 					context.onMouseDown({
 					 	rect: rectFrom(snapRect, snapRect),
 					 	x: snapRect.x,
 					 	y: snapRect.y,
+						relX: relToEditor.x,
+						relY: relToEditor.y
 					});
 				}
 
 				break;
 			case 'mousemove':	
-				if(state == states.MOUSE_DOWN) {
+				// if(state == states.MOUSE_DOWN) {
 					context.onMouseMove({
 						rect: rectFrom(snapRect, snapRect),
 						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
+						relX: relToEditor.x,
+						relY: relToEditor.y,
+						xMouseDown: xMouseDown,
+						yMouseDown: yMouseDown,
+						xMouseDownSnapped: xMouseDownSnapped,
+						yMouseDownSnapped: yMouseDownSnapped
 					});
-				}
+				// }
 				break;
 			case 'mouseup': 		
 				if(state == states.MOUSE_DOWN) {	
@@ -210,6 +323,12 @@ function GridRenderer() {
 						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
+						relX: relToEditor.x,
+						relY: relToEditor.y,
+						xMouseDown: xMouseDown,
+						yMouseDown: yMouseDown,
+						xMouseDownSnapped: xMouseDownSnapped,
+						yMouseDownSnapped: yMouseDownSnapped
 					});
 				}
 				break;
@@ -271,8 +390,36 @@ function GridRenderer() {
     
 };
 
-function merge(a, b) {
-	return $.extend({}, a, b);
+function merge(a, b, deep) {
+	var isDeep = deep === true;
+	return $.extend(isDeep, {}, a, b);
+}
+
+function remove(item, array) {
+	var newArray = [];
+	for(var i in array) {
+		if(array[i] !== item) newArray.push(array[i]);
+	}
+	return newArray;
+}
+
+function replace(array, oldItem, newItem) {
+	var newArray = [];
+	for(var i in array) {
+		if(array[i] === oldItem) newArray.push(newItem);
+		else newArray.push(array[i]);
+	}
+	return newArray;
+}
+
+function snapPoint(point, cellSize) {
+	return {
+		// 					      ~~ is a fast way to trim decimals
+		x:      cellSize.width  * ~~(point.x / cellSize.width),
+		y:      cellSize.height * ~~(point.y / cellSize.height),
+		width:  cellSize.width,
+		height: cellSize.height
+	};
 }function Modal(options) {
 	return {
 		getResults: Model.getResults.bind(Model, options.contentsTemplate,
@@ -378,7 +525,7 @@ function merge(a, b) {
 		Templates.CreateButtonModal = doT.template(Templates.Raw.CreateButtonModal);
 		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.rect.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.rect.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button {{=it.resizeDir || ""}}" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.rect.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.rect.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

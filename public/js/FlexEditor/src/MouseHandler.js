@@ -10,6 +10,10 @@ function MouseHandler() {
 	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
 	var state = states.MOUSE_UP;
 	var snapRectStart = null;
+	var xMouseDown = null;
+	var yMouseDown = null;
+	var xMouseDownSnapped = null;
+	var yMouseDownSnapped = null;
 
 
 	/**
@@ -25,33 +29,45 @@ function MouseHandler() {
 		}
 
 		// Retrieve mouse position and a rectangle it snaps to given cellsize
-		var mouse     = { x: e.pageX, y: e.pageY };
-		var absolute  = subtract(mouse, context.elementRect);
-		var relative  = percentage(absolute, context.elementRect);		
-		var snapRect  = getSnappedRect(relative, context.cellSize);
+		var mouse     	= { x: e.pageX, y: e.pageY };
+		var abs  		= subtract(mouse, context.elementRect);
+		var relToEditor	= percentage(abs, context.elementRect);		
+		var snapRect  	= getSnappedRect(relToEditor, context.cellSize);
 
 		switch (e.type) {		
 			case 'mousedown':			
 				if(state == states.MOUSE_UP) {
 					state = states.MOUSE_DOWN;
 					snapRectStart = snapRect;
+					xMouseDown = relToEditor.x;
+					yMouseDown = relToEditor.y;
+					xMouseDownSnapped = snapRect.x;
+					yMouseDownSnapped = snapRect.y;
 					context.onMouseDown({
 					 	rect: rectFrom(snapRect, snapRect),
 					 	x: snapRect.x,
 					 	y: snapRect.y,
+						relX: relToEditor.x,
+						relY: relToEditor.y
 					});
 				}
 
 				break;
 			case 'mousemove':	
-				if(state == states.MOUSE_DOWN) {
+				// if(state == states.MOUSE_DOWN) {
 					context.onMouseMove({
 						rect: rectFrom(snapRect, snapRect),
 						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
+						relX: relToEditor.x,
+						relY: relToEditor.y,
+						xMouseDown: xMouseDown,
+						yMouseDown: yMouseDown,
+						xMouseDownSnapped: xMouseDownSnapped,
+						yMouseDownSnapped: yMouseDownSnapped
 					});
-				}
+				// }
 				break;
 			case 'mouseup': 		
 				if(state == states.MOUSE_DOWN) {	
@@ -61,6 +77,12 @@ function MouseHandler() {
 						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
 						x: snapRect.x,
 						y: snapRect.y,
+						relX: relToEditor.x,
+						relY: relToEditor.y,
+						xMouseDown: xMouseDown,
+						yMouseDown: yMouseDown,
+						xMouseDownSnapped: xMouseDownSnapped,
+						yMouseDownSnapped: yMouseDownSnapped
 					});
 				}
 				break;
