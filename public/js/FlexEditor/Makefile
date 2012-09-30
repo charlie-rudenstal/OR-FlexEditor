@@ -11,12 +11,14 @@ files = 	$(src)/Main.js\
 			$(src)/MouseHandler.js\
 			$(src)/Helpers.js\
 			$(src)/Modal.js\
+			$(src)/Popover.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js
 			
 templates = $(tpl)/button.tpl\
  		    $(tpl)/preselection.tpl\
 			$(tpl)/createButton.modal.tpl\
+			$(tpl)/createButton.popover.tpl\
 			$(tpl)/modal.tpl
 
 FlexEditortarget.js: ${files}

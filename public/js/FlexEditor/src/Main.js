@@ -98,8 +98,17 @@ function Main(options) {
 		}
 
 		this.mouseUp = function(e) {
-			state = new cursorState();
-			Modal.getResults(Templates.CreateButtonModal, renderer, {
+
+			var previewButton = { 
+				  text: ''
+				, position: 'relative'
+				, rect: e.rectFromMouseDown
+				, customClass: 'current'
+			};
+			renderer.write(Templates.Preselection, buttons.concat(previewButton));
+
+			console.log($('.tmpPreview'));
+			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
 					buttons.push({
 						  text: results.inputText
@@ -107,14 +116,22 @@ function Main(options) {
 						, rect: e.rectFromMouseDown
 					});
 					renderer.write(Templates.Button, buttons);
+					state = new cursorState();
 				},
 				
 				// On cancelled, just re-render already stored buttons to clear preselection
 				onCancelled: function() {
 					renderer.write(Templates.Button, buttons);
+					state = new cursorState();
 				}
-			});				
+			});	
+
+			state = new frosenState();			
 		}
+	}
+
+	function frosenState() {
+
 	}
 
 	function moveState(movedButton) {
