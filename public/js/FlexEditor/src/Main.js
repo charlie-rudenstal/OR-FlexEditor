@@ -200,7 +200,7 @@ function Main(options) {
 			}
 
 			var previewButtons = replace(buttons, resizedButton.button, previewButton);
-			renderer.write(Templates.Button, previewButtons);
+			renderer.write(Templates.Preselection, previewButtons);
 		}
 	}
 
