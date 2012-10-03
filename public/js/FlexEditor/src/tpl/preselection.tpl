@@ -13,16 +13,14 @@ Templates.Raw.Preselection = '
 	#}}
 
 	<div class="component preselection {{=it.customClass || ""}}" 
-		 style="left: {{=it.rect.x}}{{#def.unit}};
-	 	     	top: {{=it.rect.y}}{{#def.unit}};
-	 	     	width: {{=it.rect.width}}{{#def.unit}};
-	 	     	height: {{=it.rect.height}}{{#def.unit}};">
+		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};
+	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};
+	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};
+	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">
 	 	
 	 	{{? it.resizeDir}}
 	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>
 	 	{{?}}
-
-
 
 		<span class="label label-info" style="position: absolute; 
 											  top: 50%; 
@@ -31,9 +29,9 @@ Templates.Raw.Preselection = '
 											  margin-left: -35px;">
 
 
-			{{=it.rect.width}}{{#def.unit}} 
+			{{=it.width(null, it.position)}}{{#def.unit}} 
 			<span style="color: #2A779D;">x</span> 
-			{{=it.rect.height}}{{#def.unit}}
+			{{=it.height(null, it.position)}}{{#def.unit}}
 
 		</span>
 		

@@ -10,6 +10,7 @@ files = 	$(src)/Main.js\
 	 	 	$(src)/GridRenderer.js\
 			$(src)/MouseHandler.js\
 			$(src)/Helpers.js\
+			$(src)/Button.js\
 			$(src)/Modal.js\
 			$(src)/Popover.js\
 			$(src)/Renderer.js\

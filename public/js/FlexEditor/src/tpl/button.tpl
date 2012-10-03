@@ -12,18 +12,19 @@ Templates.Raw.Button = '
 		{{?}}
 	#}}
 
-	<div class="component button " 
-		 style="left: {{=it.rect.x}}{{#def.unit}};
-	 	     	top: {{=it.rect.y}}{{#def.unit}};
-	 	     	width: {{=it.rect.width}}{{#def.unit}};
-	 	     	height: {{=it.rect.height}}{{#def.unit}};">
-
+	<div class="component button" 
+	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};
+	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};
+	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};
+	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">
+	 	
 	 	{{? it.resizeDir}}
 	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>
 	 	{{?}}
 
 		{{=it.text}}
-		
+
+	 	<div class="positionTypeAdorner">{{#def.unit}}</div>
 	</div>
 
 ';

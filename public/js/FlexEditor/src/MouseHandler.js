@@ -48,7 +48,8 @@ function MouseHandler() {
 					 	x: snapRect.x,
 					 	y: snapRect.y,
 						relX: relToEditor.x,
-						relY: relToEditor.y
+						relY: relToEditor.y,
+						originalEvent: e
 					});
 				}
 

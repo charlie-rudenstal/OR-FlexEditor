@@ -13,7 +13,6 @@ function Main(options) {
 	var state = new cursorState();
 	var cellSize =  { width: 5, height: 5 };
 
-
 	me.prototype.load = function(options) {
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
@@ -44,16 +43,31 @@ function Main(options) {
 	function cursorState() {
 		this.mouseDown = function(e) {
 			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
-			if(buttonAtCursor) {	
+			var resizeAdornerMouseDistane = 1;
+
+			// Did user mouse down on the positionType switcher on a button?
+			if(e.originalEvent.toElement.className == "positionTypeAdorner") {
+				
+				// Set to absolut positining and calculate 
+				// absolute coordinates to equal the current relative position
+				if (buttonAtCursor.button.position == "relative") {
+					buttonAtCursor.button.position = "absolute";
+				} else {
+					buttonAtCursor.button.position = "relative";
+				}
+				renderer.write(Templates.Button, buttons);			
+			}
+			// Did user mouse down on a button?
+			else if(buttonAtCursor) {	
 				//state  = new moveState(buttonAtCursor);
 				var newButton = buttonAtCursor.button;
-				if (buttonAtCursor.deltaX < 2) {	
+				if (buttonAtCursor.deltaX < resizeAdornerMouseDistane) {	
 					state = new resizeState(buttonAtCursor, "left");
-				} else if (buttonAtCursor.deltaY < 2) {
+				} else if (buttonAtCursor.deltaY < resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "top");		
-				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - 2) {
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "right");	
-				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - 2) {
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "bottom");	
 				} else {
 					state = new moveState(buttonAtCursor);
@@ -66,17 +80,18 @@ function Main(options) {
 		this.mouseMove = function(e) {
 			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
 			var renderButtons = buttons;
-			
+			var resizeAdornerMouseDistane = 1;
+
 			if(buttonAtCursor) {
 				var newButton = buttonAtCursor.button;
 				var resizeDir = null;
-				if (buttonAtCursor.deltaX < 2) {	
+				if (buttonAtCursor.deltaX < resizeAdornerMouseDistane) {	
 					resizeDir = "resizeLeft";
-				} else if (buttonAtCursor.deltaY < 2) {
+				} else if (buttonAtCursor.deltaY < resizeAdornerMouseDistane) {
 					resizeDir = "resizeTop";			
-				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - 2) {
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - resizeAdornerMouseDistane) {
 					resizeDir = "resizeRight";			
-				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - 2) {
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					resizeDir = "resizeBottom";			
 				}
 				if(resizeDir) {
@@ -90,32 +105,32 @@ function Main(options) {
 
 	function selectionState() {
 		this.mouseMove = function(e) {
-			var previewButton = { 
+			var previewButton = new Button({ 
 				  text: ''
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
-			};
+			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 		}
 
 		this.mouseUp = function(e) {
 
-			var previewButton = { 
+			var previewButton = new Button({ 
 				  text: ''
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
 				, customClass: 'current'
-			};
+			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 
 			console.log($('.tmpPreview'));
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
-					buttons.push({
+					buttons.push(new Button({ 
 						  text: results.inputText
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
-					});
+					}));
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				},
@@ -137,8 +152,8 @@ function Main(options) {
 
 	function moveState(movedButton) {
 		this.mouseMove = function(e) {
-			movedButton.button.rect.x = e.rect.x - movedButton.deltaXSnapped;
-			movedButton.button.rect.y = e.rect.y - movedButton.deltaYSnapped;
+			movedButton.button.x(e.rect.x - movedButton.deltaXSnapped);
+			movedButton.button.y(e.rect.y - movedButton.deltaYSnapped);
 			renderer.write(Templates.Button, buttons);
 		}
 
@@ -146,8 +161,6 @@ function Main(options) {
 			state = new cursorState();
 		}
 	}
-
-	
 
 	function resizeState(resizedButton, direction) {
 		this.mouseUp = function(e) {
@@ -157,18 +170,18 @@ function Main(options) {
 			var deltaY = e.y - e.yMouseDownSnapped;
 			switch(direction) {
 				case "left":
-					resizedButton.button.rect.x = resizedButton.button.rect.x + deltaX; 
-					resizedButton.button.rect.width = resizedButton.button.rect.width - deltaX;
+					resizedButton.button.x(resizedButton.button.x() + deltaX); 
+					resizedButton.button.width(resizedButton.button.width() - deltaX);
 					break;
 				case "top":
-					resizedButton.button.rect.y = resizedButton.button.rect.y + deltaY;
-					resizedButton.button.rect.height = resizedButton.button.rect.height - deltaY;
+					resizedButton.button.y(resizedButton.button.y() + deltaY);
+					resizedButton.button.height(resizedButton.button.height() - deltaY);
 					break;
 				case "right":
-					resizedButton.button.rect.width = resizedButton.button.rect.width + deltaX;
+					resizedButton.button.width(resizedButton.button.width() + deltaX);
 					break;
 				case "bottom":
-					resizedButton.button.rect.height = resizedButton.button.rect.height + deltaY;
+					resizedButton.button.height(resizedButton.button.height() + deltaY);
 					break;
 			}		
 		}
@@ -181,24 +194,26 @@ function Main(options) {
 
 			switch(direction) {
 				case "left":
-					previewButton.rect.x = resizedButton.button.rect.x + deltaX; 
-					previewButton.rect.width = resizedButton.button.rect.width - deltaX;
+					previewButton.x(resizedButton.button.x() + deltaX);
+					previewButton.width(resizedButton.button.width() - deltaX);
 					previewButton.resizeDir = 'resizeLeft';
 					break;
 				case "top":
-					previewButton.rect.y = resizedButton.button.rect.y + deltaY;
-					previewButton.rect.height = resizedButton.button.rect.height - deltaY;
+					previewButton.y(resizedButton.button.y() + deltaY);
+					previewButton.height(resizedButton.button.height() - deltaY);
 					previewButton.resizeDir = 'resizeTop';
 					break;
 				case "right":
-					previewButton.rect.width = resizedButton.button.rect.width + deltaX;
+					previewButton.width(resizedButton.button.width() + deltaX);
 					previewButton.resizeDir = 'resizeRight';
 					break;
 				case "bottom":
-					previewButton.rect.height = resizedButton.button.rect.height + deltaY;
+					previewButton.height(resizedButton.button.height() + deltaY);
 					previewButton.resizeDir = 'resizeBottom';
 					break;
 			}
+
+
 
 			var previewButtons = replace(buttons, resizedButton.button, previewButton);
 			renderer.write(Templates.Preselection, previewButtons);
@@ -316,7 +331,8 @@ function GridRenderer() {
 					 	x: snapRect.x,
 					 	y: snapRect.y,
 						relX: relToEditor.x,
-						relY: relToEditor.y
+						relY: relToEditor.y,
+						originalEvent: e
 					});
 				}
 
@@ -442,7 +458,87 @@ function snapPoint(point, cellSize) {
 		width:  cellSize.width,
 		height: cellSize.height
 	};
-}function Modal(options) {
+}
+
+function toAbsolute(fromRect) {
+	var editorWidth = 800;
+	toRect = {};
+	toRect.x = fromRect.x/100 * editorWidth;
+	toRect.y = fromRect.y/100 * editorWidth;
+	toRect.width = fromRect.width/100 * editorWidth;
+	toRect.height = fromRect.height/100 * editorWidth;
+	return toRect;
+}	
+
+function toRelative(fromRect) {
+	var editorWidth = 800;
+	toRect = {};
+	toRect.x = fromRect.x/editorWidth * 100;
+	toRect.y = fromRect.y/editorWidth * 100;
+	toRect.width = fromRect.width/editorWidth * 100;
+	toRect.height = fromRect.height/editorWidth * 100;
+	return toRect;
+}function Button(options) {
+	 this.text = options.text || 'New button';
+	 this.position = options.position || 'relative';
+	 this.rect = options.rect;
+	 this.rectAbs = toAbsolute(options.rect);
+	 this.customClass = options.customClass;
+};
+
+Button.prototype.x = function(value, positionType) {
+	if(value) 
+		if(positionType == "absolute") 
+			this.rect.x = value / 800 * 100;
+		else 
+			this.rect.x = value;
+	else 
+		if(positionType == "absolute") 
+			return this.rect.x / 100 * 800;
+		else 
+			return this.rect.x;
+};
+
+Button.prototype.y = function(value, positionType) {
+	if(value) 
+		if(positionType == "absolute") 
+			this.rect.y = value / 800 * 100;
+		else 
+			this.rect.y = value;
+	else 
+		if(positionType == "absolute") 
+			return this.rect.y / 100 * 800;
+		else 
+			return this.rect.y;
+};
+
+Button.prototype.width = function(value, positionType) {
+	if(value) 
+		if(positionType == "absolute") 
+			this.rect.width = value / 800 * 100;
+		else 
+			this.rect.width = value;
+	else 
+		if(positionType == "absolute") 
+			return this.rect.width / 100 * 800;
+		else 
+			return this.rect.width;
+};
+
+Button.prototype.height = function(value, positionType) {
+	if(value) 
+		if(positionType == "absolute") 
+			this.rect.height = value / 800 * 100;
+		else 
+			this.rect.height = value;
+	else 
+		if(positionType == "absolute") 
+			return this.rect.height / 100 * 800;
+		else 
+			return this.rect.height;
+};
+
+function Modal(options) {
 	return {
 		getResults: Model.getResults.bind(Model, options.contentsTemplate,
 												 options.renderer,
@@ -590,7 +686,7 @@ function snapPoint(point, cellSize) {
 		Templates.CreateButtonPopover = doT.template(Templates.Raw.CreateButtonPopover);
 		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button " 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.rect.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.rect.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<input type="text" name="inputText" id="inputText" placeholder="Text" />		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button" 	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{=it.text}}	 	<div class="positionTypeAdorner">{{#def.unit}}</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width(null, it.position)}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height(null, it.position)}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<input type="text" name="inputText" id="inputText" placeholder="Text" />		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

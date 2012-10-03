@@ -36,3 +36,23 @@ function snapPoint(point, cellSize) {
 		height: cellSize.height
 	};
 }
+
+function toAbsolute(fromRect) {
+	var editorWidth = 800;
+	toRect = {};
+	toRect.x = fromRect.x/100 * editorWidth;
+	toRect.y = fromRect.y/100 * editorWidth;
+	toRect.width = fromRect.width/100 * editorWidth;
+	toRect.height = fromRect.height/100 * editorWidth;
+	return toRect;
+}	
+
+function toRelative(fromRect) {
+	var editorWidth = 800;
+	toRect = {};
+	toRect.x = fromRect.x/editorWidth * 100;
+	toRect.y = fromRect.y/editorWidth * 100;
+	toRect.width = fromRect.width/editorWidth * 100;
+	toRect.height = fromRect.height/editorWidth * 100;
+	return toRect;
+}

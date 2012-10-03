@@ -86,6 +86,21 @@ body {
 }
 
 
+.positionTypeAdorner {
+
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	background-color: #ddd;
+	padding: 2px;
+	border-radius: 2px;
+	color: #333;
+	line-height: 10px;
+	font-size: 9px;
+	cursor: pointer;
+
+}
+
 .grid-single
 {
 	background-color: #269;

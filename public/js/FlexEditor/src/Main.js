@@ -12,7 +12,6 @@ function Main(options) {
 	var state = new cursorState();
 	var cellSize =  { width: 5, height: 5 };
 
-
 	me.prototype.load = function(options) {
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
@@ -43,16 +42,31 @@ function Main(options) {
 	function cursorState() {
 		this.mouseDown = function(e) {
 			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
-			if(buttonAtCursor) {	
+			var resizeAdornerMouseDistane = 1;
+
+			// Did user mouse down on the positionType switcher on a button?
+			if(e.originalEvent.toElement.className == "positionTypeAdorner") {
+				
+				// Set to absolut positining and calculate 
+				// absolute coordinates to equal the current relative position
+				if (buttonAtCursor.button.position == "relative") {
+					buttonAtCursor.button.position = "absolute";
+				} else {
+					buttonAtCursor.button.position = "relative";
+				}
+				renderer.write(Templates.Button, buttons);			
+			}
+			// Did user mouse down on a button?
+			else if(buttonAtCursor) {	
 				//state  = new moveState(buttonAtCursor);
 				var newButton = buttonAtCursor.button;
-				if (buttonAtCursor.deltaX < 2) {	
+				if (buttonAtCursor.deltaX < resizeAdornerMouseDistane) {	
 					state = new resizeState(buttonAtCursor, "left");
-				} else if (buttonAtCursor.deltaY < 2) {
+				} else if (buttonAtCursor.deltaY < resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "top");		
-				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - 2) {
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "right");	
-				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - 2) {
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "bottom");	
 				} else {
 					state = new moveState(buttonAtCursor);
@@ -65,17 +79,18 @@ function Main(options) {
 		this.mouseMove = function(e) {
 			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
 			var renderButtons = buttons;
-			
+			var resizeAdornerMouseDistane = 1;
+
 			if(buttonAtCursor) {
 				var newButton = buttonAtCursor.button;
 				var resizeDir = null;
-				if (buttonAtCursor.deltaX < 2) {	
+				if (buttonAtCursor.deltaX < resizeAdornerMouseDistane) {	
 					resizeDir = "resizeLeft";
-				} else if (buttonAtCursor.deltaY < 2) {
+				} else if (buttonAtCursor.deltaY < resizeAdornerMouseDistane) {
 					resizeDir = "resizeTop";			
-				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - 2) {
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - resizeAdornerMouseDistane) {
 					resizeDir = "resizeRight";			
-				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - 2) {
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					resizeDir = "resizeBottom";			
 				}
 				if(resizeDir) {
@@ -89,32 +104,32 @@ function Main(options) {
 
 	function selectionState() {
 		this.mouseMove = function(e) {
-			var previewButton = { 
+			var previewButton = new Button({ 
 				  text: ''
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
-			};
+			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 		}
 
 		this.mouseUp = function(e) {
 
-			var previewButton = { 
+			var previewButton = new Button({ 
 				  text: ''
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
 				, customClass: 'current'
-			};
+			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 
 			console.log($('.tmpPreview'));
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
-					buttons.push({
+					buttons.push(new Button({ 
 						  text: results.inputText
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
-					});
+					}));
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				},
@@ -136,8 +151,8 @@ function Main(options) {
 
 	function moveState(movedButton) {
 		this.mouseMove = function(e) {
-			movedButton.button.rect.x = e.rect.x - movedButton.deltaXSnapped;
-			movedButton.button.rect.y = e.rect.y - movedButton.deltaYSnapped;
+			movedButton.button.x(e.rect.x - movedButton.deltaXSnapped);
+			movedButton.button.y(e.rect.y - movedButton.deltaYSnapped);
 			renderer.write(Templates.Button, buttons);
 		}
 
@@ -145,8 +160,6 @@ function Main(options) {
 			state = new cursorState();
 		}
 	}
-
-	
 
 	function resizeState(resizedButton, direction) {
 		this.mouseUp = function(e) {
@@ -156,18 +169,18 @@ function Main(options) {
 			var deltaY = e.y - e.yMouseDownSnapped;
 			switch(direction) {
 				case "left":
-					resizedButton.button.rect.x = resizedButton.button.rect.x + deltaX; 
-					resizedButton.button.rect.width = resizedButton.button.rect.width - deltaX;
+					resizedButton.button.x(resizedButton.button.x() + deltaX); 
+					resizedButton.button.width(resizedButton.button.width() - deltaX);
 					break;
 				case "top":
-					resizedButton.button.rect.y = resizedButton.button.rect.y + deltaY;
-					resizedButton.button.rect.height = resizedButton.button.rect.height - deltaY;
+					resizedButton.button.y(resizedButton.button.y() + deltaY);
+					resizedButton.button.height(resizedButton.button.height() - deltaY);
 					break;
 				case "right":
-					resizedButton.button.rect.width = resizedButton.button.rect.width + deltaX;
+					resizedButton.button.width(resizedButton.button.width() + deltaX);
 					break;
 				case "bottom":
-					resizedButton.button.rect.height = resizedButton.button.rect.height + deltaY;
+					resizedButton.button.height(resizedButton.button.height() + deltaY);
 					break;
 			}		
 		}
@@ -180,24 +193,26 @@ function Main(options) {
 
 			switch(direction) {
 				case "left":
-					previewButton.rect.x = resizedButton.button.rect.x + deltaX; 
-					previewButton.rect.width = resizedButton.button.rect.width - deltaX;
+					previewButton.x(resizedButton.button.x() + deltaX);
+					previewButton.width(resizedButton.button.width() - deltaX);
 					previewButton.resizeDir = 'resizeLeft';
 					break;
 				case "top":
-					previewButton.rect.y = resizedButton.button.rect.y + deltaY;
-					previewButton.rect.height = resizedButton.button.rect.height - deltaY;
+					previewButton.y(resizedButton.button.y() + deltaY);
+					previewButton.height(resizedButton.button.height() - deltaY);
 					previewButton.resizeDir = 'resizeTop';
 					break;
 				case "right":
-					previewButton.rect.width = resizedButton.button.rect.width + deltaX;
+					previewButton.width(resizedButton.button.width() + deltaX);
 					previewButton.resizeDir = 'resizeRight';
 					break;
 				case "bottom":
-					previewButton.rect.height = resizedButton.button.rect.height + deltaY;
+					previewButton.height(resizedButton.button.height() + deltaY);
 					previewButton.resizeDir = 'resizeBottom';
 					break;
 			}
+
+
 
 			var previewButtons = replace(buttons, resizedButton.button, previewButton);
 			renderer.write(Templates.Preselection, previewButtons);
