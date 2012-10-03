@@ -10,6 +10,10 @@ function merge(a, b, deep) {
 	return $.extend(isDeep, {}, a, b);
 }
 
+function clone(a) {
+	return merge(a, a, true);
+}
+
 function remove(item, array) {
 	var newArray = [];
 	for(var i in array) {

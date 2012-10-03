@@ -54,7 +54,9 @@ function Main(options) {
 				} else {
 					buttonAtCursor.button.position = "relative";
 				}
-				renderer.write(Templates.Button, buttons);			
+				buttonAtCursor.button.showPositionType = true;
+				renderer.write(Templates.Button, buttons);	
+				buttonAtCursor.button.showPositionType = false;		
 			}
 			// Did user mouse down on a button?
 			else if(buttonAtCursor) {	
@@ -82,19 +84,16 @@ function Main(options) {
 			var resizeAdornerMouseDistane = 1;
 
 			if(buttonAtCursor) {
-				var newButton = buttonAtCursor.button;
-				var resizeDir = null;
+				var newButton = clone(buttonAtCursor.button);
+				newButton.showPositionType = true;
 				if (buttonAtCursor.deltaX < resizeAdornerMouseDistane) {	
-					resizeDir = "resizeLeft";
+					newButton.resizeDir = "resizeLeft";
 				} else if (buttonAtCursor.deltaY < resizeAdornerMouseDistane) {
-					resizeDir = "resizeTop";			
+					newButton.resizeDir = "resizeTop";			
 				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - resizeAdornerMouseDistane) {
-					resizeDir = "resizeRight";			
+					newButton.resizeDir = "resizeRight";			
 				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
-					resizeDir = "resizeBottom";			
-				}
-				if(resizeDir) {
-					newButton = merge(buttonAtCursor.button, { resizeDir: resizeDir });
+					newButton.resizeDir = "resizeBottom";			
 				}
 				renderButtons = replace(buttons, buttonAtCursor.button, newButton);
 			}

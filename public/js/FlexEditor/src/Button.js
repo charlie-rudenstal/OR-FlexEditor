@@ -4,6 +4,7 @@ function Button(options) {
 	 this.rect = options.rect;
 	 this.rectAbs = toAbsolute(options.rect);
 	 this.customClass = options.customClass;
+	 this.showPositionType = options.showPositionType || false;
 };
 
 Button.prototype.x = function(value, positionType) {

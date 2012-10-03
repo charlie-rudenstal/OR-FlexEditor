@@ -24,7 +24,9 @@ Templates.Raw.Button = '
 
 		{{=it.text}}
 
-	 	<div class="positionTypeAdorner">{{#def.unit}}</div>
+		{{? it.showPositionType}}
+	 		<div class="positionTypeAdorner">{{#def.unit}}</div>
+		{{?}}
 	</div>
 
 ';
