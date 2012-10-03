@@ -12,7 +12,7 @@ Templates.Raw.Button = '
 		{{?}}
 	#}}
 
-	<div class="component button" 
+	<div class="component button {{=it.resizeDir}}" 
 	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};
 	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};
 	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};

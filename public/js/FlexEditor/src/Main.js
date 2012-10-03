@@ -42,7 +42,7 @@ function Main(options) {
 	function cursorState() {
 		this.mouseDown = function(e) {
 			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
-			var resizeAdornerMouseDistane = 1;
+			var resizeAdornerMouseDistane = 2;
 
 			// Did user mouse down on the positionType switcher on a button?
 			if(e.originalEvent.toElement.className == "positionTypeAdorner") {
@@ -81,7 +81,7 @@ function Main(options) {
 		this.mouseMove = function(e) {
 			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
 			var renderButtons = buttons;
-			var resizeAdornerMouseDistane = 1;
+			var resizeAdornerMouseDistane = 2;
 
 			if(buttonAtCursor) {
 				var newButton = clone(buttonAtCursor.button);
