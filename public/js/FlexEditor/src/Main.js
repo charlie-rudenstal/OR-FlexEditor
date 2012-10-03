@@ -146,29 +146,7 @@ function Main(options) {
 		}
 	}
 
-	var onEvent = function(e, context) {
-		var action = state[context.event];
-		if(action) action(e);
-	}
 	
-	var getButtonAtCursor = function(buttons, x, y) {
-		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
-		for(var i in buttons) {
-			var b = buttons[i];
-			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
-			   y >= b.rect.y && y < b.rect.y + b.rect.height)
-
-
-				
-				return { button: buttons[i]
-					   , index: parseInt(i)
-					   , deltaX: x - b.rect.x
-					   , deltaY: y - b.rect.y
-					   , deltaXSnapped: snappedPoint.x - b.rect.x
-					   , deltaYSnapped: snappedPoint.y - b.rect.y }
-		}
-		return null;
-	}
 
 	function resizeState(resizedButton, direction) {
 		this.mouseUp = function(e) {
@@ -226,7 +204,29 @@ function Main(options) {
 		}
 	}
 
+	var onEvent = function(e, context) {
+		var action = state[context.event];
+		if(action) action(e);
+	}
+	
+	var getButtonAtCursor = function(buttons, x, y) {
+		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
+		for(var i in buttons) {
+			var b = buttons[i];
+			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
+			   y >= b.rect.y && y < b.rect.y + b.rect.height)
 
+
+				
+				return { button: buttons[i]
+					   , index: parseInt(i)
+					   , deltaX: x - b.rect.x
+					   , deltaY: y - b.rect.y
+					   , deltaXSnapped: snappedPoint.x - b.rect.x
+					   , deltaYSnapped: snappedPoint.y - b.rect.y }
+		}
+		return null;
+	}
 
 }(Main));
 

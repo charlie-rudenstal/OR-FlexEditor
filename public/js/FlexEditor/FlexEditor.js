@@ -147,29 +147,7 @@ function Main(options) {
 		}
 	}
 
-	var onEvent = function(e, context) {
-		var action = state[context.event];
-		if(action) action(e);
-	}
 	
-	var getButtonAtCursor = function(buttons, x, y) {
-		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
-		for(var i in buttons) {
-			var b = buttons[i];
-			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
-			   y >= b.rect.y && y < b.rect.y + b.rect.height)
-
-
-				
-				return { button: buttons[i]
-					   , index: parseInt(i)
-					   , deltaX: x - b.rect.x
-					   , deltaY: y - b.rect.y
-					   , deltaXSnapped: snappedPoint.x - b.rect.x
-					   , deltaYSnapped: snappedPoint.y - b.rect.y }
-		}
-		return null;
-	}
 
 	function resizeState(resizedButton, direction) {
 		this.mouseUp = function(e) {
@@ -227,7 +205,29 @@ function Main(options) {
 		}
 	}
 
+	var onEvent = function(e, context) {
+		var action = state[context.event];
+		if(action) action(e);
+	}
+	
+	var getButtonAtCursor = function(buttons, x, y) {
+		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
+		for(var i in buttons) {
+			var b = buttons[i];
+			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
+			   y >= b.rect.y && y < b.rect.y + b.rect.height)
 
+
+				
+				return { button: buttons[i]
+					   , index: parseInt(i)
+					   , deltaX: x - b.rect.x
+					   , deltaY: y - b.rect.y
+					   , deltaXSnapped: snappedPoint.x - b.rect.x
+					   , deltaYSnapped: snappedPoint.y - b.rect.y }
+		}
+		return null;
+	}
 
 }(Main));
 
@@ -590,7 +590,7 @@ function snapPoint(point, cellSize) {
 		Templates.CreateButtonPopover = doT.template(Templates.Raw.CreateButtonPopover);
 		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button " 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.resizeDir || ""}} {{=it.customClass || ""}}" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.rect.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.rect.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<input type="text" name="inputText" id="inputText" placeholder="Text" />		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button " 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{=it.text}}			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}" 		 style="left: {{=it.rect.x}}{{#def.unit}};	 	     	top: {{=it.rect.y}}{{#def.unit}};	 	     	width: {{=it.rect.width}}{{#def.unit}};	 	     	height: {{=it.rect.height}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.rect.width}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.rect.height}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<input type="text" name="inputText" id="inputText" placeholder="Text" />		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor
