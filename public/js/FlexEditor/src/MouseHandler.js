@@ -1,7 +1,7 @@
 function MouseHandler() {
 	this.register = function(context) {
 		$(context.element).off('mousedown mouseup mousemove');
-		$(context.element).on('mousedown mouseup mousemove', eventHandler(MouseHandler.onMouseEvent, context));
+		$(context.element).on('mousedown mouseup mousemove dblclick', eventHandler(MouseHandler.onMouseEvent, context));
 	}
 };
 
@@ -86,6 +86,17 @@ function MouseHandler() {
 						yMouseDownSnapped: yMouseDownSnapped
 					});
 				}
+				break;
+
+			case 'dblclick':
+				context.onDoubleClick({
+				 	rect: rectFrom(snapRect, snapRect),
+				 	x: snapRect.x,
+				 	y: snapRect.y,
+					relX: relToEditor.x,
+					relY: relToEditor.y,
+					originalEvent: e
+				});
 				break;
 		}
 	}

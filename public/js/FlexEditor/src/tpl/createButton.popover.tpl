@@ -5,7 +5,7 @@ Templates.Raw.CreateButtonPopover = '
 <div class="createButtonPopover">
 	<form>
 		<div>
-			<input type="text" name="inputText" id="inputText" placeholder="Text" />
+			<input type="text" name="inputText" id="inputText" placeholder="Text" value="{{? it.text}}{{! it.text}}{{?}}" />
 		</div>
 		<div>  
 			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />

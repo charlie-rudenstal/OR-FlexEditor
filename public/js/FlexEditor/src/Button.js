@@ -1,4 +1,5 @@
 function Button(options) {
+	 this.id = Button.idCounter++;
 	 this.text = options.text || 'New button';
 	 this.position = options.position || 'relative';
 	 this.rect = options.rect;
@@ -6,6 +7,8 @@ function Button(options) {
 	 this.customClass = options.customClass;
 	 this.showPositionType = options.showPositionType || false;
 };
+
+Button.idCounter = 0;
 
 Button.prototype.x = function(value, positionType) {
 	if(value == null) 

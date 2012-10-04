@@ -8,14 +8,14 @@ function Popover(options) {
 
 (function(me) {
 
-	me.getResults = function(contentsTemplate, renderer, button, callbacks) {
+	me.getResults = function(contentsTemplate, renderer, button, callbacks, existingButton) {
 
 		// Render a popover using the body template with the Create Button form
 		// Retrieve a reference to the generated popover element
 		// and enable js beaviors for twitter bootstrap
 		button.popover({
 			html: true,
-			content: renderer.render(Templates.CreateButtonPopover),
+			content: renderer.render(Templates.CreateButtonPopover, existingButton),
 			trigger: 'manual'
 		});
 		button.popover('show');

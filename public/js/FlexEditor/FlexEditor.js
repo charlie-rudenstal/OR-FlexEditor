@@ -37,6 +37,7 @@ function Main(options) {
 			, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
 			, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
 			, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
+			, onDoubleClick: eventHandler(onEvent, { event: 'doubleClick' })
 		});
 	};
 
@@ -72,6 +73,7 @@ function Main(options) {
 				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "bottom");	
 				} else {
+					console.log("movestate");
 					state = new moveState(buttonAtCursor);
 				}
 			} else {
@@ -100,6 +102,28 @@ function Main(options) {
 			}
 			renderer.write(Templates.Button, renderButtons); 
 		}
+
+		this.doubleClick = function(e) {
+			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			
+			state = new frozenState();
+
+			Popover.getResults(Templates.CreateButtonModal, renderer, $('#button_' + buttonAtCursor.button.id), {
+				onSuccess: function(results) {		
+					buttonAtCursor.button.text = results.inputText;
+					renderer.write(Templates.Button, buttons);
+					state = new cursorState();
+				},
+				
+				// On cancelled, just re-render already stored buttons to clear preselection
+				onCancelled: function() {
+					renderer.write(Templates.Button, buttons);
+					state = new cursorState();
+				}
+			}, buttonAtCursor.button);
+
+
+		}
 	}
 
 	function selectionState() {
@@ -113,7 +137,6 @@ function Main(options) {
 		}
 
 		this.mouseUp = function(e) {
-
 			var previewButton = new Button({ 
 				  text: ''
 				, position: 'relative'
@@ -122,7 +145,6 @@ function Main(options) {
 			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 
-			console.log($('.tmpPreview'));
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
 					buttons.push(new Button({ 
@@ -141,11 +163,11 @@ function Main(options) {
 				}
 			});	
 
-			state = new frosenState();			
+			state = new frozenState();			
 		}
 	}
 
-	function frosenState() {
+	function frozenState() {
 
 	}
 
@@ -283,7 +305,7 @@ function GridRenderer() {
 })(GridRenderer);function MouseHandler() {
 	this.register = function(context) {
 		$(context.element).off('mousedown mouseup mousemove');
-		$(context.element).on('mousedown mouseup mousemove', eventHandler(MouseHandler.onMouseEvent, context));
+		$(context.element).on('mousedown mouseup mousemove dblclick', eventHandler(MouseHandler.onMouseEvent, context));
 	}
 };
 
@@ -368,6 +390,17 @@ function GridRenderer() {
 						yMouseDownSnapped: yMouseDownSnapped
 					});
 				}
+				break;
+
+			case 'dblclick':
+				context.onDoubleClick({
+				 	rect: rectFrom(snapRect, snapRect),
+				 	x: snapRect.x,
+				 	y: snapRect.y,
+					relX: relToEditor.x,
+					relY: relToEditor.y,
+					originalEvent: e
+				});
 				break;
 		}
 	}
@@ -482,6 +515,7 @@ function toRelative(fromRect) {
 	toRect.height = fromRect.height/editorWidth * 100;
 	return toRect;
 }function Button(options) {
+	 this.id = Button.idCounter++;
 	 this.text = options.text || 'New button';
 	 this.position = options.position || 'relative';
 	 this.rect = options.rect;
@@ -489,6 +523,8 @@ function toRelative(fromRect) {
 	 this.customClass = options.customClass;
 	 this.showPositionType = options.showPositionType || false;
 };
+
+Button.idCounter = 0;
 
 Button.prototype.x = function(value, positionType) {
 	if(value == null) 
@@ -597,14 +633,14 @@ function Modal(options) {
 
 (function(me) {
 
-	me.getResults = function(contentsTemplate, renderer, button, callbacks) {
+	me.getResults = function(contentsTemplate, renderer, button, callbacks, existingButton) {
 
 		// Render a popover using the body template with the Create Button form
 		// Retrieve a reference to the generated popover element
 		// and enable js beaviors for twitter bootstrap
 		button.popover({
 			html: true,
-			content: renderer.render(Templates.CreateButtonPopover),
+			content: renderer.render(Templates.CreateButtonPopover, existingButton),
 			trigger: 'manual'
 		});
 		button.popover('show');
@@ -690,7 +726,7 @@ function Modal(options) {
 		Templates.CreateButtonPopover = doT.template(Templates.Raw.CreateButtonPopover);
 		Templates.Preselection = doT.template(Templates.Raw.Preselection);
 	}
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button {{=it.resizeDir}}" 	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{=it.text}}		{{? it.showPositionType}}	 		<div class="positionTypeAdorner">{{#def.unit}}</div>		{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width(null, it.position)}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height(null, it.position)}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<input type="text" name="inputText" id="inputText" placeholder="Text" />		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component button {{=it.resizeDir}}" id="button_{{=it.id}}" 	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{=it.text}}		{{? it.showPositionType}}	 		<div class="positionTypeAdorner">{{#def.unit}}</div>		{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width(null, it.position)}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height(null, it.position)}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonModal = '  <form class="form-horizontal" style="margin: 0">	  	  <div class="modal-body">		    <div class="control-group">		      <label class="control-label" for="inputText">Text</label>		      <div class="controls">		        <input type="text" name="inputText" id="inputText" placeholder="Text" />		      </div>		    </div>	  	  </div>	  <div class="modal-footer">  	  	    <a href="#" class="btn" data-dismiss="modal">Close</a>	    <input type="submit" class="btn btn-primary" value="Save changes" data-accept="form" />	  	  </div>	  </form>  ';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<input type="text" name="inputText" id="inputText" placeholder="Text" value="{{? it.text}}{{! it.text}}{{?}}" />		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Modal = '<div class="modal" tabindex="-1" role="dialog">  <div class="modal-header">    <button type="button" class="close" data-dismiss="modal">&times;</button>    <h3>{{=it.header}}</h3>  </div>  {{=it.body}}</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

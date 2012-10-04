@@ -36,6 +36,7 @@ function Main(options) {
 			, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
 			, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
 			, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
+			, onDoubleClick: eventHandler(onEvent, { event: 'doubleClick' })
 		});
 	};
 
@@ -71,6 +72,7 @@ function Main(options) {
 				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "bottom");	
 				} else {
+					console.log("movestate");
 					state = new moveState(buttonAtCursor);
 				}
 			} else {
@@ -99,6 +101,28 @@ function Main(options) {
 			}
 			renderer.write(Templates.Button, renderButtons); 
 		}
+
+		this.doubleClick = function(e) {
+			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			
+			state = new frozenState();
+
+			Popover.getResults(Templates.CreateButtonModal, renderer, $('#button_' + buttonAtCursor.button.id), {
+				onSuccess: function(results) {		
+					buttonAtCursor.button.text = results.inputText;
+					renderer.write(Templates.Button, buttons);
+					state = new cursorState();
+				},
+				
+				// On cancelled, just re-render already stored buttons to clear preselection
+				onCancelled: function() {
+					renderer.write(Templates.Button, buttons);
+					state = new cursorState();
+				}
+			}, buttonAtCursor.button);
+
+
+		}
 	}
 
 	function selectionState() {
@@ -112,7 +136,6 @@ function Main(options) {
 		}
 
 		this.mouseUp = function(e) {
-
 			var previewButton = new Button({ 
 				  text: ''
 				, position: 'relative'
@@ -121,7 +144,6 @@ function Main(options) {
 			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 
-			console.log($('.tmpPreview'));
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
 					buttons.push(new Button({ 
@@ -140,11 +162,11 @@ function Main(options) {
 				}
 			});	
 
-			state = new frosenState();			
+			state = new frozenState();			
 		}
 	}
 
-	function frosenState() {
+	function frozenState() {
 
 	}
 
