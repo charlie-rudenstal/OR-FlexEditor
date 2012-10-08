@@ -72,7 +72,6 @@ function Main(options) {
 				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "bottom");	
 				} else {
-					console.log("movestate");
 					state = new moveState(buttonAtCursor);
 				}
 			} else {
@@ -174,7 +173,13 @@ function Main(options) {
 		this.mouseMove = function(e) {
 			movedButton.button.x(e.rect.x - movedButton.deltaXSnapped);
 			movedButton.button.y(e.rect.y - movedButton.deltaYSnapped);
-			renderer.write(Templates.Button, buttons);
+
+			var previewButton = clone(movedButton.button);
+			previewButton.isMoving = true;
+
+			var previewButtons = replace(buttons, movedButton.button, previewButton);
+			
+			renderer.write(Templates.Button, previewButtons);
 		}
 
 		this.mouseUp = function(e) {
@@ -232,8 +237,6 @@ function Main(options) {
 					previewButton.resizeDir = 'resizeBottom';
 					break;
 			}
-
-
 
 			var previewButtons = replace(buttons, resizedButton.button, previewButton);
 			renderer.write(Templates.Preselection, previewButtons);

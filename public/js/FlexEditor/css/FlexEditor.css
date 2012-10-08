@@ -73,6 +73,10 @@ body {
 	position: absolute;
 }
 
+.component.isMoving {
+	cursor: move !important;
+}
+
 .resizeAdorner.resizeLeft {
 	left: 0px;
 	width: 3px;

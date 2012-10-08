@@ -18,7 +18,6 @@ files = 	$(src)/Main.js\
 			
 templates = $(tpl)/button.tpl\
  		    $(tpl)/preselection.tpl\
-			$(tpl)/createButton.modal.tpl\
 			$(tpl)/createButton.popover.tpl\
 			$(tpl)/modal.tpl
 

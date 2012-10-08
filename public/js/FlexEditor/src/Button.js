@@ -6,6 +6,7 @@ function Button(options) {
 	 this.rectAbs = toAbsolute(options.rect);
 	 this.customClass = options.customClass;
 	 this.showPositionType = options.showPositionType || false;
+	 this.isMoving = options.isMoving || false;
 };
 
 Button.idCounter = 0;

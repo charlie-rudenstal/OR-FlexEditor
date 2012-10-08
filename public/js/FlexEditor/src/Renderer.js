@@ -31,7 +31,15 @@ function Renderer(options) {
 		return html;
 	}
 
+
+	me.prototype.latestDataRendered = [];
+
 	me.prototype.write = function(template, array, toElement) {
+		
+		// Optimize rendering by only doing it when array data has changed 
+		if(equals(array, this.latestDataRendered)) return;
+		this.latestDataRendered = array; 
+
 		toElement = toElement || this.options.toElement;
 
 		// Creating empty div, set innerHTML and then replaceChild
@@ -46,6 +54,41 @@ function Renderer(options) {
 		}
 
 		toElement.replaceChild(div, toElement.firstChild);
+	}
+
+	var equals = function(x, y)
+	{
+		if(x == y) return true;
+
+		var p;
+		for(p in y) {
+			if(typeof(x[p])=='undefined') {return false;}
+		}
+
+		for(p in y) {
+			if (y[p]) {
+				switch(typeof(y[p])) {
+					case 'object':
+					if (!equals(y[p], x[p])) { return false; } break;
+					case 'function':
+					if (typeof(x[p])=='undefined' ||
+					(p != 'equals' && y[p].toString() != x[p].toString()))
+					return false;
+					break;
+					default:
+					if (y[p] != x[p]) { return false; }
+				}
+			} else {
+				if (x[p])
+				return false;
+			}
+		}
+
+		for(p in x) {
+			if(typeof(y[p])=='undefined') {return false;}
+		}
+
+		return true;
 	}
 
 })(Renderer);
