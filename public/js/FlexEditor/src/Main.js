@@ -109,6 +109,7 @@ function Main(options) {
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('#button_' + buttonAtCursor.button.id), {
 				onSuccess: function(results) {		
 					buttonAtCursor.button.text = results.inputText;
+					buttonAtCursor.button.image = results.inputImage;
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				},
@@ -147,6 +148,7 @@ function Main(options) {
 				onSuccess: function(results) {		
 					buttons.push(new Button({ 
 						  text: results.inputText
+						, image: results.inputImage
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
 					}));

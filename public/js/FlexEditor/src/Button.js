@@ -4,9 +4,10 @@ function Button(options) {
 	 this.position = options.position || 'relative';
 	 this.rect = options.rect;
 	 this.rectAbs = toAbsolute(options.rect);
-	 this.customClass = options.customClass;
 	 this.showPositionType = options.showPositionType || false;
 	 this.isMoving = options.isMoving || false;
+	 this.customClass = options.customClass;
+	 this.image = options.image || null;
 };
 
 Button.idCounter = 0;

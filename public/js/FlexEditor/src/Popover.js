@@ -23,6 +23,7 @@ function Popover(options) {
 
 		var popover = $('.popover');
 
+
 		// Give focus to first text area (html5 autofocus doesn't work in twitter bootstraps popover)
 		popover.find('input:first-child')[0].focus();
 
@@ -37,6 +38,14 @@ function Popover(options) {
 		popover.find('*[data-dismiss=popover]').click(function(e) {
 			button.popover('destroy');
 			callbacks.onCancelled();
+		});
+
+
+		popover.on('keydown', function(e) {
+			if(e.keyCode == 27) {
+				button.popover('destroy');
+				callbacks.onCancelled(); 
+			}
 		});
 
 	}
