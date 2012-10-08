@@ -209,6 +209,7 @@ function Main(options) {
 					resizedButton.button.height(resizedButton.button.height() + deltaY);
 					break;
 			}		
+			renderer.write(Templates.Button, buttons);
 		}
 
 		this.mouseMove = function(e) {

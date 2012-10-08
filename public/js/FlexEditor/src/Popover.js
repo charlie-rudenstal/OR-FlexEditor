@@ -14,6 +14,7 @@ function Popover(options) {
 		// Retrieve a reference to the generated popover element
 		// and enable js beaviors for twitter bootstrap
 		button.popover({
+			title: "Button",
 			html: true,
 			content: renderer.render(Templates.CreateButtonPopover, existingButton),
 			trigger: 'manual'
