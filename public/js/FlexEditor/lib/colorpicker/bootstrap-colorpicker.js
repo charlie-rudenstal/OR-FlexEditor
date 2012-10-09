@@ -534,6 +534,7 @@
 							'<div class="colorpicker-hue"><i></i></div>'+
 							'<div class="colorpicker-alpha"><i></i></div>'+
 							'<div class="colorpicker-color"><div /></div>'+
+							'<div class="colorpicker-clear">Transparent</div>'+
 						'</div>'
 	};
 
