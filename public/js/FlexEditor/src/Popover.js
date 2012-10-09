@@ -10,6 +10,9 @@ function Popover(options) {
 
 	me.getResults = function(contentsTemplate, renderer, button, callbacks, existingButton) {
 
+
+		var existingButton = existingButton || new Button();
+
 		// Render a popover using the body template with the Create Button form
 		// Retrieve a reference to the generated popover element
 		// and enable js beaviors for twitter bootstrap
@@ -23,6 +26,7 @@ function Popover(options) {
 
 		var popover = $('.popover');
 
+		popover.find('.color').colorpicker();
 
 		// Give focus to first text area (html5 autofocus doesn't work in twitter bootstraps popover)
 		popover.find('input:first-child')[0].focus();

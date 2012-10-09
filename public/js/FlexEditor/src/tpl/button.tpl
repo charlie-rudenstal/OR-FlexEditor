@@ -24,6 +24,7 @@ Templates.Raw.Button = '
 	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};
 	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};
 	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};
+	 	     	background-color: {{=it.background}}
 	 	     	">
 
 	 	{{?it.image}}
@@ -32,7 +33,7 @@ Templates.Raw.Button = '
 	 	     			height: {{=it.height(null, "absolute")}}px;"></div>
 	 	{{?}}
 
-		<div class="content">
+		<div class="content" style="color: {{=it.foreground}}">
 			{{=it.text}}
 		</div>
 

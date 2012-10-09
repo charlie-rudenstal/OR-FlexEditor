@@ -111,6 +111,8 @@ function Main(options) {
 				onSuccess: function(results) {		
 					buttonAtCursor.button.text = results.inputText;
 					buttonAtCursor.button.image = results.inputImage;
+					buttonAtCursor.button.foreground = results.inputForeground;
+					buttonAtCursor.button.background = results.inputBackground;
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				},
@@ -150,6 +152,8 @@ function Main(options) {
 					buttons.push(new Button({ 
 						  text: results.inputText
 						, image: results.inputImage
+						, foreground: results.inputForeground
+						, background: results.inputBackground
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
 					}));
@@ -521,15 +525,19 @@ function toRelative(fromRect) {
 	toRect.height = fromRect.height/editorWidth * 100;
 	return toRect;
 }function Button(options) {
+	 options = options || {};
 	 this.id = Button.idCounter++;
-	 this.text = options.text || 'New button';
+	 this.text = options.text || '';
 	 this.position = options.position || 'relative';
-	 this.rect = options.rect;
-	 this.rectAbs = toAbsolute(options.rect);
+	 this.rect = options.rect || { x: 0, y: 0, width: 0, height: 0 };
+	 this.rectAbs = toAbsolute(this.rect);
 	 this.showPositionType = options.showPositionType || false;
 	 this.isMoving = options.isMoving || false;
 	 this.customClass = options.customClass;
 	 this.image = options.image || null;
+
+	 this.background = options.background || '#3276a9';
+	 this.foreground = options.foreground || '#ffffff';
 };
 
 Button.idCounter = 0;
@@ -598,6 +606,9 @@ function Popover(options) {
 
 	me.getResults = function(contentsTemplate, renderer, button, callbacks, existingButton) {
 
+
+		var existingButton = existingButton || new Button();
+
 		// Render a popover using the body template with the Create Button form
 		// Retrieve a reference to the generated popover element
 		// and enable js beaviors for twitter bootstrap
@@ -611,6 +622,7 @@ function Popover(options) {
 
 		var popover = $('.popover');
 
+		popover.find('.color').colorpicker();
 
 		// Give focus to first text area (html5 autofocus doesn't work in twitter bootstraps popover)
 		popover.find('input:first-child')[0].focus();
@@ -746,7 +758,7 @@ function Popover(options) {
 		}
 	}
 
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}} 	<!--  	http://cdn3.iconfinder.com/data/icons/ilb/Perspective%20Button%20-%20Go.png  	-->	<div id="button_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{? it.showPositionType}}	 		<div class="positionTypeAdorner">{{#def.unit}}</div>		{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width(null, it.position)}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height(null, it.position)}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<input type="text" name="inputText" class="input" id="inputText" placeholder="Text" value="{{? it.text}}{{! it.text}}{{?}}" />			<input type="text" name="inputImage" class="input" id="inputImage" placeholder="Image URL" value="{{? it.image}}{{! it.image}}{{?}}" />		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}} 	<!--  	http://cdn3.iconfinder.com/data/icons/ilb/Perspective%20Button%20-%20Go.png  	-->	<div id="button_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		{{? it.showPositionType}}	 		<div class="positionTypeAdorner">{{#def.unit}}</div>		{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=it.width(null, it.position)}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=it.height(null, it.position)}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<div class="input-append color" data-color="{{=it.foreground}}" data-color-format="hex">				<input type="text" name="inputText" class="input" id="inputText" placeholder="Text" value="{{? it.text}}{{! it.text}}{{?}}" />				<input type="text" name="inputForeground" value="{{=it.foreground}}" class="colorInput" id="inputForeground" style="display: none;" />				<span class="add-on"><i style="background-color: {{=it.foreground}}"></i></span>			</div>			<div class="input-append color" data-color="{{=it.background}}" data-color-format="hex">				<input type="text" name="inputImage" class="input" id="inputImage" placeholder="Image URL" value="{{? it.image}}{{! it.image}}{{?}}" />				<input type="text" name="inputBackground" value="{{=it.background}}" class="colorInput" id="inputBackground" style="display: none;" />				<span class="add-on"><i style="background-color: {{=it.background}}"></i></span>			</div>		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

@@ -188,11 +188,18 @@ body {
 }
 
 .createButtonPopover .input {
-	width: 194px;
+	width: 167px;
 	margin-bottom: 10px;
+}
 
+.createButtonPopover .color {
+	float: right;
 }
 
 .createButtonPopover .btn {
 	margin-right: 5px;
+}
+
+.colorpicker {
+	z-index: 1011;
 }

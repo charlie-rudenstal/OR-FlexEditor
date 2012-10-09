@@ -1,13 +1,17 @@
 function Button(options) {
+	 options = options || {};
 	 this.id = Button.idCounter++;
-	 this.text = options.text || 'New button';
+	 this.text = options.text || '';
 	 this.position = options.position || 'relative';
-	 this.rect = options.rect;
-	 this.rectAbs = toAbsolute(options.rect);
+	 this.rect = options.rect || { x: 0, y: 0, width: 0, height: 0 };
+	 this.rectAbs = toAbsolute(this.rect);
 	 this.showPositionType = options.showPositionType || false;
 	 this.isMoving = options.isMoving || false;
 	 this.customClass = options.customClass;
 	 this.image = options.image || null;
+
+	 this.background = options.background || '#3276a9';
+	 this.foreground = options.foreground || '#ffffff';
 };
 
 Button.idCounter = 0;

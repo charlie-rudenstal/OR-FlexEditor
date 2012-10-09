@@ -110,6 +110,8 @@ function Main(options) {
 				onSuccess: function(results) {		
 					buttonAtCursor.button.text = results.inputText;
 					buttonAtCursor.button.image = results.inputImage;
+					buttonAtCursor.button.foreground = results.inputForeground;
+					buttonAtCursor.button.background = results.inputBackground;
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				},
@@ -149,6 +151,8 @@ function Main(options) {
 					buttons.push(new Button({ 
 						  text: results.inputText
 						, image: results.inputImage
+						, foreground: results.inputForeground
+						, background: results.inputBackground
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
 					}));
