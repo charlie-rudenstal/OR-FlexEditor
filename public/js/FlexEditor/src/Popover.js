@@ -25,14 +25,9 @@ function Popover(options) {
 		button.popover('show');
 
 		var popover = $('.popover');
+
 		popover.find('.color').colorpicker();
 		
-		// console.log(popover);
-		// $('.popover').on('click', '.colorpicker-clear', function() {
-		// 	var colorpicker = popover.find('.color').data('colorpicker');
-		// 	colorpicker.hide.apply(colorpicker);
-		// })
-
 		// Give focus to first text area (html5 autofocus doesn't work in twitter bootstraps popover)
 		popover.find('input:first-child')[0].focus();
 

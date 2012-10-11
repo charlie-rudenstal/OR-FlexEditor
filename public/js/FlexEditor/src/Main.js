@@ -40,11 +40,24 @@ function Main(options) {
 		});
 	};
 
+	function exportButtons(buttons) {
+		console.log(buttons);
+		console.log(JSON.stringify(buttons));
+	};
+
 	function cursorState() {
 		this.mouseDown = function(e) {
+			if(e.relX < 4 && e.relY < 4) {
+				exportButtons(buttons);
+				return;
+			}
+
+
+
 			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
 			var resizeAdornerMouseDistane = 2;
 
+			// TODO: toElement doesn't exist in opera
 			// Did user mouse down on the positionType switcher on a button?
 			if(e.originalEvent.toElement.className == "positionTypeAdorner") {
 				
