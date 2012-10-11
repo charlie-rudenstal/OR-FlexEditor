@@ -64,7 +64,7 @@ body {
 }
 
 .component.hasImage:hover {
-	background: rgba(66,134,185,0.3);
+	background: rgba(66,134,185,0.3) !important;
 }
 
 .component.preselection {
