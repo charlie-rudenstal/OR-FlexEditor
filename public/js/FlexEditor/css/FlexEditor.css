@@ -202,14 +202,4 @@ body {
 
 .colorpicker {
 	z-index: 1011;
-	height: 125px;
-}
-
-.colorpicker .colorpicker-clear {
-	width: 100px;
-	height: 50px;
-	text-align: center;
-	margin-left: 6px;
-	margin-top: 1px;
-	cursor: pointer;
 }

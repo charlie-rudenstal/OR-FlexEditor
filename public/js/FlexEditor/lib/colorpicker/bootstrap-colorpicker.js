@@ -367,7 +367,7 @@
 		// translate a format from Color object to a string
 		translateFormats: {
 			'rgb': function(){
-				var rgb = this.color.toRGB();
+				 	 rgb = this.color.toRGB();
 				return 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
 			},
 			
@@ -534,7 +534,6 @@
 							'<div class="colorpicker-hue"><i></i></div>'+
 							'<div class="colorpicker-alpha"><i></i></div>'+
 							'<div class="colorpicker-color"><div /></div>'+
-							'<div class="colorpicker-clear">Transparent</div>'+
 						'</div>'
 	};
 
