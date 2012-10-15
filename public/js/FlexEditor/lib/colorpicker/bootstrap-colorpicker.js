@@ -44,9 +44,10 @@
 					space = parser.space||'rgba';
 				if ( values ) {
 					if (space === 'hsla') {
-						that.value = CPGlobal.RGBtoHSB.apply(null, CPGlobal.HSLtoRGB.apply(null, values));
+						that.value = CPGlobal.RGBtoHSB.apply(null, CPGlobal.HSLtoRGB.apply(null, values));						
 					} else {
 						that.value = CPGlobal.RGBtoHSB.apply(null, values);
+						console.log("yeah");
 					}
 					return false;
 				}

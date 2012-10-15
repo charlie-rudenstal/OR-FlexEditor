@@ -11,7 +11,7 @@ function Main(options) {
 	var buttons = [];
 	var renderer = null;
 	var state = new cursorState();
-	var cellSize =  { width: 5, height: 5 };
+	var cellSize =  { width: 2, height: 2 };
 
 	me.prototype.load = function(options) {
 		// Merge parameter-options with the constructor-options (or use defaults)
@@ -549,7 +549,7 @@ function toRelative(fromRect) {
 	 this.customClass = options.customClass;
 	 this.image = options.image || null;
 
-	 this.background = options.background || '#3276a9';
+	 this.background = options.background || '#5296c9';
 	 this.foreground = options.foreground || '#ffffff';
 };
 

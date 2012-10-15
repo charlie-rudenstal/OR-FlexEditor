@@ -10,7 +10,7 @@ function Main(options) {
 	var buttons = [];
 	var renderer = null;
 	var state = new cursorState();
-	var cellSize =  { width: 5, height: 5 };
+	var cellSize =  { width: 2, height: 2 };
 
 	me.prototype.load = function(options) {
 		// Merge parameter-options with the constructor-options (or use defaults)

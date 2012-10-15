@@ -69,10 +69,12 @@ body {
 
 .component.preselection {
 	background-color: #3276a9;
+	background-color: #5296c9;
 }
 
 .component.preselection:hover {
 	background-color: #3276a9;
+	background-color: #5296c9;
 }
 
 .component.preselection.hasImage {
@@ -154,9 +156,11 @@ body {
 .grid-single
 {
 	background-color: #269;
+	background-color: #37a;
+	background-color: #d2dfe9;
 
-	background-image: -webkit-linear-gradient(rgba(255, 255, 255, .1) 1px, transparent 1px), 
-					  -webkit-linear-gradient(0deg, rgba(255, 255, 255, .1) 1px, transparent 1px)
+	background-image: -webkit-linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px), 
+					  -webkit-linear-gradient(0deg, rgba(255, 255, 255, .05) 1px, transparent 1px)
 
 	/*background-size: 20px 20px, 
 					 20px 20px;*/
@@ -202,3 +206,4 @@ body {
 .colorpicker {
 	z-index: 1011;
 }
+

@@ -10,7 +10,7 @@ function Button(options) {
 	 this.customClass = options.customClass;
 	 this.image = options.image || null;
 
-	 this.background = options.background || '#3276a9';
+	 this.background = options.background || '#5296c9';
 	 this.foreground = options.foreground || '#ffffff';
 };
 
