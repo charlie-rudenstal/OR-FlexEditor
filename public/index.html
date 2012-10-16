@@ -32,7 +32,7 @@
 		<div class="iphone">
 			<div class="editor grid-single"></div>
 		</div>
-		
+
 		<!-- <div class="editor grid-single" style="margin-left: 240px;"></div> -->
 
 		<!-- <div id="editor2" class="grid-single" style="height: 300px;"></div> -->
@@ -40,7 +40,10 @@
 
 			//(new OR.TestPerformance()).run();
 
-			var editor = new OR.FlexEditor({element: $('.iphone .editor')});
+			var editor = new OR.FlexEditor({
+				element: $('.iphone .editor'),
+				cellSize: { width: 10, height: 8 }
+			});
 			editor.load();
 			
 			// var editor2 = new OR.FlexEditor({element: $('#editor2')});

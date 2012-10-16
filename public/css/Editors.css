@@ -4,12 +4,12 @@
 	background: url('/gfx/iphone.png') no-repeat;
 	padding-top: 109px;
 	padding-left: 33px;
-	position: relative;
+	/*position: relative;*/
 }
 
-.iphone .editor {/*
+.iphone .editor, .iphone .editor > div {
 	width: 253px;
-	height: 383px;*/
-	width: 200px;
-	height: 200px;
+	height: 383px;
+	/*width: 200px;
+	height: 200px;*/
 }
