@@ -1,0 +1,15 @@
+.iphone {
+	width: 300px;
+	height: 600px;
+	background: url('/gfx/iphone.png') no-repeat;
+	padding-top: 109px;
+	padding-left: 33px;
+	position: relative;
+}
+
+.iphone .editor {/*
+	width: 253px;
+	height: 383px;*/
+	width: 200px;
+	height: 200px;
+}

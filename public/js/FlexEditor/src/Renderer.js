@@ -45,6 +45,8 @@ function Renderer(options) {
 		// Creating empty div, set innerHTML and then replaceChild
 		// is a major performance boost compared to just innerHTML
 		var div = document.createElement('div');
+		div.style.width = toElement.style.width;
+		div.style.height = toElement.style.height;
 		div.innerHTML = this.render(template, array);
 
 		// We need a child element inside the Editor div which 

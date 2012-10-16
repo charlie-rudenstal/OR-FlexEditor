@@ -355,17 +355,17 @@ function GridRenderer() {
 		}
 
 		// Retrieve the current Editor container
-		var elmEditor = context.element;
-		var posEditor = $(elmEditor).offset();
+		// var elmEditor = context.element;
+		// var posEditor = $(elmEditor).offset();
 
 		// Retrieve mouse position and a rectangle it snaps to given cellsize
 		// var mouse     	  = { x: e.pageX, y: e.pageY };
-		var mouse 		  = { x: e.pageX - posEditor.left, 
-							  y: e.pageY - posEditor.top }; 
+		var mouse 		  = { x: e.pageX , y: e.pageY }; 
 
 		var abs  		  = subtract(mouse, context.elementRect);
 		var relToEditor	  = percentage(abs, context.elementRect);		
 		var snapRect  	  = getSnappedRect(relToEditor, context.cellSize);
+
 
 		switch (e.type) {		
 			case 'mousedown':			
@@ -764,6 +764,8 @@ function Popover(options) {
 		// Creating empty div, set innerHTML and then replaceChild
 		// is a major performance boost compared to just innerHTML
 		var div = document.createElement('div');
+		div.style.width = toElement.style.width;
+		div.style.height = toElement.style.height;
 		div.innerHTML = this.render(template, array);
 
 		// We need a child element inside the Editor div which 

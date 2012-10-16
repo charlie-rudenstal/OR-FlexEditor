@@ -10,7 +10,6 @@ body {
 	background: #999;
 }
 
-
 .editor, .editor > div {
 
 	width: 200px;
@@ -21,7 +20,6 @@ body {
 
 	/*position: relative;*/
 	position: absolute;
-
 
 }
 
