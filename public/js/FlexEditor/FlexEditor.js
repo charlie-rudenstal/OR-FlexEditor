@@ -2,28 +2,30 @@
 	// TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
 
 function Main(options) {
-
 	var me = this;
-	me.options = options;
-	me.buttons = [];
+
+	me.options = options || {};
+	me.options.cellSize = me.options.cellSize || { width: 5, height: 5 };
+	me.options.element = $(options.element).get(0);
+
+	me.buttons = me.options.buttons || [];
+	me.element = me.options.element;
 
 	var renderer = null;
 	var state = new cursorState();
-	var cellSize =  { width: 5, height: 5 };
 
 	me.load = function(options) {
 
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
-		var element = document.getElementById(options.elementId);
-		if(options.cellSize) cellSize = options.cellSize; 
-		
+		var element = me.options.element;
+
 		// Init button and grid renderer
 		renderer = options.renderer || new Renderer({toElement: element});
 		var gridRenderer = options.gridRenderer || new GridRenderer();
 
 		// Render grid lines
-		gridRenderer.render(element, cellSize);
+		gridRenderer.render(element, me.options.cellSize);
 
 		// Compile templates from the tpl folder (and store in the Templates namespace)
 		Templates.compile();
@@ -32,7 +34,7 @@ function Main(options) {
 		var mouseHandler = new MouseHandler();
 		mouseHandler.register({
 			  element: element
-			, cellSize: cellSize 
+			, cellSize: me.options.cellSize 
 			, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
 			, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
 			, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
@@ -142,6 +144,7 @@ function Main(options) {
 				  text: ''
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
+				, parent: me.element
 			});
 			renderer.write(Templates.Preselection, me.buttons.concat(previewButton));
 		}
@@ -152,6 +155,7 @@ function Main(options) {
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
 				, customClass: 'current'
+				, parent: me.element
 			});
 			renderer.write(Templates.Preselection, me.buttons.concat(previewButton));
 
@@ -165,6 +169,7 @@ function Main(options) {
 						, background: results.inputBackground
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
+						, parent: me.element
 					}));
 					renderer.write(Templates.Button, me.buttons);
 					state = new cursorState();
@@ -266,7 +271,7 @@ function Main(options) {
 	}
 	
 	var getButtonAtCursor = function(buttons, x, y) {
-		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
+		var snappedPoint = snapPoint({x: x, y: y}, me.options.cellSize);
 		for(var i in me.buttons) {
 			var b = me.buttons[i];
 			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
@@ -549,6 +554,8 @@ function toRelative(fromRect) {
 	 this.isMoving = options.isMoving || false;
 	 this.customClass = options.customClass;
 	 this.image = options.image || null;
+	 this.parentWidth = $(options.parent).width();
+	 this.parentHeight = $(options.parent).height(); 
 
 	 this.background = options.background || '#3276a9';
 	 this.foreground = options.foreground || '#ffffff';
@@ -556,15 +563,25 @@ function toRelative(fromRect) {
 
 Button.idCounter = 0;
 
+Button.prototype.getEditorWidth = function() {
+	// return $('#button_' + this.id).closest('.editor').width();
+	return this.parentWidth;
+}
+
+Button.prototype.getEditorHeight = function() {
+	// return $('#button_' + this.id).closest('.editor').height();
+	return this.parentHeight;
+}
+
 Button.prototype.x = function(value, positionType) {
 	if(value == null) 
-		if(positionType == "absolute") 
-			return this.rect.x / 100 * 800;
-		else 
+		if(positionType == "absolute") {
+			return this.rect.x / 100 * this.getEditorWidth();
+		} else 
 			return this.rect.x;
 	else 
 		if(positionType == "absolute") 
-			this.rect.x = value / 800 * 100;
+			this.rect.x = value / this.getEditorWidth() * 100;
 		else 
 			this.rect.x = value;
 };
@@ -572,25 +589,27 @@ Button.prototype.x = function(value, positionType) {
 Button.prototype.y = function(value, positionType) {
 	if(value == null) 
 		if(positionType == "absolute") 
-			return this.rect.y / 100 * 800;
+			return this.rect.y / 100 * this.getEditorHeight();
 		else 
 			return this.rect.y;
 	else 
 		if(positionType == "absolute") 
-			this.rect.y = value / 800 * 100;
+			this.rect.y = value / this.getEditorHeight() * 100;
 		else 
 			this.rect.y = value;
 };
 
 Button.prototype.width = function(value, positionType) {
 	if(value == null) 
-		if(positionType == "absolute") 
-			return this.rect.width / 100 * 800;
-		else 
+		if(positionType == "absolute") {
+
+			// console.log("left", this, this.getEditorWidth());
+			return this.rect.width / 100 * this.getEditorWidth();
+		} else 
 			return this.rect.width;
 	else 
-		if(positionType == "absolute") 
-			this.rect.width = value / 800 * 100;
+		if(positionType == "absolute")		
+			this.rect.width = value / this.getEditorWidth() * 100;
 		else 
 			this.rect.width = value;
 };
@@ -598,12 +617,12 @@ Button.prototype.width = function(value, positionType) {
 Button.prototype.height = function(value, positionType) {
 	if(value == null) 
 		if(positionType == "absolute") 
-			return this.rect.height / 100 * 800;
+			return this.rect.height / 100 * this.getEditorHeight();
 		else 
 			return this.rect.height;
 	else 
 		if(positionType == "absolute") 
-			this.rect.height = value / 800 * 100;
+			this.rect.height = value / this.getEditorHeight() * 100;
 		else 
 			this.rect.height = value;
 };
