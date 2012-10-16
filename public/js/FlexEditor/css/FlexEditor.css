@@ -11,10 +11,10 @@ body {
 }
 
 
-#editor, #editor > div {
+.editor, .editor > div {
 
-	width: 800px;
-	height: 800px;
+	width: 200px;
+	height: 200px;
 /*
 	width: 100%;
 	height: 100%;*/

@@ -23,13 +23,19 @@
 		<script src="http://twitter.github.com/hogan.js/builds/2.0.0/hogan-2.0.0.js"></script>
 	</head>
 	<body>
-		<div id="editor" class="grid-single"></div>
+		<div id="editor" class="editor grid-single"></div>
+		<div id="editor2" class="editor grid-single" style="margin-left: 240px;"></div>
+
+		<!-- <div id="editor2" class="grid-single" style="height: 300px;"></div> -->
 		<script type="text/javascript">
 
 			//(new OR.TestPerformance()).run();
 
 			var editor = new OR.FlexEditor({elementId: 'editor'});
 			editor.load();
+			
+			var editor2 = new OR.FlexEditor({elementId: 'editor2'});
+			editor2.load();
 
 			// var num = 0;
 			// setInterval(function() {

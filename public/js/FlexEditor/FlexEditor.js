@@ -349,11 +349,18 @@ function GridRenderer() {
 			return me.onMouseEvent(e, $.extend(context, {elementRect: getElementRect(context.element)}));
 		}
 
+		// Retrieve the current Editor container
+		var elmEditor = context.element;
+		var posEditor = $(elmEditor).offset();
+
 		// Retrieve mouse position and a rectangle it snaps to given cellsize
-		var mouse     	= { x: e.pageX, y: e.pageY };
-		var abs  		= subtract(mouse, context.elementRect);
-		var relToEditor	= percentage(abs, context.elementRect);		
-		var snapRect  	= getSnappedRect(relToEditor, context.cellSize);
+		// var mouse     	  = { x: e.pageX, y: e.pageY };
+		var mouse 		  = { x: e.pageX - posEditor.left, 
+							  y: e.pageY - posEditor.top }; 
+
+		var abs  		  = subtract(mouse, context.elementRect);
+		var relToEditor	  = percentage(abs, context.elementRect);		
+		var snapRect  	  = getSnappedRect(relToEditor, context.cellSize);
 
 		switch (e.type) {		
 			case 'mousedown':			
