@@ -629,7 +629,7 @@ function Popover(options) {
 		var placement = 'right';
 		if(distanceToRightEdge < 220) placement = 'left';
 		if(distanceToBottomEdge < 60) placement = 'top';
-		if(distanceToTopEdge < 60) placement = 'bottom';
+		if(distanceToTopEdge < 40) placement = 'bottom';
 
 		// Render a popover using the body template with the Create Button form
 		// Retrieve a reference to the generated popover element
