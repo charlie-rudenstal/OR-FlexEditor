@@ -2,18 +2,16 @@
 	// TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
 
 function Main(options) {
-	this.options = options;
-};
 
+	var me = this;
+	me.options = options;
+	me.buttons = [];
 
-(function(me) {
-
-	var buttons = [];
 	var renderer = null;
 	var state = new cursorState();
 	var cellSize =  { width: 5, height: 5 };
 
-	me.prototype.load = function(options) {
+	me.load = function(options) {
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
 		var element = document.getElementById(options.elementId);
@@ -41,21 +39,16 @@ function Main(options) {
 		});
 	};
 
-	function exportButtons(buttons) {
-		console.log(buttons);
-		console.log(JSON.stringify(buttons));
+	me.getExport = function() {
+		return me.buttons;
 	};
 
+
 	function cursorState() {
+
 		this.mouseDown = function(e) {
-			if(e.relX < 4 && e.relY < 4) {
-				exportButtons(buttons);
-				return;
-			}
 
-
-
-			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			var buttonAtCursor = getButtonAtCursor(me.buttons, e.relX, e.relY);
 			var resizeAdornerMouseDistane = 2;
 
 			// TODO: toElement doesn't exist in opera
@@ -70,9 +63,10 @@ function Main(options) {
 					buttonAtCursor.button.position = "relative";
 				}
 				buttonAtCursor.button.showPositionType = true;
-				renderer.write(Templates.Button, buttons);	
+				renderer.write(Templates.Button, me.buttons);	
 				buttonAtCursor.button.showPositionType = false;		
 			}
+
 			// Did user mouse down on a button?
 			else if(buttonAtCursor) {	
 				//state  = new moveState(buttonAtCursor);
@@ -94,8 +88,8 @@ function Main(options) {
 		}
 
 		this.mouseMove = function(e) {
-			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
-			var renderButtons = buttons;
+			var buttonAtCursor = getButtonAtCursor(me.buttons, e.relX, e.relY);
+			var renderButtons = me.buttons;
 			var resizeAdornerMouseDistane = 2;
 
 			if(buttonAtCursor) {
@@ -110,13 +104,13 @@ function Main(options) {
 				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					newButton.resizeDir = "resizeBottom";			
 				}
-				renderButtons = replace(buttons, buttonAtCursor.button, newButton);
+				renderButtons = replace(me.buttons, buttonAtCursor.button, newButton);
 			}
 			renderer.write(Templates.Button, renderButtons); 
 		}
 
 		this.doubleClick = function(e) {
-			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			var buttonAtCursor = getButtonAtCursor(me.buttons, e.relX, e.relY);
 			
 			state = new frozenState();
 
@@ -126,13 +120,13 @@ function Main(options) {
 					buttonAtCursor.button.image = results.inputImage;
 					buttonAtCursor.button.foreground = results.inputForeground;
 					buttonAtCursor.button.background = results.inputBackground;
-					renderer.write(Templates.Button, buttons);
+					renderer.write(Templates.Button, me.buttons);
 					state = new cursorState();
 				},
 				
-				// On cancelled, just re-render already stored buttons to clear preselection
+				// On cancelled, just re-render already stored me.buttons to clear preselection
 				onCancelled: function() {
-					renderer.write(Templates.Button, buttons);
+					renderer.write(Templates.Button, me.buttons);
 					state = new cursorState();
 				}
 			}, buttonAtCursor.button);
@@ -148,7 +142,7 @@ function Main(options) {
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
 			});
-			renderer.write(Templates.Preselection, buttons.concat(previewButton));
+			renderer.write(Templates.Preselection, me.buttons.concat(previewButton));
 		}
 
 		this.mouseUp = function(e) {
@@ -158,11 +152,11 @@ function Main(options) {
 				, rect: e.rectFromMouseDown
 				, customClass: 'current'
 			});
-			renderer.write(Templates.Preselection, buttons.concat(previewButton));
+			renderer.write(Templates.Preselection, me.buttons.concat(previewButton));
 
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
-					buttons.push(new Button({ 
+					me.buttons.push(new Button({ 
 						  text: results.inputText
 						, image: results.inputImage
 						, foreground: results.inputForeground
@@ -170,13 +164,13 @@ function Main(options) {
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
 					}));
-					renderer.write(Templates.Button, buttons);
+					renderer.write(Templates.Button, me.buttons);
 					state = new cursorState();
 				},
 				
-				// On cancelled, just re-render already stored buttons to clear preselection
+				// On cancelled, just re-render already stored me.buttons to clear preselection
 				onCancelled: function() {
-					renderer.write(Templates.Button, buttons);
+					renderer.write(Templates.Button, me.buttons);
 					state = new cursorState();
 				}
 			});	
@@ -197,7 +191,7 @@ function Main(options) {
 			var previewButton = clone(movedButton.button);
 			previewButton.isMoving = true;
 
-			var previewButtons = replace(buttons, movedButton.button, previewButton);
+			var previewButtons = replace(me.buttons, movedButton.button, previewButton);
 			
 			renderer.write(Templates.Button, previewButtons);
 		}
@@ -229,13 +223,13 @@ function Main(options) {
 					resizedButton.button.height(resizedButton.button.height() + deltaY);
 					break;
 			}		
-			renderer.write(Templates.Button, buttons);
+			renderer.write(Templates.Button, me.buttons);
 		}
 
 		this.mouseMove = function(e) {
 			var deltaX = e.x - e.xMouseDownSnapped;
 			var deltaY = e.y - e.yMouseDownSnapped;
-			var renderButtons = buttons;
+			var renderButtons = me.buttons;
 			var previewButton = merge({}, resizedButton.button, true);
 
 			switch(direction) {
@@ -259,7 +253,7 @@ function Main(options) {
 					break;
 			}
 
-			var previewButtons = replace(buttons, resizedButton.button, previewButton);
+			var previewButtons = replace(me.buttons, resizedButton.button, previewButton);
 			renderer.write(Templates.Preselection, previewButtons);
 		}
 	}
@@ -271,14 +265,12 @@ function Main(options) {
 	
 	var getButtonAtCursor = function(buttons, x, y) {
 		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
-		for(var i in buttons) {
-			var b = buttons[i];
+		for(var i in me.buttons) {
+			var b = me.buttons[i];
 			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
 			   y >= b.rect.y && y < b.rect.y + b.rect.height)
 
-
-				
-				return { button: buttons[i]
+				return { button: me.buttons[i]
 					   , index: parseInt(i)
 					   , deltaX: x - b.rect.x
 					   , deltaY: y - b.rect.y
@@ -288,7 +280,7 @@ function Main(options) {
 		return null;
 	}
 
-}(Main));
+};
 
 // background-size: 10% 10%, 10% 10%;
 

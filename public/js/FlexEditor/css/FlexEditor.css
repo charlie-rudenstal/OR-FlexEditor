@@ -203,3 +203,27 @@ body {
 .colorpicker {
 	z-index: 1011;
 }
+
+/* more mac-like style of popovers */
+.popover {
+	background-color: #E3E3E3;
+	padding: 0px;
+}
+
+.popover-title {
+	background-image: -webkit-linear-gradient(#F1F1F1, #B8B8B8);
+}
+
+.popover.right .arrow {
+	border-right-color: #E3E3E3;
+}
+
+.add-on {
+	background-image: -webkit-linear-gradient(#FCFCFC, #C9C9C9);
+	padding: 4px !important;
+}
+
+.add-on i {
+	width: 20px !important;
+	height: 20px !important;
+}
