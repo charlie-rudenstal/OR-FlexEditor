@@ -36,9 +36,9 @@ Templates.Raw.Preselection = '
 											  margin-left: -35px;">
 
 
-			{{=it.width(null, it.position)}}{{#def.unit}} 
+			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 
 			<span style="color: #2A779D;">x</span> 
-			{{=it.height(null, it.position)}}{{#def.unit}}
+			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}
 
 		</span>
 		
