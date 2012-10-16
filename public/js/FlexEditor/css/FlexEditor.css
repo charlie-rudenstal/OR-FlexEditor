@@ -218,6 +218,7 @@ body {
 	border-right-color: #E3E3E3;
 }
 
+
 .add-on {
 	background-image: -webkit-linear-gradient(#FCFCFC, #C9C9C9);
 	padding: 4px !important;
@@ -241,8 +242,20 @@ body {
 	padding: 7px 12px;
 }
 
+.popover.left .arrow {
+	border-left-color: #333;
+}
+
 .popover.right .arrow {
 	border-right-color: #333;
+}
+
+.popover.top .arrow {
+	border-top-color: #333; 
+}
+
+.popover.bottom .arrow {
+	border-bottom-color: #444; /* different color to match with header */
 }
 
 .popover input {
