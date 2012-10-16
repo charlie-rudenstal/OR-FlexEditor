@@ -8,20 +8,37 @@ function Popover(options) {
 
 (function(me) {
 
+
 	me.getResults = function(contentsTemplate, renderer, button, callbacks, existingButton) {
 
-
 		var existingButton = existingButton || new Button();
+
+		// Determine best placement depending on available screen area
+		var buttonPosition = button.position();
+
+		var buttonRect = getRect(button);
+  		var windowRect = getRect($(window));
+
+		var distanceToRightEdge = windowRect.width - buttonRect.right;
+		var distanceToTopEdge = buttonRect.y;
+		var distanceToBottomEdge = windowRect.height - buttonRect.bottom;
+
+		var placement = 'right';
+		if(distanceToRightEdge < 220) placement = 'left';
+		if(distanceToBottomEdge < 60) placement = 'top';
+		if(distanceToTopEdge < 60) placement = 'bottom';
 
 		// Render a popover using the body template with the Create Button form
 		// Retrieve a reference to the generated popover element
 		// and enable js beaviors for twitter bootstrap
 		button.popover({
 			title: "Button",
+			placement: placement,
 			html: true,
 			content: renderer.render(Templates.CreateButtonPopover, existingButton),
 			trigger: 'manual'
 		});
+
 		button.popover('show');
 
 		var popover = $('.popover');
@@ -51,6 +68,23 @@ function Popover(options) {
 				callbacks.onCancelled(); 
 			}
 		});
+
+		function getRect(element) {
+			var rect = {};
+
+			rect.width = element.width();
+			rect.height = element.height();
+
+			// position is not supported for the window object
+			if (element.get(0) != window) {
+				var position = element.position();
+				rect.x = position.left;
+				rect.y = position.top;
+				rect.right = rect.x + rect.width;
+		  		rect.bottom = rect.y + rect.height;
+	  		}
+	  		return rect;
+		}
 
 	}
 

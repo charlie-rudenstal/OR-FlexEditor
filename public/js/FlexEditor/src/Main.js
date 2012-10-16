@@ -11,6 +11,7 @@ function Main(options) {
 	var cellSize =  { width: 5, height: 5 };
 
 	me.load = function(options) {
+
 		// Merge parameter-options with the constructor-options (or use defaults)
 		var options = merge(this.options, options);
 		var element = document.getElementById(options.elementId);
@@ -153,6 +154,7 @@ function Main(options) {
 			});
 			renderer.write(Templates.Preselection, me.buttons.concat(previewButton));
 
+			// Open a popover to edit the new button
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
 					me.buttons.push(new Button({ 
@@ -172,7 +174,7 @@ function Main(options) {
 					renderer.write(Templates.Button, me.buttons);
 					state = new cursorState();
 				}
-			});	
+			}/*, previewButton*/);	
 
 			state = new frozenState();			
 		}
