@@ -1,0 +1,13 @@
+.editor * {
+	padding: 0px;
+	margin: 0px;
+}
+
+input:focus {	
+	outline-color: transparent !important;
+	outline-style: none !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	border-color: #666 !important;
+}
+

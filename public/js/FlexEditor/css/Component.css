@@ -1,0 +1,58 @@
+
+.component {
+	/*background-color: #3276a9;*/
+	position: absolute;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.component .content {
+	position: absolute;
+
+	width: 100%;
+	text-align: center;
+
+	top: 50%;
+	margin-top: -10px;
+
+
+	color: #ccc;
+	font-family: helvetica;
+	font-size: 14px;
+}
+
+.component.button {
+	background-color: #4286b9;
+	box-sizing: border-box;
+}
+
+.component.hasImage {
+	background: none;
+}
+
+.component.hasImage:hover {
+	background: rgba(66,134,185,0.3) !important;
+}
+
+.component.preselection {
+	background-color: #3276a9;
+}
+
+.component.preselection:hover {
+	background-color: #3276a9;
+}
+
+.component.preselection.hasImage {
+	background: rgba(66,134,185,0.3);
+}
+
+
+
+
+.component.isMoving {
+	cursor: move !important;
+}

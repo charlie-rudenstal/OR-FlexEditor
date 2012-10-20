@@ -1,0 +1,4 @@
+{
+    "cmd": ["make FlexEditortarget.css"],
+    "working_dir": "${project_path:${folder}}"
+}

@@ -1,0 +1,93 @@
+
+.createButtonPopover form {
+	margin: 4px 0px;
+}
+
+.createButtonPopover .input {
+	width: 167px;
+	margin-bottom: 10px;
+}
+
+.createButtonPopover .color {
+	float: right;
+}
+
+.createButtonPopover .btn {
+	margin-right: 5px;
+}
+
+.colorpicker {
+	z-index: 1011;
+}
+
+/* more mac-like style of popovers */
+.popover {
+	background-color: #E3E3E3;
+	padding: 0px;
+}
+
+.popover-title {
+	background-image: -webkit-linear-gradient(#F1F1F1, #B8B8B8);
+	padding: 7px 12px;
+}
+
+.popover.right .arrow {
+	border-right-color: #E3E3E3;
+}
+
+
+.add-on {
+	background-image: -webkit-linear-gradient(#FCFCFC, #C9C9C9);
+	padding: 4px !important;
+}
+
+.add-on i {
+	width: 20px !important;
+	height: 20px !important;
+}
+
+/* dark theme of popovers */
+.popover {
+	background-color: #333;
+	padding: 0px;
+}
+
+.popover-title {
+	background-image: -webkit-linear-gradient(#444, #333);
+	border-color: #404040;
+	color: white;
+	padding: 7px 12px;
+}
+
+.popover.left .arrow {
+	border-left-color: #333;
+}
+
+.popover.right .arrow {
+	border-right-color: #333;
+}
+
+.popover.top .arrow {
+	border-top-color: #333; 
+}
+
+.popover.bottom .arrow {
+	border-bottom-color: #444; /* different color to match with header */
+}
+
+.popover input {
+	background-color: #444;
+	border-color: #555;
+	color: white;
+}
+
+.add-on {
+	background-image: -webkit-linear-gradient(#555, #444);
+	border-color: #555 !important;
+	padding: 4px !important;
+}
+
+.add-on i {
+	width: 20px !important;
+	height: 20px !important;
+}

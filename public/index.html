@@ -15,47 +15,50 @@
 		<script src="js/FlexEditor/lib/colorpicker/bootstrap-colorpicker.js" type="text/javascript"></script>
 
 		<!-- FlexEditor -->
-		<link  href="js/FlexEditor/css/FlexEditor.css" rel="stylesheet" type="text/css">
+		<link  href="js/FlexEditor/FlexEditor.css" rel="stylesheet" type="text/css">
 		<script src="js/FlexEditor/FlexEditor.js" type="text/javascript"></script>
 
 		<!-- Live reload during development -->
 		<script type="text/javascript" src="js/live.js"></script>
 		<script src="http://twitter.github.com/hogan.js/builds/2.0.0/hogan-2.0.0.js"></script>
 
-		<!-- Custom Styles (iPhone editor look etc) -->
-		<link  href="/css/Editors.css" rel="stylesheet" type="text/css">
-	
-
-
+		<!-- Development Environment -->
+		<link href="/css/Base.css" rel="stylesheet" type="text/css">
+		<link href="/css/Editors.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
+
 		<div class="iphone">
-			<div class="editor grid-single"></div>
+			<div class="editor"></div>
 		</div>
 
-		<!-- <div class="editor grid-single" style="margin-left: 240px;"></div> -->
-
-		<!-- <div id="editor2" class="grid-single" style="height: 300px;"></div> -->
 		<script type="text/javascript">
 
-			//(new OR.TestPerformance()).run();
+			var elmIphone = $('.iphone');
 
-			var editor = new OR.FlexEditor({
-				element: $('.iphone .editor'),
-				cellSize: { width: 10, height: 7 }
-			});
+			var options = { element: elmIphone.find('.editor')
+						  ,	cellSize: { width: 10, height: 7 } };
+
+			var editor = new OR.FlexEditor(options);
+			editor.grid(elmIphone);
 			editor.load();
-			
-			// var editor2 = new OR.FlexEditor({element: $('#editor2')});
-			// editor2.load();
 
-			// var num = 0;
-			// setInterval(function() {
-			// 	console.log('export: ' + num++, editor.getExport());
-			// }, 3000);
-
-
-			//editor.load();
 		</script>
+
 	</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

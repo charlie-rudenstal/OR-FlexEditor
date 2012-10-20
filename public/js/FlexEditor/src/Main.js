@@ -2,29 +2,23 @@
 
 function Main(options) {
 	var me = this;
-
-	me.options = options || {};
-	me.options.cellSize = me.options.cellSize || { width: 5, height: 5 };
-	me.options.element = $(options.element).get(0);
-
-	me.buttons = me.options.buttons || [];
-	me.element = me.options.element;
-
-	var renderer = null;
+	options = options || {};
+	
+	var elmEditor = $(options.element).get(0);
+	var cellSize = options.cellSize || { width: 5, height: 5 };
+	var buttons = options.buttons || [];
+	
+	var renderer = options.renderer || new Renderer({toElement: elmEditor});
+	// var gridRenderer = options.gridRenderer || new GridRenderer();
 	var state = new cursorState();
 
-	me.load = function(options) {
+	me.load = function() {
 
 		// Merge parameter-options with the constructor-options (or use defaults)
-		var options = merge(this.options, options);
-		var element = me.options.element;
-
-		// Init button and grid renderer
-		renderer = options.renderer || new Renderer({toElement: element});
-		var gridRenderer = options.gridRenderer || new GridRenderer();
+		// var options = merge(this.options, options);
 
 		// Render grid lines
-		gridRenderer.render(element, me.options.cellSize);
+		// gridRenderer.render(elmEditor, cellSize);
 
 		// Compile templates from the tpl folder (and store in the Templates namespace)
 		Templates.compile();
@@ -32,8 +26,8 @@ function Main(options) {
 		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler();
 		mouseHandler.register({
-			  element: element
-			, cellSize: me.options.cellSize 
+			  element: elmEditor
+			, cellSize: cellSize 
 			, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
 			, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
 			, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
@@ -41,16 +35,27 @@ function Main(options) {
 		});
 	};
 
+	/**
+	 * Renders a grid in the specified element 
+	 * using the cellsize supplied in the options to the current editor   
+	 * @param  {[type]} element [description]
+	 * @return {[type]}         [description]
+	 */
+	me.grid = function(element) {
+		// The renderer work on pure elements not wrapped by jQuery
+		if(element instanceof jQuery) element = element.get(0);
+		//renderer.write(Templates.Grid, { cellSize: cellSize }, element);
+	}
+
 	me.getExport = function() {
 		return me.buttons;
 	};
-
 
 	function cursorState() {
 
 		this.mouseDown = function(e) {
 
-			var buttonAtCursor = getButtonAtCursor(me.buttons, e.relX, e.relY);
+			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
 			var resizeAdornerMouseDistane = 2;
 
 			// TODO: toElement doesn't exist in opera
@@ -65,7 +70,7 @@ function Main(options) {
 					buttonAtCursor.button.position = "relative";
 				}
 				buttonAtCursor.button.showPositionType = true;
-				renderer.write(Templates.Button, me.buttons);	
+				renderer.write(Templates.Button, buttons);	
 				buttonAtCursor.button.showPositionType = false;		
 			}
 
@@ -90,8 +95,8 @@ function Main(options) {
 		}
 
 		this.mouseMove = function(e) {
-			var buttonAtCursor = getButtonAtCursor(me.buttons, e.relX, e.relY);
-			var renderButtons = me.buttons;
+			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			var renderButtons = buttons;
 			var resizeAdornerMouseDistane = 2;
 
 			if(buttonAtCursor) {
@@ -106,13 +111,13 @@ function Main(options) {
 				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
 					newButton.resizeDir = "resizeBottom";			
 				}
-				renderButtons = replace(me.buttons, buttonAtCursor.button, newButton);
+				renderButtons = replace(buttons, buttonAtCursor.button, newButton);
 			}
 			renderer.write(Templates.Button, renderButtons); 
 		}
 
 		this.doubleClick = function(e) {
-			var buttonAtCursor = getButtonAtCursor(me.buttons, e.relX, e.relY);
+			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
 			
 			state = new frozenState();
 
@@ -122,7 +127,7 @@ function Main(options) {
 					buttonAtCursor.button.image = results.inputImage;
 					buttonAtCursor.button.foreground = results.inputForeground;
 					buttonAtCursor.button.background = results.inputBackground;
-					renderer.write(Templates.Button, me.buttons);
+					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				},
 				
@@ -143,9 +148,9 @@ function Main(options) {
 				  text: ''
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
-				, parent: me.element
+				, parent: elmEditor
 			});
-			renderer.write(Templates.Preselection, me.buttons.concat(previewButton));
+			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 		}
 
 		this.mouseUp = function(e) {
@@ -154,29 +159,29 @@ function Main(options) {
 				, position: 'relative'
 				, rect: e.rectFromMouseDown
 				, customClass: 'current'
-				, parent: me.element
+				, parent: elmEditor
 			});
-			renderer.write(Templates.Preselection, me.buttons.concat(previewButton));
+			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 
 			// Open a popover to edit the new button
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
-					me.buttons.push(new Button({ 
+					buttons.push(new Button({ 
 						  text: results.inputText
 						, image: results.inputImage
 						, foreground: results.inputForeground
 						, background: results.inputBackground
 						, position: 'relative'
 						, rect: e.rectFromMouseDown
-						, parent: me.element
+						, parent: elmEditor
 					}));
-					renderer.write(Templates.Button, me.buttons);
+					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				},
 				
 				// On cancelled, just re-render already stored me.buttons to clear preselection
 				onCancelled: function() {
-					renderer.write(Templates.Button, me.buttons);
+					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				}
 			}/*, previewButton*/);	
@@ -197,7 +202,7 @@ function Main(options) {
 			var previewButton = clone(movedButton.button);
 			previewButton.isMoving = true;
 
-			var previewButtons = replace(me.buttons, movedButton.button, previewButton);
+			var previewButtons = replace(buttons, movedButton.button, previewButton);
 			
 			renderer.write(Templates.Button, previewButtons);
 		}
@@ -229,13 +234,13 @@ function Main(options) {
 					resizedButton.button.height(resizedButton.button.height() + deltaY);
 					break;
 			}		
-			renderer.write(Templates.Button, me.buttons);
+			renderer.write(Templates.Button, buttons);
 		}
 
 		this.mouseMove = function(e) {
 			var deltaX = e.x - e.xMouseDownSnapped;
 			var deltaY = e.y - e.yMouseDownSnapped;
-			var renderButtons = me.buttons;
+			var renderButtons = buttons;
 			var previewButton = merge({}, resizedButton.button, true);
 
 			switch(direction) {
@@ -259,7 +264,7 @@ function Main(options) {
 					break;
 			}
 
-			var previewButtons = replace(me.buttons, resizedButton.button, previewButton);
+			var previewButtons = replace(buttons, resizedButton.button, previewButton);
 			renderer.write(Templates.Preselection, previewButtons);
 		}
 	}
@@ -270,13 +275,13 @@ function Main(options) {
 	}
 	
 	var getButtonAtCursor = function(buttons, x, y) {
-		var snappedPoint = snapPoint({x: x, y: y}, me.options.cellSize);
-		for(var i in me.buttons) {
-			var b = me.buttons[i];
+		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
+		for(var i in buttons) {
+			var b = buttons[i];
 			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
 			   y >= b.rect.y && y < b.rect.y + b.rect.height)
 
-				return { button: me.buttons[i]
+				return { button: buttons[i]
 					   , index: parseInt(i)
 					   , deltaX: x - b.rect.x
 					   , deltaY: y - b.rect.y

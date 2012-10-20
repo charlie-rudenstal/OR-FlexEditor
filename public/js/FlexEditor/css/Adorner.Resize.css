@@ -1,0 +1,49 @@
+.component.resizeLeft {
+	cursor: w-resize;
+}
+
+.component.resizeTop {
+	cursor: n-resize;
+}
+
+.component.resizeRight {
+	cursor: e-resize;
+}
+
+.component.resizeBottom {
+	cursor: s-resize;
+}
+
+.resizeAdorner {
+	background-color: #bbf;
+	position: absolute;
+}
+
+.resizeAdorner.resizeLeft {
+	left: 0px;
+	width: 3px;
+	height: 100%;
+	cursor: w-resize;
+}
+
+.resizeAdorner.resizeTop {
+	top: 0px;
+	width: 100%;
+	height: 3px;
+	cursor: n-resize;
+}
+
+.resizeAdorner.resizeRight {
+	right: 0px;
+	width: 3px;
+	height: 100%;
+	cursor: e-resize;
+}
+
+.resizeAdorner.resizeBottom {
+	bottom: 0px;
+	width: 100%;
+	height: 3px;
+	cursor: s-resize;
+}
+

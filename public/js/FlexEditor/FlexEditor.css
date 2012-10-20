@@ -1,0 +1,271 @@
+.editor * {
+	padding: 0px;
+	margin: 0px;
+}
+
+input:focus {	
+	outline-color: transparent !important;
+	outline-style: none !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	border-color: #666 !important;
+}
+
+
+.editor, .editor > div {
+	/*width: 100%;
+	height: 100%;
+	position: relative;*/
+	width: 100px;
+	height: 200px;
+	position: absolute;
+}.grid-single
+{
+	/*background-color: #269;
+	background-position: 0px 0px, -1px -1px;
+	background-image: -webkit-linear-gradient(rgba(255, 255, 255, .1) 1px, transparent 1px), 
+					  -webkit-linear-gradient(0deg, rgba(255, 255, 255, .1) 1px, transparent 1px);*/
+	/*background-size: 20px 20px, 20px 20px;
+	background-size: 10% 10%, 10% 10%;*/
+}
+.createButtonPopover form {
+	margin: 4px 0px;
+}
+
+.createButtonPopover .input {
+	width: 167px;
+	margin-bottom: 10px;
+}
+
+.createButtonPopover .color {
+	float: right;
+}
+
+.createButtonPopover .btn {
+	margin-right: 5px;
+}
+
+.colorpicker {
+	z-index: 1011;
+}
+
+/* more mac-like style of popovers */
+.popover {
+	background-color: #E3E3E3;
+	padding: 0px;
+}
+
+.popover-title {
+	background-image: -webkit-linear-gradient(#F1F1F1, #B8B8B8);
+	padding: 7px 12px;
+}
+
+.popover.right .arrow {
+	border-right-color: #E3E3E3;
+}
+
+
+.add-on {
+	background-image: -webkit-linear-gradient(#FCFCFC, #C9C9C9);
+	padding: 4px !important;
+}
+
+.add-on i {
+	width: 20px !important;
+	height: 20px !important;
+}
+
+/* dark theme of popovers */
+.popover {
+	background-color: #333;
+	padding: 0px;
+}
+
+.popover-title {
+	background-image: -webkit-linear-gradient(#444, #333);
+	border-color: #404040;
+	color: white;
+	padding: 7px 12px;
+}
+
+.popover.left .arrow {
+	border-left-color: #333;
+}
+
+.popover.right .arrow {
+	border-right-color: #333;
+}
+
+.popover.top .arrow {
+	border-top-color: #333; 
+}
+
+.popover.bottom .arrow {
+	border-bottom-color: #444; /* different color to match with header */
+}
+
+.popover input {
+	background-color: #444;
+	border-color: #555;
+	color: white;
+}
+
+.add-on {
+	background-image: -webkit-linear-gradient(#555, #444);
+	border-color: #555 !important;
+	padding: 4px !important;
+}
+
+.add-on i {
+	width: 20px !important;
+	height: 20px !important;
+}.btn {
+	background-image: -webkit-linear-gradient(#444, #333);
+	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
+	box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
+	border-color: #333;
+	text-shadow: none;
+	color: #bbb;
+	background-color: #373737;
+}
+
+.btn-primary, input.btn-primary {
+	color: #ccc;
+
+	background-color: #004DCC;
+	background-image: -webkit-linear-gradient(top, #458, #458);
+
+	background-color: #004DCC;
+	background-image: -webkit-linear-gradient(top, #08C, #04C);
+	
+	background-color: #004DCC;
+	background-image: -webkit-linear-gradient(top, #369, #247);
+	
+}
+
+.btn:hover {
+	background-color: #373737;
+	color: #ddd;
+	background-position: 0px 0px;
+}
+.component {
+	/*background-color: #3276a9;*/
+	position: absolute;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.component .content {
+	position: absolute;
+
+	width: 100%;
+	text-align: center;
+
+	top: 50%;
+	margin-top: -10px;
+
+
+	color: #ccc;
+	font-family: helvetica;
+	font-size: 14px;
+}
+
+.component.button {
+	background-color: #4286b9;
+	box-sizing: border-box;
+}
+
+.component.hasImage {
+	background: none;
+}
+
+.component.hasImage:hover {
+	background: rgba(66,134,185,0.3) !important;
+}
+
+.component.preselection {
+	background-color: #3276a9;
+}
+
+.component.preselection:hover {
+	background-color: #3276a9;
+}
+
+.component.preselection.hasImage {
+	background: rgba(66,134,185,0.3);
+}
+
+
+
+
+.component.isMoving {
+	cursor: move !important;
+}
+.positionTypeAdorner {
+
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	background-color: #ddd;
+	padding: 2px;
+	border-radius: 2px;
+	color: #333;
+	line-height: 10px;
+	font-size: 9px;
+	cursor: pointer;
+
+	background-color: #3276a9;
+	color: #eee;
+}.component.resizeLeft {
+	cursor: w-resize;
+}
+
+.component.resizeTop {
+	cursor: n-resize;
+}
+
+.component.resizeRight {
+	cursor: e-resize;
+}
+
+.component.resizeBottom {
+	cursor: s-resize;
+}
+
+.resizeAdorner {
+	background-color: #bbf;
+	position: absolute;
+}
+
+.resizeAdorner.resizeLeft {
+	left: 0px;
+	width: 3px;
+	height: 100%;
+	cursor: w-resize;
+}
+
+.resizeAdorner.resizeTop {
+	top: 0px;
+	width: 100%;
+	height: 3px;
+	cursor: n-resize;
+}
+
+.resizeAdorner.resizeRight {
+	right: 0px;
+	width: 3px;
+	height: 100%;
+	cursor: e-resize;
+}
+
+.resizeAdorner.resizeBottom {
+	bottom: 0px;
+	width: 100%;
+	height: 3px;
+	cursor: s-resize;
+}
+
