@@ -9,13 +9,12 @@ function MouseHandler() {
 
 	var states = { MOUSE_UP: 0, MOUSE_DOWN: 1 };
 	var state = states.MOUSE_UP;
-	var snapRectStart = null;
-	var xMouseDown = null;
-	var yMouseDown = null;
-	var xMouseDownSnapped = null;
-	var yMouseDownSnapped = null;
 
-
+	var atMouseDown = { 
+		absolute: { mousePosition: null, snappedPosition: null, selectionStart: null, selection: null },
+		relative: { mousePosition: null, snappedPosition: null, selectionStart: null, selection: null }
+	}
+	
 	/**
 	 * Handle a mouse event and call onPreSelection(rect) when user interacts
 	 * @param  obj e       Mouse Event
@@ -28,80 +27,67 @@ function MouseHandler() {
 			return me.onMouseEvent(e, $.extend(context, {elementRect: getElementRect(context.element)}));
 		}
 
-		// Retrieve the current Editor container
-		// var elmEditor = context.element;
-		// var posEditor = $(elmEditor).offset();
-
 		// Retrieve mouse position and a rectangle it snaps to given cellsize
-		// var mouse     	  = { x: e.pageX, y: e.pageY };
-		var mouse 		  = { x: e.pageX , y: e.pageY }; 
+		// Get current mouse position relative to the editor
+		var globalMousePosition  = { x: e.pageX, y: e.pageY };
+		var mousePosition = subtract(globalMousePosition, context.elementRect);
+		
+		var absolute = {};
+		absolute.mousePosition = mousePosition;
+		absolute.snappedPosition = getSnappedRect(absolute.mousePosition, context.cellSize);
+		absolute.selectionStart = atMouseDown.absolute.selectionStart || absolute.snappedPosition;
+		absolute.selection = rectFrom(absolute.selectionStart, absolute.snappedPosition);
+		absolute.delta = {};
+		absolute.delta.position = subtract(absolute.mousePosition, atMouseDown.absolute.mousePosition || absolute.mousePosition);
+		absolute.delta.snappedPosition = getSnappedRect(absolute.delta.position, context.cellSize);
 
-		var abs  		  = subtract(mouse, context.elementRect);
-		var relToEditor	  = percentage(abs, context.elementRect);		
-		var snapRect  	  = getSnappedRect(relToEditor, context.cellSize);
-
+		var relative = {};
+		relative.mousePosition = percentage(mousePosition, context.elementRect);
+		relative.snappedPosition = getSnappedRect(relative.mousePosition, context.cellSize);
+		relative.selectionStart = atMouseDown.relative.selectionStart || relative.snappedPosition;
+		relative.selection = rectFrom(relative.selectionStart, relative.snappedPosition);
+		
+		// var abs  		  = subtract(mouse, context.elementRect);
+		// var relToEditor	  = percentage(abs, context.elementRect);		
+		// var snapRect  	  = getSnappedRect(relToEditor, context.cellSize);
+		// var relRectFromMouseDown = rectFrom(snapRectStart || snapRect, snapRect);
+		// var absRectFromMouseDown = rectFrom(snapRectStart || snapRect, snapRect);
 
 		switch (e.type) {		
 			case 'mousedown':			
 				if(state == states.MOUSE_UP) {
 					state = states.MOUSE_DOWN;
-					snapRectStart = snapRect;
-					xMouseDown = relToEditor.x;
-					yMouseDown = relToEditor.y;
-					xMouseDownSnapped = snapRect.x;
-					yMouseDownSnapped = snapRect.y;
+					atMouseDown = { absolute: absolute, relative: relative };
 					context.onMouseDown({
-					 	rect: rectFrom(snapRect, snapRect),
-					 	x: snapRect.x,
-					 	y: snapRect.y,
-						relX: relToEditor.x,
-						relY: relToEditor.y,
+						absolute: absolute,
+						relative: relative,
 						originalEvent: e
 					});
 				}
 
 				break;
 			case 'mousemove':	
-				// if(state == states.MOUSE_DOWN) {
-					context.onMouseMove({
-						rect: rectFrom(snapRect, snapRect),
-						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
-						x: snapRect.x,
-						y: snapRect.y,
-						relX: relToEditor.x,
-						relY: relToEditor.y,
-						xMouseDown: xMouseDown,
-						yMouseDown: yMouseDown,
-						xMouseDownSnapped: xMouseDownSnapped,
-						yMouseDownSnapped: yMouseDownSnapped
-					});
-				// }
+				context.onMouseMove({
+					absolute: absolute,
+					relative: relative,
+					originalEvent: e
+				});
 				break;
 			case 'mouseup': 		
 				if(state == states.MOUSE_DOWN) {	
 					state = states.MOUSE_UP;		
 					context.onMouseUp({
-						rect: rectFrom(snapRect, snapRect),
-						rectFromMouseDown: rectFrom(snapRectStart || snapRect, snapRect),
-						x: snapRect.x,
-						y: snapRect.y,
-						relX: relToEditor.x,
-						relY: relToEditor.y,
-						xMouseDown: xMouseDown,
-						yMouseDown: yMouseDown,
-						xMouseDownSnapped: xMouseDownSnapped,
-						yMouseDownSnapped: yMouseDownSnapped
+						absolute: absolute,
+						relative: relative,
+						originalEvent: e
 					});
 				}
 				break;
 
 			case 'dblclick':
 				context.onDoubleClick({
-				 	rect: rectFrom(snapRect, snapRect),
-				 	x: snapRect.x,
-				 	y: snapRect.y,
-					relX: relToEditor.x,
-					relY: relToEditor.y,
+				 	absolute: absolute,
+				 	relative: relative,
 					originalEvent: e
 				});
 				break;

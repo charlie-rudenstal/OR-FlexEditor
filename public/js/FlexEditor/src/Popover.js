@@ -11,8 +11,6 @@ function Popover(options) {
 
 	me.getResults = function(contentsTemplate, renderer, button, callbacks, existingButton) {
 
-		var existingButton = existingButton || new Button();
-
 		// Determine best placement depending on available screen area
 		var buttonPosition = button.position();
 

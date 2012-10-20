@@ -9,20 +9,15 @@ function Main(options) {
 	var buttons = options.buttons || [];
 	
 	var renderer = options.renderer || new Renderer({toElement: elmEditor});
-	// var gridRenderer = options.gridRenderer || new GridRenderer();
 	var state = new cursorState();
 
+	// Display resize tool when mouse is this far from an edge
+	var resizeAdornerMouseDistane = 6;
+
+	// Compile templates from the tpl folder (and store in the Templates namespace)
+	Templates.compile();
+
 	me.load = function() {
-
-		// Merge parameter-options with the constructor-options (or use defaults)
-		// var options = merge(this.options, options);
-
-		// Render grid lines
-		// gridRenderer.render(elmEditor, cellSize);
-
-		// Compile templates from the tpl folder (and store in the Templates namespace)
-		Templates.compile();
-
 		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler();
 		mouseHandler.register({
@@ -44,20 +39,24 @@ function Main(options) {
 	me.grid = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		//renderer.write(Templates.Grid, { cellSize: cellSize }, element);
+		renderer.write(Templates.Grid, { cellSize: cellSize }, element);
 	}
 
 	me.getExport = function() {
 		return me.buttons;
 	};
 
+
+	function frozenState() {
+
+	}
+
 	function cursorState() {
 
 		this.mouseDown = function(e) {
 
-			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
-			var resizeAdornerMouseDistane = 2;
-
+			var buttonAtCursor = getButtonAtPosition(buttons, e.absolute.mousePosition);
+			
 			// TODO: toElement doesn't exist in opera
 			// Did user mouse down on the positionType switcher on a button?
 			if(e.originalEvent.toElement.className == "positionTypeAdorner") {
@@ -82,9 +81,9 @@ function Main(options) {
 					state = new resizeState(buttonAtCursor, "left");
 				} else if (buttonAtCursor.deltaY < resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "top");		
-				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - resizeAdornerMouseDistane) {
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.width() - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "right");	
-				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.height() - resizeAdornerMouseDistane) {
 					state = new resizeState(buttonAtCursor, "bottom");	
 				} else {
 					state = new moveState(buttonAtCursor);
@@ -95,10 +94,9 @@ function Main(options) {
 		}
 
 		this.mouseMove = function(e) {
-			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			var buttonAtCursor = getButtonAtPosition(buttons, e.absolute.mousePosition);
 			var renderButtons = buttons;
-			var resizeAdornerMouseDistane = 2;
-
+			
 			if(buttonAtCursor) {
 				var newButton = clone(buttonAtCursor.button);
 				newButton.showPositionType = true;
@@ -106,9 +104,9 @@ function Main(options) {
 					newButton.resizeDir = "resizeLeft";
 				} else if (buttonAtCursor.deltaY < resizeAdornerMouseDistane) {
 					newButton.resizeDir = "resizeTop";			
-				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.rect.width - resizeAdornerMouseDistane) {
+				} else if (buttonAtCursor.deltaX > buttonAtCursor.button.width() - resizeAdornerMouseDistane) {
 					newButton.resizeDir = "resizeRight";			
-				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.rect.height - resizeAdornerMouseDistane) {
+				} else if (buttonAtCursor.deltaY > buttonAtCursor.button.height() - resizeAdornerMouseDistane) {
 					newButton.resizeDir = "resizeBottom";			
 				}
 				renderButtons = replace(buttons, buttonAtCursor.button, newButton);
@@ -117,7 +115,7 @@ function Main(options) {
 		}
 
 		this.doubleClick = function(e) {
-			var buttonAtCursor = getButtonAtCursor(buttons, e.relX, e.relY);
+			var buttonAtCursor = getButtonAtPosition(buttons, e.absolute.mousePosition);
 			
 			state = new frozenState();
 
@@ -137,8 +135,6 @@ function Main(options) {
 					state = new cursorState();
 				}
 			}, buttonAtCursor.button);
-
-
 		}
 	}
 
@@ -146,8 +142,8 @@ function Main(options) {
 		this.mouseMove = function(e) {
 			var previewButton = new Button({ 
 				  text: ''
-				, position: 'relative'
-				, rect: e.rectFromMouseDown
+				, position: 'absolute'
+				, rect: e.absolute.selection
 				, parent: elmEditor
 			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
@@ -156,8 +152,8 @@ function Main(options) {
 		this.mouseUp = function(e) {
 			var previewButton = new Button({ 
 				  text: ''
-				, position: 'relative'
-				, rect: e.rectFromMouseDown
+				, position: 'absolute'
+				, rect: e.absolute.selection
 				, customClass: 'current'
 				, parent: elmEditor
 			});
@@ -171,8 +167,8 @@ function Main(options) {
 						, image: results.inputImage
 						, foreground: results.inputForeground
 						, background: results.inputBackground
-						, position: 'relative'
-						, rect: e.rectFromMouseDown
+						, position: 'absolute'
+						, rect: e.absolute.selection
 						, parent: elmEditor
 					}));
 					renderer.write(Templates.Button, buttons);
@@ -184,26 +180,22 @@ function Main(options) {
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				}
-			}/*, previewButton*/);	
+
+			}, new Button({ parent: elmEditor }));	
 
 			state = new frozenState();			
 		}
 	}
 
-	function frozenState() {
-
-	}
-
 	function moveState(movedButton) {
 		this.mouseMove = function(e) {
-			movedButton.button.x(e.rect.x - movedButton.deltaXSnapped);
-			movedButton.button.y(e.rect.y - movedButton.deltaYSnapped);
+			movedButton.button.x(e.absolute.snappedPosition.x - movedButton.deltaXSnapped);
+			movedButton.button.y(e.absolute.snappedPosition.y - movedButton.deltaYSnapped);
 
 			var previewButton = clone(movedButton.button);
 			previewButton.isMoving = true;
-
-			var previewButtons = replace(buttons, movedButton.button, previewButton);
 			
+			var previewButtons = replace(buttons, movedButton.button, previewButton);
 			renderer.write(Templates.Button, previewButtons);
 		}
 
@@ -215,51 +207,47 @@ function Main(options) {
 	function resizeState(resizedButton, direction) {
 		this.mouseUp = function(e) {
 			state = new cursorState();
-
-			var deltaX = e.x - e.xMouseDownSnapped;
-			var deltaY = e.y - e.yMouseDownSnapped;
+			var deltaPosition = e.absolute.delta.snappedPosition;
 			switch(direction) {
 				case "left":
-					resizedButton.button.x(resizedButton.button.x() + deltaX); 
-					resizedButton.button.width(resizedButton.button.width() - deltaX);
+					resizedButton.button.x(resizedButton.button.x() + deltaPosition.x); 
+					resizedButton.button.width(resizedButton.button.width() - deltaPosition.x);
 					break;
 				case "top":
-					resizedButton.button.y(resizedButton.button.y() + deltaY);
-					resizedButton.button.height(resizedButton.button.height() - deltaY);
+					resizedButton.button.y(resizedButton.button.y() + deltaPosition.y);
+					resizedButton.button.height(resizedButton.button.height() - deltaPosition.y);
 					break;
 				case "right":
-					resizedButton.button.width(resizedButton.button.width() + deltaX);
+					resizedButton.button.width(resizedButton.button.width() + deltaPosition.x);
 					break;
 				case "bottom":
-					resizedButton.button.height(resizedButton.button.height() + deltaY);
+					resizedButton.button.height(resizedButton.button.height() + deltaPosition.y);
 					break;
 			}		
 			renderer.write(Templates.Button, buttons);
 		}
 
 		this.mouseMove = function(e) {
-			var deltaX = e.x - e.xMouseDownSnapped;
-			var deltaY = e.y - e.yMouseDownSnapped;
 			var renderButtons = buttons;
 			var previewButton = merge({}, resizedButton.button, true);
-
+			var deltaPosition = e.absolute.delta.snappedPosition;
 			switch(direction) {
 				case "left":
-					previewButton.x(resizedButton.button.x() + deltaX);
-					previewButton.width(resizedButton.button.width() - deltaX);
+					previewButton.x(resizedButton.button.x() + deltaPosition.x);
+					previewButton.width(resizedButton.button.width() - deltaPosition.x);
 					previewButton.resizeDir = 'resizeLeft';
 					break;
 				case "top":
-					previewButton.y(resizedButton.button.y() + deltaY);
-					previewButton.height(resizedButton.button.height() - deltaY);
+					previewButton.y(resizedButton.button.y() + deltaPosition.y);
+					previewButton.height(resizedButton.button.height() - deltaPosition.y);
 					previewButton.resizeDir = 'resizeTop';
 					break;
 				case "right":
-					previewButton.width(resizedButton.button.width() + deltaX);
+					previewButton.width(resizedButton.button.width() + deltaPosition.x);
 					previewButton.resizeDir = 'resizeRight';
 					break;
 				case "bottom":
-					previewButton.height(resizedButton.button.height() + deltaY);
+					previewButton.height(resizedButton.button.height() + deltaPosition.y);
 					previewButton.resizeDir = 'resizeBottom';
 					break;
 			}
@@ -274,19 +262,19 @@ function Main(options) {
 		if(action) action(e);
 	}
 	
-	var getButtonAtCursor = function(buttons, x, y) {
-		var snappedPoint = snapPoint({x: x, y: y}, cellSize);
+	var getButtonAtPosition = function(buttons, position) {
+		var snappedPoint = snapPoint({x: position.x, y: position.y}, cellSize);
 		for(var i in buttons) {
 			var b = buttons[i];
-			if(x >= b.rect.x && x < b.rect.x + b.rect.width && 
-			   y >= b.rect.y && y < b.rect.y + b.rect.height)
+			if(position.x >= b.x() && position.x < b.x() + b.width() && 
+			   position.y >= b.y() && position.y < b.y() + b.height())
 
 				return { button: buttons[i]
 					   , index: parseInt(i)
-					   , deltaX: x - b.rect.x
-					   , deltaY: y - b.rect.y
-					   , deltaXSnapped: snappedPoint.x - b.rect.x
-					   , deltaYSnapped: snappedPoint.y - b.rect.y }
+					   , deltaX: position.x - b.x()
+					   , deltaY: position.y - b.y()
+					   , deltaXSnapped: snappedPoint.x - b.x()
+					   , deltaYSnapped: snappedPoint.y - b.y() }
 		}
 		return null;
 	}
