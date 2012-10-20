@@ -39,7 +39,11 @@
 			var editor = iphone.find('.editor');
 			var grid = iphone.find('.grid');
 
-			var options = { element: editor, cellSize: { width: 20, height: 20 } };
+			var options = { 
+				  element: editor 
+				, cellSize: { width:  16 
+						    , height: 16 } 
+			};
 			var editor = new OR.FlexEditor(options);
 			editor.grid(grid);
 			editor.load();
