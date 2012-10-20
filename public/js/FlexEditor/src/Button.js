@@ -38,11 +38,10 @@ Button.prototype.x = function(value, positionType) {
 		if(positionType == "relative")
 			 return this.rect.x;
 		else return this.rect.x / 100 * this.parentWidth;
-
 	else 
 		if(positionType == "relative") 
-			 this.rect.x = value;
-		else this.rect.x = value / this.parentWidth * 100;
+			 this.rect.x = limit(value, 0, 100 - this.width(null, 'relative'));
+		else this.rect.x = limit(value / this.parentWidth * 100, 0, 100 - this.width(null, 'relative'));
 };
 
 Button.prototype.y = function(value, positionType) {
@@ -52,8 +51,8 @@ Button.prototype.y = function(value, positionType) {
 		else return this.rect.y / 100 * this.parentHeight;			
 	else 
 		if(positionType == "relative") 
-			 this.rect.y = value;
-		else this.rect.y = value / this.parentHeight * 100;
+			 this.rect.y = limit(value, 0, 100 - this.height(null, 'relative'));
+		else this.rect.y = limit(value / this.parentHeight * 100, 0, 100 - this.height(null, 'relative'));
 };
 
 Button.prototype.width = function(value, positionType) {

@@ -14,6 +14,12 @@ function clone(a) {
 	return merge(a, a, true);
 }
 
+function limit(value, min, max) {
+	if(value < min) return min;
+	if(value > max) return max;
+	return value;
+}
+
 function remove(item, array) {
 	var newArray = [];
 	for(var i in array) {

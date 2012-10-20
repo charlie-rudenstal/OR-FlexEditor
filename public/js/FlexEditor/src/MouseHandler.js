@@ -138,13 +138,15 @@ function MouseHandler() {
 	 * @return object           {left, top, width, height}
 	 */
 	function getSnappedRect(point, cellSize) {
-		return {
+		var rect = {
 			// 					      ~~ is a fast way to trim decimals
 			x:      cellSize.width  * ~~(point.x / cellSize.width),
 			y:      cellSize.height * ~~(point.y / cellSize.height),
 			width:  cellSize.width,
 			height: cellSize.height
 		};
+
+		return rect;
 	}
 
 })(MouseHandler);

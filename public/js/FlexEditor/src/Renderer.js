@@ -52,7 +52,8 @@ function Renderer(options) {
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing
 		if(!toElement.firstChild) {
-			toElement.appendChild(document.createElement('div'));
+			var innerDiv = document.createElement('div');
+			toElement.appendChild(innerDiv);
 		}
 
 		toElement.replaceChild(div, toElement.firstChild);

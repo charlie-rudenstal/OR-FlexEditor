@@ -457,13 +457,15 @@ function GridRenderer() {
 	 * @return object           {left, top, width, height}
 	 */
 	function getSnappedRect(point, cellSize) {
-		return {
+		var rect = {
 			// 					      ~~ is a fast way to trim decimals
 			x:      cellSize.width  * ~~(point.x / cellSize.width),
 			y:      cellSize.height * ~~(point.y / cellSize.height),
 			width:  cellSize.width,
 			height: cellSize.height
 		};
+
+		return rect;
 	}
 
 })(MouseHandler);function eventHandler(action, context) {
@@ -480,6 +482,12 @@ function merge(a, b, deep) {
 
 function clone(a) {
 	return merge(a, a, true);
+}
+
+function limit(value, min, max) {
+	if(value < min) return min;
+	if(value > max) return max;
+	return value;
 }
 
 function remove(item, array) {
@@ -567,11 +575,10 @@ Button.prototype.x = function(value, positionType) {
 		if(positionType == "relative")
 			 return this.rect.x;
 		else return this.rect.x / 100 * this.parentWidth;
-
 	else 
 		if(positionType == "relative") 
-			 this.rect.x = value;
-		else this.rect.x = value / this.parentWidth * 100;
+			 this.rect.x = limit(value, 0, 100 - this.width(null, 'relative'));
+		else this.rect.x = limit(value / this.parentWidth * 100, 0, 100 - this.width(null, 'relative'));
 };
 
 Button.prototype.y = function(value, positionType) {
@@ -581,8 +588,8 @@ Button.prototype.y = function(value, positionType) {
 		else return this.rect.y / 100 * this.parentHeight;			
 	else 
 		if(positionType == "relative") 
-			 this.rect.y = value;
-		else this.rect.y = value / this.parentHeight * 100;
+			 this.rect.y = limit(value, 0, 100 - this.height(null, 'relative'));
+		else this.rect.y = limit(value / this.parentHeight * 100, 0, 100 - this.height(null, 'relative'));
 };
 
 Button.prototype.width = function(value, positionType) {
@@ -749,7 +756,8 @@ function Popover(options) {
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing
 		if(!toElement.firstChild) {
-			toElement.appendChild(document.createElement('div'));
+			var innerDiv = document.createElement('div');
+			toElement.appendChild(innerDiv);
 		}
 
 		toElement.replaceChild(div, toElement.firstChild);

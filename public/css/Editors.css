@@ -7,9 +7,13 @@
 	/*position: relative;*/
 }
 
-.iphone .editor, .iphone .editor > div {
-	/*width: 253px;
-	height: 383px;*/
-	/*width: 200px;
-	height: 200px;*/
+.iphone .editor, .iphone .grid {
+	width: 253px;
+	height: 383px;
+	position: absolute;
 }
+
+.iphone .grid {
+	overflow: hidden;
+}
+
