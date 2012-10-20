@@ -20,6 +20,10 @@ function limit(value, min, max) {
 	return value;
 }
 
+function between(value, min, max) {
+	return value >= min && value <= max;
+}
+
 function remove(item, array) {
 	var newArray = [];
 	for(var i in array) {

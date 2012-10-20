@@ -490,6 +490,10 @@ function limit(value, min, max) {
 	return value;
 }
 
+function between(value, min, max) {
+	return value >= min && value <= max;
+}
+
 function remove(item, array) {
 	var newArray = [];
 	for(var i in array) {
@@ -571,25 +575,25 @@ function toRelative(fromRect) {
 Button.idCounter = 0;
 
 Button.prototype.x = function(value, positionType) {
-	if(value == null) 
+	if (value == null) {
 		if(positionType == "relative")
 			 return this.rect.x;
 		else return this.rect.x / 100 * this.parentWidth;
-	else 
-		if(positionType == "relative") 
-			 this.rect.x = limit(value, 0, 100 - this.width(null, 'relative'));
-		else this.rect.x = limit(value / this.parentWidth * 100, 0, 100 - this.width(null, 'relative'));
+	} else { 
+		if(positionType != "relative") value = value / this.parentWidth * 100;
+		if(between(value, 0, 100)) this.rect.x = value;
+	}
 };
 
 Button.prototype.y = function(value, positionType) {
-	if(value == null) 
+	if(value == null) {
 		if(positionType == "relative") 
 			 return this.rect.y;
 		else return this.rect.y / 100 * this.parentHeight;			
-	else 
-		if(positionType == "relative") 
-			 this.rect.y = limit(value, 0, 100 - this.height(null, 'relative'));
-		else this.rect.y = limit(value / this.parentHeight * 100, 0, 100 - this.height(null, 'relative'));
+	} else { 
+		if(positionType != "relative") value = value / this.parentHeight * 100;
+		if(between(value, 0, 100)) this.rect.y = value;
+	}
 };
 
 Button.prototype.width = function(value, positionType) {
