@@ -11,15 +11,12 @@ input:focus {
 	border-color: #666 !important;
 }
 
-
-.editor, .editor > div {
-	/*width: 100%;
-	height: 100%;
-	position: relative;*/
-	width: 100px;
-	height: 200px;
+.editor {
+	width: 500px;
+	height: 500px;
 	position: absolute;
-}.grid-single
+}
+.grid-single
 {
 	/*background-color: #269;
 	background-position: 0px 0px, -1px -1px;

@@ -29,18 +29,19 @@
 	<body>
 
 		<div class="iphone">
+			<div class='grid'></div>
 			<div class="editor"></div>
 		</div>
 
 		<script type="text/javascript">
 
-			var elmIphone = $('.iphone');
+			var iphone = $('.iphone');
+			var editor = iphone.find('.editor');
+			var grid = iphone.find('.grid');
 
-			var options = { element: elmIphone.find('.editor')
-						  ,	cellSize: { width: 20, height: 20 } };
-
+			var options = { element: editor, cellSize: { width: 20, height: 20 } };
 			var editor = new OR.FlexEditor(options);
-			editor.grid(elmIphone);
+			editor.grid(grid);
 			editor.load();
 
 		</script>

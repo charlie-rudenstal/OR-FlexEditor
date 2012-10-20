@@ -394,7 +394,12 @@ function GridRenderer() {
 				break;
 			case 'mouseup': 		
 				if(state == states.MOUSE_DOWN) {	
-					state = states.MOUSE_UP;		
+					state = states.MOUSE_UP;
+					atMouseDown = { 
+						absolute: { mousePosition: null, snappedPosition: null, selectionStart: null, selection: null },
+						relative: { mousePosition: null, snappedPosition: null, selectionStart: null, selection: null }
+					};
+		
 					context.onMouseUp({
 						absolute: absolute,
 						relative: relative,
