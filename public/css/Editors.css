@@ -10,8 +10,10 @@
 .panel-header {
 	font-size: 12px;
 	font-family: arial, helvetica, sans-serif;
-	line-height: 8px;
-	padding: 0px 8px;
+	line-height: 0px;
+	padding: 12px 8px;
+	margin: 0px;
+	background-color: #eee;
 }
 
 .panel-contents {
