@@ -210,12 +210,12 @@ function Main(options) {
 			var deltaPosition = e.absolute.delta.snappedPosition;
 			switch(direction) {
 				case "left":
-					resizedButton.button.x(resizedButton.button.x() + deltaPosition.x); 
 					resizedButton.button.width(resizedButton.button.width() - deltaPosition.x);
+					resizedButton.button.x(resizedButton.button.x() + deltaPosition.x); 
 					break;
 				case "top":
-					resizedButton.button.y(resizedButton.button.y() + deltaPosition.y);
 					resizedButton.button.height(resizedButton.button.height() - deltaPosition.y);
+					resizedButton.button.y(resizedButton.button.y() + deltaPosition.y);
 					break;
 				case "right":
 					resizedButton.button.width(resizedButton.button.width() + deltaPosition.x);
@@ -233,13 +233,13 @@ function Main(options) {
 			var deltaPosition = e.absolute.delta.snappedPosition;
 			switch(direction) {
 				case "left":
-					previewButton.x(resizedButton.button.x() + deltaPosition.x);
 					previewButton.width(resizedButton.button.width() - deltaPosition.x);
+					previewButton.x(resizedButton.button.x() + deltaPosition.x);
 					previewButton.resizeDir = 'resizeLeft';
 					break;
 				case "top":
-					previewButton.y(resizedButton.button.y() + deltaPosition.y);
 					previewButton.height(resizedButton.button.height() - deltaPosition.y);
+					previewButton.y(resizedButton.button.y() + deltaPosition.y);
 					previewButton.resizeDir = 'resizeTop';
 					break;
 				case "right":

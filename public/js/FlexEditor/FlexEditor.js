@@ -211,12 +211,12 @@ function Main(options) {
 			var deltaPosition = e.absolute.delta.snappedPosition;
 			switch(direction) {
 				case "left":
-					resizedButton.button.x(resizedButton.button.x() + deltaPosition.x); 
 					resizedButton.button.width(resizedButton.button.width() - deltaPosition.x);
+					resizedButton.button.x(resizedButton.button.x() + deltaPosition.x); 
 					break;
 				case "top":
-					resizedButton.button.y(resizedButton.button.y() + deltaPosition.y);
 					resizedButton.button.height(resizedButton.button.height() - deltaPosition.y);
+					resizedButton.button.y(resizedButton.button.y() + deltaPosition.y);
 					break;
 				case "right":
 					resizedButton.button.width(resizedButton.button.width() + deltaPosition.x);
@@ -234,13 +234,13 @@ function Main(options) {
 			var deltaPosition = e.absolute.delta.snappedPosition;
 			switch(direction) {
 				case "left":
-					previewButton.x(resizedButton.button.x() + deltaPosition.x);
 					previewButton.width(resizedButton.button.width() - deltaPosition.x);
+					previewButton.x(resizedButton.button.x() + deltaPosition.x);
 					previewButton.resizeDir = 'resizeLeft';
 					break;
 				case "top":
-					previewButton.y(resizedButton.button.y() + deltaPosition.y);
 					previewButton.height(resizedButton.button.height() - deltaPosition.y);
+					previewButton.y(resizedButton.button.y() + deltaPosition.y);
 					previewButton.resizeDir = 'resizeTop';
 					break;
 				case "right":
@@ -639,15 +639,22 @@ function Popover(options) {
 		var buttonRect = getRect(button);
   		var windowRect = getRect($(window));
 
+		var distanceToLeftEdge = buttonRect.x;
 		var distanceToRightEdge = windowRect.width - buttonRect.right;
 		var distanceToTopEdge = buttonRect.y;
 		var distanceToBottomEdge = windowRect.height - buttonRect.bottom;
 
-		var placement = 'right';
-		if(distanceToRightEdge < 220) placement = 'left';
-		if(distanceToBottomEdge < 60) placement = 'top';
-		if(distanceToTopEdge < 40) placement = 'bottom';
-
+		// Find out which direction has the least distance to an edge
+		// and use to opposite placement (ie, if we're close to the left, the popover should
+		// be displayed to the right)
+		var popoverWidth = 236;
+		var popoverHeight = 146;
+		var placement = 'right'; // opposite of left edge
+		var minDistance = distanceToLeftEdge; 
+		if(minDistance > distanceToRightEdge) { placement = 'left'; minDistance = distanceToRightEdge };
+		if(minDistance > distanceToTopEdge) { placement = 'bottom'; minDistance = distanceToTopEdge };
+		if(minDistance > distanceToBottomEdge) { placement = 'top'; minDistance = distanceToBottomEdge };
+		
 		// Render a popover using the body template with the Create Button form
 		// Retrieve a reference to the generated popover element
 		// and enable js beaviors for twitter bootstrap
