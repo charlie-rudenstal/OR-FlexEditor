@@ -33,7 +33,16 @@
 	<body>
 
 		<div class="header">
-
+			<div class="header-options">
+				<div class="input-append color" data-color="#226699" data-color-format="hex">
+					<label>Background</label>
+					<input type="text" class="colorInput" class="span2" value="#226699" />
+					<span class="add-on"><i style="background-color: #226699"></i></span>
+				</div>
+				<div>
+					<button type="button" id="btnShowGrid" class="btn active" data-toggle="button">Show grid</button>
+				</div>
+			</div>
 		</div>
 
 		<div class="workarea">
@@ -81,6 +90,7 @@
 			var iphone = loadEditor($('.device-iphone'));
 			var ipad = loadEditor($('.device-ipad'));
 
+			// Sync changes between iphone and ipad
 			$(iphone).on('change', function() {
 				ipad.import(iphone.getExport());
 			});
@@ -89,6 +99,45 @@
 				iphone.import(ipad.getExport());
 			});
 			
+			var gridColor = null;
+
+			// Initialize color picker for background color 
+			$('.header .color').colorpicker().on('changeColor', function(e) {
+				$('.grid').css('background-color', e.color.toHex());
+
+				gridColor = e.color.value;
+				var lightness = e.color.value.b;
+				var gridlineColor = null;
+				if(lightness > 0.7) {
+					gridlineColor = "rgba(0, 0, 0, 0.1)";
+				} else {
+					gridlineColor = "rgba(255, 255, 255, 0.1)";
+				}
+
+				$('.grid-line').css('background-color', gridlineColor);
+			});
+
+			// Listener for 'show grid' toggle button
+			$("#btnShowGrid").on('click', function() {
+				var btn = $(this)
+				window.setTimeout(function() {
+					var showGrid = btn.is('.active');
+					$('.grid').empty();
+					if(showGrid) {
+						iphone.grid($('.device-iphone .grid'));
+						ipad.grid($('.device-ipad .grid'));
+
+						if(gridColor) {
+							if(gridColor.b > 0.7) {
+								gridlineColor = "rgba(0, 0, 0, 0.1)";
+							} else {
+								gridlineColor = "rgba(255, 255, 255, 0.1)";
+							}
+							$('.grid-line').css('background-color', gridlineColor);
+						}
+					}
+				}, 0);
+			});
 
 		</script>
 

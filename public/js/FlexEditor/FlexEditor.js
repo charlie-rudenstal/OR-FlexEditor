@@ -40,7 +40,7 @@ function Main(options) {
 	me.grid = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		renderer.write(Templates.Grid, { cellSize: cellSize }, element);
+		renderer.write(Templates.Grid, { cellSize: cellSize }, element, true);
 	}
 
 	me.getExport = function() {
@@ -858,13 +858,14 @@ function Popover(options) {
 		while(i < len) {
 			html += template(array[i += 1]);			
 		}
+		
 		return html;
 	}
 
 
-	me.prototype.write = function(template, array, toElement) {
+	me.prototype.write = function(template, array, toElement, ignoreCache) {
 		// Optimize rendering by only doing it when array data has changed 
-		if(equals(array, this.latestDataRendered)) return;
+		if(!ignoreCache && equals(array, this.latestDataRendered)) return;
 		this.latestDataRendered = clone(array); 
 
 		toElement = toElement || this.options.toElement;

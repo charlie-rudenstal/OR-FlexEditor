@@ -1,4 +1,4 @@
-.btn {
+.popover .btn {
 	background-image: -webkit-linear-gradient(#444, #333);
 	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
 	box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
@@ -8,7 +8,7 @@
 	background-color: #373737;
 }
 
-.btn-primary, input.btn-primary {
+.popover .btn-primary, .popover input.btn-primary {
 	color: #ccc;
 
 	background-color: #004DCC;
@@ -22,7 +22,7 @@
 	
 }
 
-.btn:hover {
+.popover .btn:hover {
 	background-color: #373737;
 	color: #ddd;
 	background-position: 0px 0px;

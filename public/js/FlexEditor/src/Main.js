@@ -39,7 +39,7 @@ function Main(options) {
 	me.grid = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		renderer.write(Templates.Grid, { cellSize: cellSize }, element);
+		renderer.write(Templates.Grid, { cellSize: cellSize }, element, true);
 	}
 
 	me.getExport = function() {

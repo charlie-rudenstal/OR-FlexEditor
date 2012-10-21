@@ -30,13 +30,14 @@ function Renderer(options) {
 		while(i < len) {
 			html += template(array[i += 1]);			
 		}
+		
 		return html;
 	}
 
 
-	me.prototype.write = function(template, array, toElement) {
+	me.prototype.write = function(template, array, toElement, ignoreCache) {
 		// Optimize rendering by only doing it when array data has changed 
-		if(equals(array, this.latestDataRendered)) return;
+		if(!ignoreCache && equals(array, this.latestDataRendered)) return;
 		this.latestDataRendered = clone(array); 
 
 		toElement = toElement || this.options.toElement;

@@ -13,16 +13,76 @@ body {
 .header {
 	background-color: #444;
 	width: 100%;
-	height: 32px;
+	height: 36px;
 	position: fixed;
 	top: 0px;
 	left: 0px;
 
+	z-index: 1000;
+
+	padding-top: 3px;
+
+	box-sizing: border-box;
+
 	background: -webkit-linear-gradient(#393c43, #1e1f24);
+}
+
+.header-options {
+	float: right;
+	margin: 0px 6px;
+}
+
+.header-options > div {
+	margin-right: 5px;
+	float: left;
+}
+
+.header-options .input-checkbox {
+	margin-top: 10px;
+}
+
+.header label {
+	float: left;
+	color: white;
+	margin: 6px  10px;
+	color: #ddd;
+	font-size: 12px;
+	font-family: arial, helvetica, sans-serif;
+}
+
+.header .colorInput {
+	background-color: #444;
+	border-color: #555;
+	color: white;
+	width: 60px;
 }
 
 .workarea {
 	margin-left: 10px;
 	margin-top: 43px;
 	white-space: nowrap;
+}
+
+.header .btn {
+	background-image: -webkit-linear-gradient(#444, #333);
+	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
+	box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
+	border-color: #333;
+	text-shadow: none;
+	background-color: #373737;
+	box-sizing: border-box;
+	color: #eee;
+}
+
+.header .btn:hover {
+	background-color: #373737;
+	color: #fff;
+	background-position: 0px 0px;
+}
+
+.header .btn.active {
+	background-image: -webkit-linear-gradient(#223377, #334466);
+	background-image: -webkit-linear-gradient(#335588, #224477);
+	box-shadow: rgba(255, 255, 255, 0.2) 0px -1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
+	
 }
