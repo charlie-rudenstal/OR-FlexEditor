@@ -25,4 +25,8 @@ io.sockets.on('connection', function (socket) {
 	socket.on('change', function (exportedData) {
 		io.sockets.emit('change', exportedData)
  	});
+
+ 	socket.on('background', function (hexColor) {
+		io.sockets.emit('background', hexColor)
+ 	});
 });

@@ -19,11 +19,11 @@ body {
 /* iphone */
 .editor-container {
 	width: 320px;
-	height: 503px;
+	height: 548px;
 	background-color: #226699;
 }
 
 .editor-container > * {
 	width: 320px;
-	height: 503px;
+	height: 548px;
 }

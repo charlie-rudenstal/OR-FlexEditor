@@ -122,6 +122,8 @@
 				var hex = e.color.toHex();
 				$('#btnBackgroundColor .flex-color').css("background-color", hex);
 
+				socket.emit('background', hex);
+
 				gridColor = e.color.value;
 				var lightness = e.color.value.b;
 				var gridlineColor = null;
