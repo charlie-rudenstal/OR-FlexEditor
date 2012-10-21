@@ -85,6 +85,9 @@
 				ipad.import(iphone.getExport());
 			});
 
+			$(ipad).on('change', function() {
+				iphone.import(ipad.getExport());
+			});
 			
 
 		</script>

@@ -269,11 +269,11 @@ function Main(options) {
 			}	
 
 			newRectSnapped = snapRect(newRect, cellSize);
-			resizedButton.button.x(newRectSnapped.x);
-			resizedButton.button.y(newRectSnapped.y);
 			resizedButton.button.width(newRectSnapped.width);
 			resizedButton.button.height(newRectSnapped.height);
-
+			resizedButton.button.x(newRectSnapped.x);
+			resizedButton.button.y(newRectSnapped.y);
+			
 			renderer.write(Templates.Button, buttons);
 			$(me).trigger('change');
 		}
@@ -310,10 +310,10 @@ function Main(options) {
 			}
 
 			newRectSnapped = snapRect(newRect, cellSize);
-			previewButton.x(newRectSnapped.x);
-			previewButton.y(newRectSnapped.y);
 			previewButton.width(newRectSnapped.width);
 			previewButton.height(newRectSnapped.height);
+			previewButton.x(newRectSnapped.x);
+			previewButton.y(newRectSnapped.y);
 
 			var previewButtons = replace(buttons, resizedButton.button, previewButton);
 			renderer.write(Templates.Preselection, previewButtons);
