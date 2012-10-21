@@ -14,9 +14,13 @@
 	font-size: 12px;
 	font-family: arial, helvetica, sans-serif;
 	line-height: 0px;
-	padding: 12px 8px;
+	padding-left: 8px;
+	padding-top: 13px;
+	padding-bottom: 11px;
 	margin: 0px;
-	background-color: #eee;
+	/*background-color: #eee;*/
+	background-color: #ddd;
+	text-shadow: 0px 1px #fff;
 }
 
 .panel-contents {

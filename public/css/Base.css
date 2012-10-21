@@ -10,6 +10,12 @@ body {
 	background: #ddd;
 }
 
+.workarea {
+	margin-left: 10px;
+	margin-top: 43px;
+	white-space: nowrap;
+}
+
 .header {
 	background-color: #444;
 	width: 100%;
@@ -29,11 +35,11 @@ body {
 
 .header-options {
 	float: right;
-	margin: 0px 6px;
+	margin: 0px 0px;
 }
 
 .header-options > div {
-	margin-right: 5px;
+	margin-right: 6px;
 	float: left;
 }
 
@@ -57,32 +63,65 @@ body {
 	width: 60px;
 }
 
-.workarea {
-	margin-left: 10px;
-	margin-top: 43px;
-	white-space: nowrap;
-}
 
-.header .btn {
+/** too quickly hacked, redo entire header bar */
+
+.header .flex-btn {
 	background-image: -webkit-linear-gradient(#444, #333);
 	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
-	box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
+	box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 0px inset;
 	border-color: #333;
 	text-shadow: none;
 	background-color: #373737;
 	box-sizing: border-box;
-	color: #eee;
+	margin-top: 1px;
+	color: #ccc;
+	border-radius: 3px;
+	border-width: 1px;
+	padding-left: 6px;
+	padding-right: 7px;
+	padding-top: 5px;
+	height: 27px;
+	text-shadow: 0px 1px #111;
+	font-size: 12px;
+	cursor: default;
 }
 
-.header .btn:hover {
-	background-color: #373737;
-	color: #fff;
-	background-position: 0px 0px;
+.header .flex-btn:hover {
+	background-image: -webkit-linear-gradient(#484848, #383838);
+	color: #ddd;
 }
 
-.header .btn.active {
+.header .flex-btn.active {
 	background-image: -webkit-linear-gradient(#223377, #334466);
 	background-image: -webkit-linear-gradient(#335588, #224477);
 	box-shadow: rgba(255, 255, 255, 0.2) 0px -1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
-	
+}
+
+.flex-color {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-right: 2px;
+	position: relative;
+	top: 1px;
+	background: -webkit-linear-gradient(#444, #333);
+	border: 1px solid #424242;
+}
+
+.flex-check {
+	display: inline-block;
+	width: 9px;
+	height: 9px;
+	margin-right: 2px;
+	position: relative;
+	top: 1px;
+	border-radius: 20px;
+	background: -webkit-linear-gradient(#595959, #696969);
+	border: 1px solid #666;
+}
+
+.flex-check.active {
+	background: -webkit-linear-gradient(#00bb00, #008800);
+	border: 1px inset #00bb00;
 }

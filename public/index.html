@@ -34,13 +34,13 @@
 
 		<div class="header">
 			<div class="header-options">
-				<div class="input-append color" data-color="#226699" data-color-format="hex">
-					<label>Background</label>
-					<input type="text" class="colorInput" class="span2" value="#226699" />
-					<span class="add-on"><i style="background-color: #226699"></i></span>
+				<div class="flex-btn" id="btnBackgroundColor" data-color="#226699" data-color-format="hex">
+					<div class="flex-color" style="background: #226699;"></div>
+					Background
 				</div>
-				<div>
-					<button type="button" id="btnShowGrid" class="btn active" data-toggle="button">Show grid</button>
+				<div id="btnShowGrid" class="flex-btn" data-toggle="button">
+					<div class="flex-check active"></div>
+					Show grid
 				</div>
 			</div>
 		</div>
@@ -72,6 +72,8 @@
 
 		<script type="text/javascript">
 
+			/** this inline code is quickly hacked for testing, rewrite */
+
 			function loadEditor(device) {
 				var device = $(device);
 				var editor = device.find('.editor');
@@ -102,8 +104,11 @@
 			var gridColor = null;
 
 			// Initialize color picker for background color 
-			$('.header .color').colorpicker().on('changeColor', function(e) {
+			$('.header #btnBackgroundColor').colorpicker().on('changeColor', function(e) {
 				$('.grid').css('background-color', e.color.toHex());
+
+				var hex = e.color.toHex();
+				$('#btnBackgroundColor .flex-color').css("background-color", hex);
 
 				gridColor = e.color.value;
 				var lightness = e.color.value.b;
@@ -117,11 +122,21 @@
 				$('.grid-line').css('background-color', gridlineColor);
 			});
 
+			$('.flex-check').on('click', function(e) {
+				$(this).toggleClass('active');
+				e.stopPropagation();
+			});
+
+			$('.flex-btn').on('click', function(e) {
+				$(this).find('.flex-check').toggleClass('active');
+				e.stopPropagation();
+			});
+
 			// Listener for 'show grid' toggle button
-			$("#btnShowGrid").on('click', function() {
+			$('#btnShowGrid').on('click', function() {
 				var btn = $(this)
 				window.setTimeout(function() {
-					var showGrid = btn.is('.active');
+					var showGrid = btn.find(".flex-check").is('.active');
 					$('.grid').empty();
 					if(showGrid) {
 						iphone.grid($('.device-iphone .grid'));
