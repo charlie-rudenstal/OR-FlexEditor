@@ -87,7 +87,6 @@ function Main(options) {
 
 			// Did user mouse down on a button?
 			else if(buttonAtCursor) {	
-				//state  = new moveState(buttonAtCursor);
 				var newButton = buttonAtCursor.button;
 				if (buttonAtCursor.deltaX < resizeAdornerMouseDistane) {	
 					state = new resizeState(buttonAtCursor, "left");
@@ -200,9 +199,34 @@ function Main(options) {
 
 	function moveState(movedButton) {
 		this.mouseMove = function(e) {
-			movedButton.button.x(e.absolute.snappedPosition.x - movedButton.deltaXSnapped);
-			movedButton.button.y(e.absolute.snappedPosition.y - movedButton.deltaYSnapped);
+			
+			// Get the new position after mouse drag, 
+			// is not automatically snapped
+			var newX = e.absolute.snappedPosition.x - movedButton.deltaXSnapped;
+			var newY = e.absolute.snappedPosition.y - movedButton.deltaYSnapped;
 
+			// Make sure that the button gets snapped upon move
+			// if it's position happens to be out of sync with the snap
+			// (Could happen with synchronized views among devices or if
+			// cellsize of grid is changed)
+			snappedRect = snapRect({
+				x: newX, 
+				y: newY,
+				width: movedButton.button.width(),
+				height: movedButton.button.height() 
+			}, cellSize);
+
+			movedButton.button.x(snappedRect.x);
+			movedButton.button.y(snappedRect.y);
+			movedButton.button.width(snappedRect.width);
+			movedButton.button.height(snappedRect.height); 
+
+			// snappedPoint = snapPoint({x: newX, y: newY}, cellSize);
+			// movedButton.button.x(snappedPoint.x);
+			// movedButton.button.y(snappedPoint.y);
+
+			// Create a copy of the current button, just to set the 
+			// isMoving variable temporarily.
 			var previewButton = clone(movedButton.button);
 			previewButton.isMoving = true;
 			
@@ -220,22 +244,35 @@ function Main(options) {
 		this.mouseUp = function(e) {
 			state = new cursorState();
 			var deltaPosition = e.absolute.delta.snappedPosition;
+			var newRect = { 
+				x: resizedButton.button.x(),
+				y: resizedButton.button.y(),
+				width: resizedButton.button.width(),
+				height: resizedButton.button.height()			
+			};
 			switch(direction) {
 				case "left":
-					resizedButton.button.width(resizedButton.button.width() - deltaPosition.x);
-					resizedButton.button.x(resizedButton.button.x() + deltaPosition.x); 
+					newRect.width = resizedButton.button.width() - deltaPosition.x;
+					newRect.x = resizedButton.button.x() + deltaPosition.x;
 					break;
 				case "top":
-					resizedButton.button.height(resizedButton.button.height() - deltaPosition.y);
-					resizedButton.button.y(resizedButton.button.y() + deltaPosition.y);
+					newRect.height = resizedButton.button.height() - deltaPosition.y;
+					newRect.y = resizedButton.button.y() + deltaPosition.y;
 					break;
 				case "right":
-					resizedButton.button.width(resizedButton.button.width() + deltaPosition.x);
+					newRect.width = resizedButton.button.width() + deltaPosition.x;
 					break;
 				case "bottom":
-					resizedButton.button.height(resizedButton.button.height() + deltaPosition.y);
+					newRect.height = resizedButton.button.height() + deltaPosition.y;
 					break;
-			}		
+			}	
+
+			newRectSnapped = snapRect(newRect, cellSize);
+			resizedButton.button.x(newRectSnapped.x);
+			resizedButton.button.y(newRectSnapped.y);
+			resizedButton.button.width(newRectSnapped.width);
+			resizedButton.button.height(newRectSnapped.height);
+
 			renderer.write(Templates.Button, buttons);
 			$(me).trigger('change');
 		}
@@ -244,26 +281,38 @@ function Main(options) {
 			var renderButtons = buttons;
 			var previewButton = merge({}, resizedButton.button, true);
 			var deltaPosition = e.absolute.delta.snappedPosition;
+			var newRect = { 
+				x: resizedButton.button.x(),
+				y: resizedButton.button.y(),
+				width: resizedButton.button.width(),
+				height: resizedButton.button.height()			
+			}
 			switch(direction) {
 				case "left":
-					previewButton.width(resizedButton.button.width() - deltaPosition.x);
-					previewButton.x(resizedButton.button.x() + deltaPosition.x);
+					newRect.width = resizedButton.button.width() - deltaPosition.x;
+					newRect.x = resizedButton.button.x() + deltaPosition.x;
 					previewButton.resizeDir = 'resizeLeft';
 					break;
 				case "top":
-					previewButton.height(resizedButton.button.height() - deltaPosition.y);
-					previewButton.y(resizedButton.button.y() + deltaPosition.y);
+					newRect.height = resizedButton.button.height() - deltaPosition.y;
+					newRect.y = resizedButton.button.y() + deltaPosition.y;
 					previewButton.resizeDir = 'resizeTop';
 					break;
 				case "right":
-					previewButton.width(resizedButton.button.width() + deltaPosition.x);
+					newRect.width = resizedButton.button.width() + deltaPosition.x;
 					previewButton.resizeDir = 'resizeRight';
 					break;
 				case "bottom":
-					previewButton.height(resizedButton.button.height() + deltaPosition.y);
+					newRect.height = resizedButton.button.height() + deltaPosition.y;
 					previewButton.resizeDir = 'resizeBottom';
 					break;
 			}
+
+			newRectSnapped = snapRect(newRect, cellSize);
+			previewButton.x(newRectSnapped.x);
+			previewButton.y(newRectSnapped.y);
+			previewButton.width(newRectSnapped.width);
+			previewButton.height(newRectSnapped.height);
 
 			var previewButtons = replace(buttons, resizedButton.button, previewButton);
 			renderer.write(Templates.Preselection, previewButtons);

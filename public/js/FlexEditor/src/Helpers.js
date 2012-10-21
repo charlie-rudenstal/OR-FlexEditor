@@ -57,6 +57,21 @@ function snapPoint(point, cellSize) {
 	};
 }
 
+function snapRect(rect, cellSize) {
+
+	console.log(rect.width, cellSize.width  * ~~(rect.width / cellSize.width));
+
+	// Why math round and not floor, ceil, int cast or ~~?
+	// Because we want it to snap to the closest snap point availble,
+	// x: 0.8 should snap to 1, and x: 0.3 to 0
+	return {
+		x:      cellSize.width  * Math.round(rect.x / cellSize.width),
+		y:      cellSize.height * Math.round(rect.y / cellSize.height),
+		width:  cellSize.width  * Math.round(rect.width / cellSize.width),
+		height: cellSize.height * Math.round(rect.height / cellSize.height)
+	};	
+}
+
 function toAbsolute(fromRect) {
 	var editorWidth = 800;
 	toRect = {};
