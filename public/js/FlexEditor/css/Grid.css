@@ -8,6 +8,10 @@
 	background-size: 10% 10%, 10% 10%;*/
 }
 
+.grid {
+	background-color: #269;
+}
+
 .grid-root {
 	position: relative;
 }
@@ -18,4 +22,9 @@
 	position: absolute;
 	border-right: 1px solid rgba(255, 255, 255, .1);
 	border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+.grid-line {
+	position: absolute;
+	background-color: #3674a2;
 }
