@@ -37,6 +37,9 @@
 	<body>
 
 		<div class="header">
+
+			<h1>Flex Editor</h1>
+
 			<div class="header-options">
 				<div class="flex-btn" id="btnBackgroundColor" data-color="#226699" data-color-format="hex">
 					<div class="flex-color" style="background: #226699;"></div>
@@ -45,6 +48,11 @@
 				<div id="btnShowGrid" class="flex-btn" data-toggle="button">
 					<div class="flex-check active"></div>
 					Show grid
+				</div>
+
+				<div id="infoLivePreview" class="flex-btn" style="display: none;" data-toggle="button">
+					<div class="flex-check active"></div>
+					Live Preview (<i id="connectionCount"></i>)
 				</div>
 			</div>
 		</div>
@@ -100,6 +108,19 @@
 			var host = "http://" + window.location.hostname;
 			var socket = io.connect(host);
 			
+			socket.on('connection-count', function(count) {
+				// dont count our own deviec
+				count--;
+				if(count > 0) {
+					var postfix = ' devices';
+					if(count == 1) postfix = ' device'; 
+					$("#infoLivePreview #connectionCount").text(count + postfix);	
+					$("#infoLivePreview").show();	
+				} else {
+					$("#infoLivePreview").hide();	
+				}
+			});
+
 			// Sync changes between iphone and ipad
 			$(iphone).on('change', function() {
 				var exportedData = iphone.getExport();

@@ -33,6 +33,22 @@ body {
 	background: -webkit-linear-gradient(#393c43, #1e1f24);
 }
 
+#connectionCount {
+	font-style: normal;
+}
+
+.header h1 {
+	display: none;
+	color: #999;
+	font-size: 14px;
+	font-weight: normal;
+	position: absolute;
+	text-shadow: 0px 1px #333;
+	top: 0px;
+	left: 8px;
+	line-height: 17px;
+}
+
 .header-options {
 	float: right;
 	margin: 0px 0px;

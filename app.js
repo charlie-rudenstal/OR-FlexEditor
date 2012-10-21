@@ -17,11 +17,13 @@ server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
+var connectionCount = 0;
+
 // Socket for real time preview in iphone/device
 io.sockets.on('connection', function (socket) {
-
-	// socket.emit("status");
-
+ 	connectionCount++;
+ 	io.sockets.emit('connection-count', connectionCount);
+	
 	socket.on('change', function (exportedData) {
 		io.sockets.emit('change', exportedData)
  	});
@@ -29,4 +31,10 @@ io.sockets.on('connection', function (socket) {
  	socket.on('background', function (hexColor) {
 		io.sockets.emit('background', hexColor)
  	});
+
+ 	socket.on('disconnect', function() {
+ 		connectionCount--;
+ 		io.sockets.emit('connection-count', connectionCount);
+ 	})
+
 });
