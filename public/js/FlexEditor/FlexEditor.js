@@ -283,6 +283,7 @@ function Main(options) {
 
 		this.mouseMove = function(e) {
 			var deltaPosition = e.absolute.delta.snappedPosition;
+
 			var resizeDir = "";
 			var newRect = { 
 				x: resizedButton.button.x(),
@@ -290,6 +291,7 @@ function Main(options) {
 				width: resizedButton.button.width(),
 				height: resizedButton.button.height()			
 			}
+
 			switch(direction) {
 				case "left":
 					newRect.width = resizedButton.buttonRectClone.width - deltaPosition.x;
@@ -302,6 +304,8 @@ function Main(options) {
 					resizeDir = 'resizeTop';
 					break;
 				case "right":
+					// added 5 as a magic number in a try to make it easier to drag to edge 
+					// cells that are outside of the device
 					newRect.width = resizedButton.buttonRectClone.width + deltaPosition.x;
 					resizeDir = 'resizeRight';
 					break;
@@ -312,6 +316,7 @@ function Main(options) {
 			}
 
 			newRectSnapped = snapRect(newRect, cellSize);
+			
 			resizedButton.button.width(newRectSnapped.width);
 			resizedButton.button.height(newRectSnapped.height);
 			resizedButton.button.x(newRectSnapped.x);
@@ -714,10 +719,11 @@ Button.prototype.width = function(value, positionType) {
 		if(positionType == "relative")
 			 return this.rect.width;
 		else return this.rect.width / 100 * this.parentWidth;
-	else 
+	else {
 		if(positionType == "relative")		
 			 this.rect.width = value;
 		else this.rect.width = value / this.parentWidth * 100;	
+	}
 };
 
 Button.prototype.height = function(value, positionType) {

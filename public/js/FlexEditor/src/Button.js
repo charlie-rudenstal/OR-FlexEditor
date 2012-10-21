@@ -82,10 +82,11 @@ Button.prototype.width = function(value, positionType) {
 		if(positionType == "relative")
 			 return this.rect.width;
 		else return this.rect.width / 100 * this.parentWidth;
-	else 
+	else {
 		if(positionType == "relative")		
 			 this.rect.width = value;
 		else this.rect.width = value / this.parentWidth * 100;	
+	}
 };
 
 Button.prototype.height = function(value, positionType) {
