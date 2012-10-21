@@ -256,18 +256,18 @@ function Main(options) {
 			};
 			switch(direction) {
 				case "left":
-					newRect.width = resizedButton.button.width() - deltaPosition.x;
-					newRect.x = resizedButton.button.x() + deltaPosition.x;
+					newRect.width = resizedButton.buttonRectClone.width - deltaPosition.x;
+					newRect.x = resizedButton.buttonRectClone.x + deltaPosition.x;
 					break;
 				case "top":
-					newRect.height = resizedButton.button.height() - deltaPosition.y;
-					newRect.y = resizedButton.button.y() + deltaPosition.y;
+					newRect.height = resizedButton.buttonRectClone.height - deltaPosition.y;
+					newRect.y = resizedButton.buttonRectClone.y + deltaPosition.y;
 					break;
 				case "right":
-					newRect.width = resizedButton.button.width() + deltaPosition.x;
+					newRect.width = resizedButton.buttonRectClone.width + deltaPosition.x;
 					break;
 				case "bottom":
-					newRect.height = resizedButton.button.height() + deltaPosition.y;
+					newRect.height = resizedButton.buttonRectClone.height + deltaPosition.y;
 					break;
 			}	
 
@@ -282,9 +282,8 @@ function Main(options) {
 		}
 
 		this.mouseMove = function(e) {
-			var renderButtons = buttons;
-			var previewButton = merge({}, resizedButton.button, true);
 			var deltaPosition = e.absolute.delta.snappedPosition;
+			var resizeDir = "";
 			var newRect = { 
 				x: resizedButton.button.x(),
 				y: resizedButton.button.y(),
@@ -293,33 +292,36 @@ function Main(options) {
 			}
 			switch(direction) {
 				case "left":
-					newRect.width = resizedButton.button.width() - deltaPosition.x;
-					newRect.x = resizedButton.button.x() + deltaPosition.x;
-					previewButton.resizeDir = 'resizeLeft';
+					newRect.width = resizedButton.buttonRectClone.width - deltaPosition.x;
+					newRect.x = resizedButton.buttonRectClone.x + deltaPosition.x;
+					resizeDir = 'resizeLeft';
 					break;
 				case "top":
-					newRect.height = resizedButton.button.height() - deltaPosition.y;
-					newRect.y = resizedButton.button.y() + deltaPosition.y;
-					previewButton.resizeDir = 'resizeTop';
+					newRect.height = resizedButton.buttonRectClone.height - deltaPosition.y;
+					newRect.y = resizedButton.buttonRectClone.y + deltaPosition.y;
+					resizeDir = 'resizeTop';
 					break;
 				case "right":
-					newRect.width = resizedButton.button.width() + deltaPosition.x;
-					previewButton.resizeDir = 'resizeRight';
+					newRect.width = resizedButton.buttonRectClone.width + deltaPosition.x;
+					resizeDir = 'resizeRight';
 					break;
 				case "bottom":
-					newRect.height = resizedButton.button.height() + deltaPosition.y;
-					previewButton.resizeDir = 'resizeBottom';
+					newRect.height = resizedButton.buttonRectClone.height + deltaPosition.y;
+					resizeDir = 'resizeBottom';
 					break;
 			}
 
 			newRectSnapped = snapRect(newRect, cellSize);
-			previewButton.width(newRectSnapped.width);
-			previewButton.height(newRectSnapped.height);
-			previewButton.x(newRectSnapped.x);
-			previewButton.y(newRectSnapped.y);
+			resizedButton.button.width(newRectSnapped.width);
+			resizedButton.button.height(newRectSnapped.height);
+			resizedButton.button.x(newRectSnapped.x);
+			resizedButton.button.y(newRectSnapped.y);
 
-			var previewButtons = replace(buttons, resizedButton.button, previewButton);
-			renderer.write(Templates.Preselection, previewButtons);
+			resizedButton.button.resizeDir = "resizeDir";
+			renderer.write(Templates.Preselection, buttons);
+			resizedButton.button.resizeDir = null;
+
+			$(me).trigger('change');
 		}
 	}
 
@@ -337,6 +339,12 @@ function Main(options) {
 
 				return { button: buttons[i]
 					   , index: parseInt(i)
+					   , buttonRectClone: {
+					   		x: buttons[i].x(),
+					   		y: buttons[i].y(),
+					   		width: buttons[i].width(),
+					   		height: buttons[i].height()
+					   }
 					   , deltaX: position.x - b.x()
 					   , deltaY: position.y - b.y()
 					   , deltaXSnapped: snappedPoint.x - b.x()
@@ -593,9 +601,6 @@ function snapPoint(point, cellSize) {
 }
 
 function snapRect(rect, cellSize) {
-
-	console.log(rect.width, cellSize.width  * ~~(rect.width / cellSize.width));
-
 	// Why math round and not floor, ceil, int cast or ~~?
 	// Because we want it to snap to the closest snap point availble,
 	// x: 0.8 should snap to 1, and x: 0.3 to 0
@@ -860,7 +865,7 @@ function Popover(options) {
 	me.prototype.write = function(template, array, toElement) {
 		// Optimize rendering by only doing it when array data has changed 
 		if(equals(array, this.latestDataRendered)) return;
-		this.latestDataRendered = array; 
+		this.latestDataRendered = clone(array); 
 
 		toElement = toElement || this.options.toElement;
 

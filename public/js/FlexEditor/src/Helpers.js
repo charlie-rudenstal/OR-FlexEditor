@@ -58,9 +58,6 @@ function snapPoint(point, cellSize) {
 }
 
 function snapRect(rect, cellSize) {
-
-	console.log(rect.width, cellSize.width  * ~~(rect.width / cellSize.width));
-
 	// Why math round and not floor, ceil, int cast or ~~?
 	// Because we want it to snap to the closest snap point availble,
 	// x: 0.8 should snap to 1, and x: 0.3 to 0

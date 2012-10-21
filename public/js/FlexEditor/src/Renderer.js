@@ -37,7 +37,7 @@ function Renderer(options) {
 	me.prototype.write = function(template, array, toElement) {
 		// Optimize rendering by only doing it when array data has changed 
 		if(equals(array, this.latestDataRendered)) return;
-		this.latestDataRendered = array; 
+		this.latestDataRendered = clone(array); 
 
 		toElement = toElement || this.options.toElement;
 
