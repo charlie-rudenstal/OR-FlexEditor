@@ -1,10 +1,13 @@
 
 .panel {
 	display: inline-block;
-	margin: 10px 20px;
 	box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.2);
 	border-radius: 4px;
 	overflow: hidden;
+
+	margin-right: 6px;
+	margin-bottom: 6px;
+
 }
 
 .panel-header {
@@ -21,25 +24,45 @@
 	padding: 6px;
 }
 
+.device {
+	box-sizing: border-box;
+}
+
+.device .grid {
+	overflow: hidden;
+}
+
+.device > * {
+	position: absolute;
+}
+
+/* iphone */
 .device-iphone {
 	width: 300px;
 	height: 586px;
 	background: url('/gfx/iphone.png') no-repeat;
 	background-position: -8px -8px;
-	box-sizing: border-box;
-
-	/* positioning editor */
 	padding-top: 101px;
 	padding-left: 25px;
 }
 
-.device-iphone .editor, .device-iphone .grid {
+.device-iphone > * {
 	width: 256px;
 	height: 385px;
-	position: absolute;
 }
 
-.device .grid {
-	overflow: hidden;
+/* ipad */
+.device-ipad {
+	width: 618px;
+	height: 483px;
+	background: url('/gfx/ipad.png') no-repeat;
+	background-position: -4px -6px;
+	padding-top: 101px;
+	padding-left: 25px;
+}
+
+.device-ipad > * {
+	width: 256px;
+	height: 385px;
 }
 
