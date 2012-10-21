@@ -97,8 +97,9 @@
 			var ipad = loadEditor($('.device-ipad'));
 
 			// set up socket for real time preview in iphone/devices
-			var socket = io.connect('http://localhost')
-
+			var host = "http://" + window.location.hostname;
+			var socket = io.connect(host);
+			
 			// Sync changes between iphone and ipad
 			$(iphone).on('change', function() {
 				var exportedData = iphone.getExport();
