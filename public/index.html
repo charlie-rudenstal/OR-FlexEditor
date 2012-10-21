@@ -63,18 +63,24 @@
 
 		<script type="text/javascript">
 
-			var iphone = $('.device-iphone');
-			var editor = iphone.find('.editor');
-			var grid = iphone.find('.grid');
+			function loadEditor(device) {
+				var device = $(device);
+				var editor = device.find('.editor');
+				var grid = device.find('.grid');
+				var options = { 
+					element: editor,
+					cellSize: { 
+						width:  16,
+						height: 16 }};
+				var editor = new OR.FlexEditor(options);
+				editor.grid(grid);
+				editor.load();
+			}
 
-			var options = { element: editor 
-						  , cellSize: 
-						  		{ width:  16 
-								, height: 16 } 
-			};
-			var editor = new OR.FlexEditor(options);
-			editor.grid(grid);
-			editor.load();
+			loadEditor($('.device-iphone'));
+			loadEditor($('.device-ipad'));
+
+			
 
 		</script>
 
