@@ -42,10 +42,14 @@ function Main(options) {
 		renderer.write(Templates.Grid, { cellSize: cellSize }, element);
 	}
 
-	me.getExport = function() {
-		return me.buttons;
+	me.getButtons = function() {
+		return buttons;
 	};
 
+	me.setButtons = function(newButtons) {
+		buttons = clone(newButtons);
+		renderer.write(Templates.Button, buttons);			
+	}
 
 	function frozenState() {
 
@@ -71,6 +75,7 @@ function Main(options) {
 				buttonAtCursor.button.showPositionType = true;
 				renderer.write(Templates.Button, buttons);	
 				buttonAtCursor.button.showPositionType = false;		
+				$(me).trigger('change');
 			}
 
 			// Did user mouse down on a button?
@@ -127,11 +132,12 @@ function Main(options) {
 					buttonAtCursor.button.background = results.inputBackground;
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
+					$(me).trigger('change');
 				},
 				
 				// On cancelled, just re-render already stored me.buttons to clear preselection
 				onCancelled: function() {
-					renderer.write(Templates.Button, me.buttons);
+					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				}
 			}, buttonAtCursor.button);
@@ -173,6 +179,7 @@ function Main(options) {
 					}));
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
+					$(me).trigger('change');
 				},
 				
 				// On cancelled, just re-render already stored me.buttons to clear preselection
@@ -197,6 +204,7 @@ function Main(options) {
 			
 			var previewButtons = replace(buttons, movedButton.button, previewButton);
 			renderer.write(Templates.Button, previewButtons);
+			$(me).trigger('change');
 		}
 
 		this.mouseUp = function(e) {
@@ -225,6 +233,7 @@ function Main(options) {
 					break;
 			}		
 			renderer.write(Templates.Button, buttons);
+			$(me).trigger('change');
 		}
 
 		this.mouseMove = function(e) {

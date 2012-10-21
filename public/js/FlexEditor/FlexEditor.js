@@ -43,10 +43,14 @@ function Main(options) {
 		renderer.write(Templates.Grid, { cellSize: cellSize }, element);
 	}
 
-	me.getExport = function() {
-		return me.buttons;
+	me.getButtons = function() {
+		return buttons;
 	};
 
+	me.setButtons = function(newButtons) {
+		buttons = clone(newButtons);
+		renderer.write(Templates.Button, buttons);			
+	}
 
 	function frozenState() {
 
@@ -72,6 +76,7 @@ function Main(options) {
 				buttonAtCursor.button.showPositionType = true;
 				renderer.write(Templates.Button, buttons);	
 				buttonAtCursor.button.showPositionType = false;		
+				$(me).trigger('change');
 			}
 
 			// Did user mouse down on a button?
@@ -128,11 +133,12 @@ function Main(options) {
 					buttonAtCursor.button.background = results.inputBackground;
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
+					$(me).trigger('change');
 				},
 				
 				// On cancelled, just re-render already stored me.buttons to clear preselection
 				onCancelled: function() {
-					renderer.write(Templates.Button, me.buttons);
+					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
 				}
 			}, buttonAtCursor.button);
@@ -174,6 +180,7 @@ function Main(options) {
 					}));
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
+					$(me).trigger('change');
 				},
 				
 				// On cancelled, just re-render already stored me.buttons to clear preselection
@@ -198,6 +205,7 @@ function Main(options) {
 			
 			var previewButtons = replace(buttons, movedButton.button, previewButton);
 			renderer.write(Templates.Button, previewButtons);
+			$(me).trigger('change');
 		}
 
 		this.mouseUp = function(e) {
@@ -226,6 +234,7 @@ function Main(options) {
 					break;
 			}		
 			renderer.write(Templates.Button, buttons);
+			$(me).trigger('change');
 		}
 
 		this.mouseMove = function(e) {
@@ -481,7 +490,13 @@ function merge(a, b, deep) {
 }
 
 function clone(a) {
-	return merge(a, a, true);
+	if(a instanceof Array) {
+		var arr = [];
+		for(var i in a) arr.push(clone(a[i]));
+		return arr; 
+	} else {
+		return merge(a, a, true);
+	}
 }
 
 function limit(value, min, max) {
@@ -718,6 +733,8 @@ function Popover(options) {
 })(Popover);function Renderer(options) {
 	this.options = options;
 	this.toElement = options.toElement;
+	this.latestDataRendered = [];
+	this.hej = Math.random();
 };
 
 (function(me) {
@@ -749,10 +766,7 @@ function Popover(options) {
 	}
 
 
-	me.prototype.latestDataRendered = [];
-
 	me.prototype.write = function(template, array, toElement) {
-		
 		// Optimize rendering by only doing it when array data has changed 
 		if(equals(array, this.latestDataRendered)) return;
 		this.latestDataRendered = array; 

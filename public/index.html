@@ -75,10 +75,15 @@
 				var editor = new OR.FlexEditor(options);
 				editor.grid(grid);
 				editor.load();
+				return editor;
 			}
 
-			loadEditor($('.device-iphone'));
-			loadEditor($('.device-ipad'));
+			var iphone = loadEditor($('.device-iphone'));
+			var ipad = loadEditor($('.device-ipad'));
+
+			$(iphone).on('change', function() {
+				ipad.setButtons(iphone.getButtons());
+			});
 
 			
 

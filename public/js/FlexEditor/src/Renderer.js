@@ -1,6 +1,8 @@
 function Renderer(options) {
 	this.options = options;
 	this.toElement = options.toElement;
+	this.latestDataRendered = [];
+	this.hej = Math.random();
 };
 
 (function(me) {
@@ -32,10 +34,7 @@ function Renderer(options) {
 	}
 
 
-	me.prototype.latestDataRendered = [];
-
 	me.prototype.write = function(template, array, toElement) {
-		
 		// Optimize rendering by only doing it when array data has changed 
 		if(equals(array, this.latestDataRendered)) return;
 		this.latestDataRendered = array; 

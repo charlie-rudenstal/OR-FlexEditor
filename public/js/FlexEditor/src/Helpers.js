@@ -11,7 +11,13 @@ function merge(a, b, deep) {
 }
 
 function clone(a) {
-	return merge(a, a, true);
+	if(a instanceof Array) {
+		var arr = [];
+		for(var i in a) arr.push(clone(a[i]));
+		return arr; 
+	} else {
+		return merge(a, a, true);
+	}
 }
 
 function limit(value, min, max) {
