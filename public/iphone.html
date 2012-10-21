@@ -61,7 +61,9 @@
     			e.preventDefault(); 
 			}	
 
-			var socket = io.connect('http://192.168.1.153');
+			var host = "http://" + window.location.hostname;
+			var socket = io.connect(host);
+			// var socket = io.connect('http://192.168.1.153');
 			// socket.on('status', function () {
 			// 	alert("it's working");
 			// });
