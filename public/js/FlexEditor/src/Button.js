@@ -1,10 +1,10 @@
-function Button(options) {
-	if(options == null) throw "Button options cannot be null";
-	if(options.parent == null) throw "Parent option cannot be null";
+function Button(parent, options) {
+	if(parent == null) throw "Parent for Button cannot be null";
+	options = options || {};
 
 	// Parent
-	this.parentWidth = $(options.parent).width();
-	this.parentHeight = $(options.parent).height(); 
+	this.parentWidth = $(parent).width();
+	this.parentHeight = $(parent).height(); 
 
 	// ID and text
 	this.id = Button.idCounter++;
@@ -33,11 +33,29 @@ function Button(options) {
 
 Button.idCounter = 0;
 
+Button.prototype.getExport = function() {
+	return {
+		position: this.position,
+		rect: {
+			x: this.x(null, this.position),
+			y: this.y(null, this.position),
+			width: this.width(null, this.position),
+			height: this.height(null, this.position)
+		},
+		text: this.text,
+		background: this.background,
+		foreground: this.foreground,
+		image: this.image
+	};
+}
+
 Button.prototype.x = function(value, positionType) {
 	if (value == null) {
 		if(positionType == "relative")
-			 return this.rect.x;
-		else return this.rect.x / 100 * this.parentWidth;
+			return this.rect.x;
+		else {
+			return this.rect.x / 100 * this.parentWidth;
+		}
 	} else { 
 		if(positionType != "relative") value = value / this.parentWidth * 100;
 		if(value < 0) value = 0;

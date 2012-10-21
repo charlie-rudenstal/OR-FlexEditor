@@ -43,13 +43,20 @@ function Main(options) {
 		renderer.write(Templates.Grid, { cellSize: cellSize }, element);
 	}
 
-	me.getButtons = function() {
-		return buttons;
+	me.getExport = function() {
+		var arr = [];
+		for(var i in buttons) {
+			arr.push(buttons[i].getExport());
+		}
+		return arr;
 	};
 
-	me.setButtons = function(newButtons) {
-		buttons = clone(newButtons);
-		renderer.write(Templates.Button, buttons);			
+	me.import = function(newButtonData) {
+		buttons = [];
+		for(var i in newButtonData) {
+			buttons.push(new Button(elmEditor, newButtonData[i]));
+		}
+		renderer.write(Templates.Button, buttons);	
 	}
 
 	function frozenState() {
@@ -147,36 +154,33 @@ function Main(options) {
 
 	function selectionState() {
 		this.mouseMove = function(e) {
-			var previewButton = new Button({ 
+			var previewButton = new Button(elmEditor, { 
 				  text: ''
 				, position: 'absolute'
 				, rect: e.absolute.selection
-				, parent: elmEditor
 			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 		}
 
 		this.mouseUp = function(e) {
-			var previewButton = new Button({ 
+			var previewButton = new Button(elmEditor, { 
 				  text: ''
 				, position: 'absolute'
 				, rect: e.absolute.selection
 				, customClass: 'current'
-				, parent: elmEditor
 			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 
 			// Open a popover to edit the new button
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
-					buttons.push(new Button({ 
+					buttons.push(new Button(elmEditor, { 
 						  text: results.inputText
 						, image: results.inputImage
 						, foreground: results.inputForeground
 						, background: results.inputBackground
 						, position: 'absolute'
 						, rect: e.absolute.selection
-						, parent: elmEditor
 					}));
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
@@ -189,7 +193,7 @@ function Main(options) {
 					state = new cursorState();
 				}
 
-			}, new Button({ parent: elmEditor }));	
+			}, new Button(elmEditor));	
 
 			state = new frozenState();			
 		}
@@ -554,13 +558,13 @@ function toRelative(fromRect) {
 	toRect.width = fromRect.width/editorWidth * 100;
 	toRect.height = fromRect.height/editorWidth * 100;
 	return toRect;
-}function Button(options) {
-	if(options == null) throw "Button options cannot be null";
-	if(options.parent == null) throw "Parent option cannot be null";
+}function Button(parent, options) {
+	if(parent == null) throw "Parent for Button cannot be null";
+	options = options || {};
 
 	// Parent
-	this.parentWidth = $(options.parent).width();
-	this.parentHeight = $(options.parent).height(); 
+	this.parentWidth = $(parent).width();
+	this.parentHeight = $(parent).height(); 
 
 	// ID and text
 	this.id = Button.idCounter++;
@@ -589,11 +593,29 @@ function toRelative(fromRect) {
 
 Button.idCounter = 0;
 
+Button.prototype.getExport = function() {
+	return {
+		position: this.position,
+		rect: {
+			x: this.x(null, this.position),
+			y: this.y(null, this.position),
+			width: this.width(null, this.position),
+			height: this.height(null, this.position)
+		},
+		text: this.text,
+		background: this.background,
+		foreground: this.foreground,
+		image: this.image
+	};
+}
+
 Button.prototype.x = function(value, positionType) {
 	if (value == null) {
 		if(positionType == "relative")
-			 return this.rect.x;
-		else return this.rect.x / 100 * this.parentWidth;
+			return this.rect.x;
+		else {
+			return this.rect.x / 100 * this.parentWidth;
+		}
 	} else { 
 		if(positionType != "relative") value = value / this.parentWidth * 100;
 		if(value < 0) value = 0;

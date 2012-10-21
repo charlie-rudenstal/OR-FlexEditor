@@ -82,7 +82,7 @@
 			var ipad = loadEditor($('.device-ipad'));
 
 			$(iphone).on('change', function() {
-				ipad.setButtons(iphone.getButtons());
+				ipad.import(iphone.getExport());
 			});
 
 			

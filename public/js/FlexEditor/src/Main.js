@@ -42,13 +42,20 @@ function Main(options) {
 		renderer.write(Templates.Grid, { cellSize: cellSize }, element);
 	}
 
-	me.getButtons = function() {
-		return buttons;
+	me.getExport = function() {
+		var arr = [];
+		for(var i in buttons) {
+			arr.push(buttons[i].getExport());
+		}
+		return arr;
 	};
 
-	me.setButtons = function(newButtons) {
-		buttons = clone(newButtons);
-		renderer.write(Templates.Button, buttons);			
+	me.import = function(newButtonData) {
+		buttons = [];
+		for(var i in newButtonData) {
+			buttons.push(new Button(elmEditor, newButtonData[i]));
+		}
+		renderer.write(Templates.Button, buttons);	
 	}
 
 	function frozenState() {
@@ -146,36 +153,33 @@ function Main(options) {
 
 	function selectionState() {
 		this.mouseMove = function(e) {
-			var previewButton = new Button({ 
+			var previewButton = new Button(elmEditor, { 
 				  text: ''
 				, position: 'absolute'
 				, rect: e.absolute.selection
-				, parent: elmEditor
 			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 		}
 
 		this.mouseUp = function(e) {
-			var previewButton = new Button({ 
+			var previewButton = new Button(elmEditor, { 
 				  text: ''
 				, position: 'absolute'
 				, rect: e.absolute.selection
 				, customClass: 'current'
-				, parent: elmEditor
 			});
 			renderer.write(Templates.Preselection, buttons.concat(previewButton));
 
 			// Open a popover to edit the new button
 			Popover.getResults(Templates.CreateButtonModal, renderer, $('.preselection.current'), {
 				onSuccess: function(results) {		
-					buttons.push(new Button({ 
+					buttons.push(new Button(elmEditor, { 
 						  text: results.inputText
 						, image: results.inputImage
 						, foreground: results.inputForeground
 						, background: results.inputBackground
 						, position: 'absolute'
 						, rect: e.absolute.selection
-						, parent: elmEditor
 					}));
 					renderer.write(Templates.Button, buttons);
 					state = new cursorState();
@@ -188,7 +192,7 @@ function Main(options) {
 					state = new cursorState();
 				}
 
-			}, new Button({ parent: elmEditor }));	
+			}, new Button(elmEditor));	
 
 			state = new frozenState();			
 		}
