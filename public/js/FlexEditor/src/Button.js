@@ -59,7 +59,8 @@ Button.prototype.x = function(value, positionType) {
 	} else { 
 		if(positionType != "relative") value = value / this.parentWidth * 100;
 		if(value < 0) value = 0;
-		if(value + this.rect.width <= 100) this.rect.x = value;
+		//if(value + this.rect.width <= 100) 
+		this.rect.x = value;
 	}
 };
 
@@ -71,7 +72,8 @@ Button.prototype.y = function(value, positionType) {
 	} else { 
 		if(positionType != "relative") value = value / this.parentHeight * 100;
 		if(value < 0) value = 0;
-		if(value + this.rect.height <= 100) this.rect.y = value;
+		//if(value + this.rect.height <= 100) 
+		this.rect.y = value;
 	}
 };
 

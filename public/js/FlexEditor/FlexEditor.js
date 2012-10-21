@@ -217,6 +217,9 @@ function Main(options) {
 				height: movedButton.button.height() 
 			}, cellSize);
 
+			// if((snappedRect.x + snappedRect.width) > $(elmEditor).width()) return; 
+			// if((snappedRect.y + snappedRect.height) > $(elmEditor).height()) return; 
+
 			movedButton.button.x(snappedRect.x);
 			movedButton.button.y(snappedRect.y);
 			movedButton.button.width(snappedRect.width);
@@ -683,7 +686,8 @@ Button.prototype.x = function(value, positionType) {
 	} else { 
 		if(positionType != "relative") value = value / this.parentWidth * 100;
 		if(value < 0) value = 0;
-		if(value + this.rect.width <= 100) this.rect.x = value;
+		//if(value + this.rect.width <= 100) 
+		this.rect.x = value;
 	}
 };
 
@@ -695,7 +699,8 @@ Button.prototype.y = function(value, positionType) {
 	} else { 
 		if(positionType != "relative") value = value / this.parentHeight * 100;
 		if(value < 0) value = 0;
-		if(value + this.rect.height <= 100) this.rect.y = value;
+		//if(value + this.rect.height <= 100) 
+		this.rect.y = value;
 	}
 };
 

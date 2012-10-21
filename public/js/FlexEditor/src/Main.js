@@ -216,6 +216,9 @@ function Main(options) {
 				height: movedButton.button.height() 
 			}, cellSize);
 
+			// if((snappedRect.x + snappedRect.width) > $(elmEditor).width()) return; 
+			// if((snappedRect.y + snappedRect.height) > $(elmEditor).height()) return; 
+
 			movedButton.button.x(snappedRect.x);
 			movedButton.button.y(snappedRect.y);
 			movedButton.button.width(snappedRect.width);
