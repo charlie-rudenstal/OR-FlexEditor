@@ -29,6 +29,10 @@
 		<!-- Development Environment -->
 		<link href="/css/Base.css" rel="stylesheet" type="text/css">
 		<link href="/css/Editors.css" rel="stylesheet" type="text/css">
+	
+		<!-- Socket.io for live preview in iphone/device -->
+		<script src="/socket.io/socket.io.js"></script>
+		
 	</head>
 	<body>
 
@@ -92,13 +96,20 @@
 			var iphone = loadEditor($('.device-iphone'));
 			var ipad = loadEditor($('.device-ipad'));
 
+			// set up socket for real time preview in iphone/devices
+			var socket = io.connect('http://localhost')
+
 			// Sync changes between iphone and ipad
 			$(iphone).on('change', function() {
-				ipad.import(iphone.getExport());
+				var exportedData = iphone.getExport();
+				ipad.import(exportedData);
+				socket.emit('change', exportedData);			
 			});
 
 			$(ipad).on('change', function() {
-				iphone.import(ipad.getExport());
+				var exportedData = ipad.getExport();
+				iphone.import(exportedData);
+				socket.emit('change', exportedData);
 			});
 			
 			var gridColor = null;

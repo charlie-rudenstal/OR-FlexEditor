@@ -11,6 +11,8 @@ function Main(options) {
 	var renderer = options.renderer || new Renderer({toElement: elmEditor});
 	var state = new cursorState();
 
+	var noInteraction = options.noInteraction || false;
+
 	// Display resize tool when mouse is this far from an edge
 	var resizeAdornerMouseDistane = 6;
 
@@ -18,6 +20,8 @@ function Main(options) {
 	Templates.compile();
 
 	me.load = function() {
+		if(noInteraction) return;
+
 		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler();
 		mouseHandler.register({
