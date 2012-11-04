@@ -11,7 +11,6 @@
 		<script src="js/dot.js"></script>
 
 		<!-- Twitter Bootstrap -->		
-		<link  href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 		<script src="js/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 
 		<!-- Color Picker for Twitter Bootstrap  -->		
@@ -28,168 +27,72 @@
 
 		<!-- Development Environment -->
 		<link href="/css/Base.css" rel="stylesheet" type="text/css">
-		<link href="/css/Editors.css" rel="stylesheet" type="text/css">
-	
+		
 		<!-- Socket.io for live preview in iphone/device -->
 		<script src="/socket.io/socket.io.js"></script>
 		
 	</head>
 	<body>
 
-		<div class="header">
-
-			<h1>Flex Editor</h1>
-
-			<div class="header-options">
-				<div class="flex-btn" id="btnBackgroundColor" data-color="#226699" data-color-format="hex">
-					<div class="flex-color" style="background: #226699;"></div>
+	<div class="ide">
+		<div class="bar bar-left">
+			<div class="section section-single logo">OpenRatio</div>
+			<div class="section section-header">Elements</div>
+			<div class="section section-elements">
+				<div class="element">Button 2</div>
+				<div class="element">Button 1</div>
+				<div class="element">Header</div>
+				<div class="element">
+					<div class="element-attributes">
+						<div class="attribute attribute-position">R</div>
+						<div class="attribute attribute-bg"></div>
+					</div>
 					Background
 				</div>
-				<div id="btnShowGrid" class="flex-btn" data-toggle="button">
-					<div class="flex-check active"></div>
-					Show grid
-				</div>
+			</div>
+		</div>
 
-				<div id="infoLivePreview" class="flex-btn" style="display: none;" data-toggle="button">
-					<div class="flex-check active"></div>
-					Live Preview (<i id="connectionCount"></i>)
+		<div class="bar bar-right">
+			<div class="section section-single">Preview on your Phone</div>
+			<div class="section section-header">Library</div>
+			<div class="section section-library">
+				<div class="library-element">
+					<h1 class="library-header">Image</h1>
+					<p class="library-description">Import an image you have already created from a URL</p>
+				</div>
+				<div class="library-element">
+					<h1 class="library-header">Text</h1>
+					<p class="library-description">Used for captions, notices of any other kind of message</p>
 				</div>
 			</div>
 		</div>
 
-		<div class="workarea">
-			
-			<div class="panel">
-				<h2 class='panel-header'>iPhone 4s</h2>
-				<div class="panel-contents">
-					<div class="device device-iphone">
-						<div class='grid'></div>
-						<div class="editor"></div>
-					</div>
-				</div>
-			</div>
-
-			<div class="panel">
-				<h2 class='panel-header'>iPad</h2>
-				<div class="panel-contents">
-					<div class="device device-ipad">
-						<div class='grid'></div>
-						<div class="editor"></div>
-					</div>
-				</div>
-			</div>
-
-
+		<div class="scene">
+			Scene
 		</div>
 
-		<script type="text/javascript">
+	</div>
 
-			/** this inline code is quickly hacked for testing, rewrite */
+	<script type="text/javascript">
+		// function loadEditor(device) {
+		// 	var device = $(device);
+		// 	var editor = device.find('.editor');
+		// 	var grid = device.find('.grid');
+		// 	var options = { 
+		// 		element: editor,
+		// 		cellSize: { 
+		// 			width:  16,
+		// 			height: 16 }};
+		// 	var editor = new OR.FlexEditor(options);
+		// 	editor.grid(grid);
+		// 	editor.load();
+		// 	return editor;
+		// }
 
-			function loadEditor(device) {
-				var device = $(device);
-				var editor = device.find('.editor');
-				var grid = device.find('.grid');
-				var options = { 
-					element: editor,
-					cellSize: { 
-						width:  16,
-						height: 16 }};
-				var editor = new OR.FlexEditor(options);
-				editor.grid(grid);
-				editor.load();
-				return editor;
-			}
-
-			var iphone = loadEditor($('.device-iphone'));
-			var ipad = loadEditor($('.device-ipad'));
-
-			// set up socket for real time preview in iphone/devices
-			var host = "http://" + window.location.hostname;
-			var socket = io.connect(host);
-			
-			socket.on('connection-count', function(count) {
-				// dont count our own deviec
-				count--;
-				if(count > 0) {
-					var postfix = ' devices';
-					if(count == 1) postfix = ' device'; 
-					$("#infoLivePreview #connectionCount").text(count + postfix);	
-					$("#infoLivePreview").show();	
-				} else {
-					$("#infoLivePreview").hide();	
-				}
-			});
-
-			// Sync changes between iphone and ipad
-			$(iphone).on('change', function() {
-				var exportedData = iphone.getExport();
-				ipad.import(exportedData);
-				socket.emit('change', exportedData);			
-			});
-
-			$(ipad).on('change', function() {
-				var exportedData = ipad.getExport();
-				iphone.import(exportedData);
-				socket.emit('change', exportedData);
-			});
-			
-			var gridColor = null;
-
-			// Initialize color picker for background color 
-			$('.header #btnBackgroundColor').colorpicker().on('changeColor', function(e) {
-				$('.grid').css('background-color', e.color.toHex());
-
-				var hex = e.color.toHex();
-				$('#btnBackgroundColor .flex-color').css("background-color", hex);
-
-				socket.emit('background', hex);
-
-				gridColor = e.color.value;
-				var lightness = e.color.value.b;
-				var gridlineColor = null;
-				if(lightness > 0.7) {
-					gridlineColor = "rgba(0, 0, 0, 0.1)";
-				} else {
-					gridlineColor = "rgba(255, 255, 255, 0.1)";
-				}
-
-				$('.grid-line').css('background-color', gridlineColor);
-			});
-
-			$('.flex-check').on('click', function(e) {
-				$(this).toggleClass('active');
-				e.stopPropagation();
-			});
-
-			$('.flex-btn').on('click', function(e) {
-				$(this).find('.flex-check').toggleClass('active');
-				e.stopPropagation();
-			});
-
-			// Listener for 'show grid' toggle button
-			$('#btnShowGrid').on('click', function() {
-				var btn = $(this)
-				window.setTimeout(function() {
-					var showGrid = btn.find(".flex-check").is('.active');
-					$('.grid').empty();
-					if(showGrid) {
-						iphone.grid($('.device-iphone .grid'));
-						ipad.grid($('.device-ipad .grid'));
-
-						if(gridColor) {
-							if(gridColor.b > 0.7) {
-								gridlineColor = "rgba(0, 0, 0, 0.1)";
-							} else {
-								gridlineColor = "rgba(255, 255, 255, 0.1)";
-							}
-							$('.grid-line').css('background-color', gridlineColor);
-						}
-					}
-				}, 0);
-			});
-
-		</script>
+		// set up socket for real time preview in iphone/devices
+		// var host = "http://" + window.location.hostname;
+		// var socket = io.connect(host);
+	</script>
 
 	</body>
 </html>

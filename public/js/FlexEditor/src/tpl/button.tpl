@@ -12,10 +12,6 @@ Templates.Raw.Button = '
 		{{?}}
 	#}}
 
- 	<!-- 
- 	http://cdn3.iconfinder.com/data/icons/ilb/Perspective%20Button%20-%20Go.png 
- 	-->
-
 	<div id="button_{{=it.id}}" 
 	 	 class="component button {{=it.resizeDir}} 
 	 		    {{?it.isMoving}}isMoving{{?}}
@@ -41,10 +37,6 @@ Templates.Raw.Button = '
 	 	{{? it.resizeDir}}
 	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>
 	 	{{?}}
-
-		{{? it.showPositionType}}
-	 		<div class="positionTypeAdorner">{{#def.unit}}</div>
-		{{?}}
 	</div>
 
 ';

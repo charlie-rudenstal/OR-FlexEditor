@@ -11,8 +11,6 @@ function Main(options) {
 	var renderer = options.renderer || new Renderer({toElement: elmEditor});
 	var state = new cursorState();
 
-	var noInteraction = options.noInteraction || false;
-
 	// Display resize tool when mouse is this far from an edge
 	var resizeAdornerMouseDistane = 6;
 
@@ -20,8 +18,6 @@ function Main(options) {
 	Templates.compile();
 
 	me.load = function() {
-		if(noInteraction) return;
-
 		// Init mouse handler and handle onPreSelection (grid selection)
 		var mouseHandler = new MouseHandler();
 		mouseHandler.register({
@@ -69,28 +65,9 @@ function Main(options) {
 	function cursorState() {
 
 		this.mouseDown = function(e) {
-
 			var buttonAtCursor = getButtonAtPosition(buttons, e.absolute.mousePosition);
-			
-			// TODO: toElement doesn't exist in opera
-			// Did user mouse down on the positionType switcher on a button?
-			if(e.originalEvent.toElement.className == "positionTypeAdorner") {
-				
-				// Set to absolut positining and calculate 
-				// absolute coordinates to equal the current relative position
-				if (buttonAtCursor.button.position == "relative") {
-					buttonAtCursor.button.position = "absolute";
-				} else {
-					buttonAtCursor.button.position = "relative";
-				}
-				buttonAtCursor.button.showPositionType = true;
-				renderer.write(Templates.Button, buttons);	
-				buttonAtCursor.button.showPositionType = false;		
-				$(me).trigger('change');
-			}
-
 			// Did user mouse down on a button?
-			else if(buttonAtCursor) {	
+			if(buttonAtCursor) {	
 				var newButton = buttonAtCursor.button;
 				if (buttonAtCursor.deltaX < resizeAdornerMouseDistane) {	
 					state = new resizeState(buttonAtCursor, "left");
