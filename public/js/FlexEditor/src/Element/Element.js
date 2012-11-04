@@ -1,5 +1,5 @@
-function Button(parent, options) {
-	if(parent == null) throw "Parent for Button cannot be null";
+function Element(parent, options) {
+	if(parent == null) throw "Parent for Element cannot be null";
 	options = options || {};
 
 	// Parent
@@ -7,7 +7,7 @@ function Button(parent, options) {
 	this.parentHeight = $(parent).height(); 
 
 	// ID and text
-	this.id = Button.idCounter++;
+	this.id = Element.idCounter++;
 	
 	// Position
 	this.position = options.position || 'absolute';
@@ -31,9 +31,9 @@ function Button(parent, options) {
 	this.customClass = options.customClass;
 };
 
-Button.idCounter = 0;
+Element.idCounter = 0;
 
-Button.prototype.getExport = function() {
+Element.prototype.getExport = function() {
 	return {
 		position: this.position,
 		rect: {
@@ -49,7 +49,7 @@ Button.prototype.getExport = function() {
 	};
 }
 
-Button.prototype.x = function(value, positionType) {
+Element.prototype.x = function(value, positionType) {
 	if (value == null) {
 		if(positionType == "relative")
 			return this.rect.x;
@@ -64,7 +64,7 @@ Button.prototype.x = function(value, positionType) {
 	}
 };
 
-Button.prototype.y = function(value, positionType) {
+Element.prototype.y = function(value, positionType) {
 	if(value == null) {
 		if(positionType == "relative") 
 			 return this.rect.y;
@@ -77,7 +77,7 @@ Button.prototype.y = function(value, positionType) {
 	}
 };
 
-Button.prototype.width = function(value, positionType) {
+Element.prototype.width = function(value, positionType) {
 	if(value == null) 
 		if(positionType == "relative")
 			 return this.rect.width;
@@ -89,7 +89,7 @@ Button.prototype.width = function(value, positionType) {
 	}
 };
 
-Button.prototype.height = function(value, positionType) {
+Element.prototype.height = function(value, positionType) {
 	if(value == null) 
 		if(positionType == "relative") 
 			 return this.rect.height;

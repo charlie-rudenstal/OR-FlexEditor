@@ -68,30 +68,26 @@
 		</div>
 
 		<div class="scene">
-			Scene
+			<div id="grid"></div>
+			<div id="editor"></div>
 		</div>
 
 	</div>
 
-	<script type="text/javascript">
-		// function loadEditor(device) {
-		// 	var device = $(device);
-		// 	var editor = device.find('.editor');
-		// 	var grid = device.find('.grid');
-		// 	var options = { 
-		// 		element: editor,
-		// 		cellSize: { 
-		// 			width:  16,
-		// 			height: 16 }};
-		// 	var editor = new OR.FlexEditor(options);
-		// 	editor.grid(grid);
-		// 	editor.load();
-		// 	return editor;
-		// }
+	<style>
+		#editor, #grid {
+			width: 300px;
+			height: 400px;
+			position: absolute;
+			overflow: hidden;
+		}
+	</style>
 
-		// set up socket for real time preview in iphone/devices
-		// var host = "http://" + window.location.hostname;
-		// var socket = io.connect(host);
+	<script type="text/javascript">
+		var options = { element: $('#editor'), cellSize: { width:  16, height: 16 }};
+		var editor = new OR.FlexEditor(options);
+		editor.grid($('#grid'));
+		editor.load();
 	</script>
 
 	</body>

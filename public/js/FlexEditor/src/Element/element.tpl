@@ -1,6 +1,6 @@
 /* Will be compressed into one line by Makefile */
 var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; 
-Templates.Raw.Button = '
+Templates.Raw.Element = '
 
 	{{##def.unit:
 		{{? it.position == "relative" }}
@@ -12,7 +12,7 @@ Templates.Raw.Button = '
 		{{?}}
 	#}}
 
-	<div id="button_{{=it.id}}" 
+	<div id="element_{{=it.id}}" 
 	 	 class="component button {{=it.resizeDir}} 
 	 		    {{?it.isMoving}}isMoving{{?}}
 	 	     	{{?it.image}}hasImage{{?}}"

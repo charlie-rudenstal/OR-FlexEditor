@@ -2,7 +2,6 @@ function Renderer(options) {
 	this.options = options;
 	this.toElement = options.toElement;
 	this.latestDataRendered = [];
-	this.hej = Math.random();
 };
 
 (function(me) {
