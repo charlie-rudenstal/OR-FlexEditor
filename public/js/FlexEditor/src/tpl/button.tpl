@@ -28,7 +28,8 @@ Templates.Raw.Button = '
 	 	     	">
 
 	 	{{?it.image}}
-			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;
+			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;
+						background-size: {{=it.width(null, "absolute")}}px auto;
 						width: {{=it.width(null, "absolute")}}px;
 	 	     			height: {{=it.height(null, "absolute")}}px;"></div>
 	 	{{?}}
