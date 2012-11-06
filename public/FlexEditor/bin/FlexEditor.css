@@ -46,99 +46,6 @@ input:focus {
 	position: absolute;
 	/*background-color: #3674a2;*/
 	background-color: rgba(255, 255, 255, 0.1);
-}
-.createButtonPopover form {
-	margin: 4px 0px;
-}
-
-.createButtonPopover .input {
-	width: 167px;
-	margin-bottom: 10px;
-}
-
-.createButtonPopover .color {
-	float: right;
-}
-
-.createButtonPopover .btn {
-	margin-right: 5px;
-}
-
-.colorpicker {
-	z-index: 1011;
-}
-
-/* more mac-like style of popovers */
-.popover {
-	background-color: #E3E3E3;
-	padding: 0px;
-}
-
-.popover-title {
-	background-image: -webkit-linear-gradient(#F1F1F1, #B8B8B8);
-	padding: 7px 12px;
-}
-
-.popover.right .arrow {
-	border-right-color: #E3E3E3;
-}
-
-
-.add-on {
-	background-image: -webkit-linear-gradient(#FCFCFC, #C9C9C9);
-	padding: 4px !important;
-}
-
-.add-on i {
-	width: 20px !important;
-	height: 20px !important;
-}
-
-/* dark theme of popovers */
-.popover {
-	background-color: #333;
-	padding: 0px;
-}
-
-.popover-title {
-	background-image: -webkit-linear-gradient(#444, #333);
-	border-color: #404040;
-	color: white;
-	padding: 7px 12px;
-	text-shadow: 0px 1px #000;
-}
-
-.popover.left .arrow {
-	border-left-color: #333;
-}
-
-.popover.right .arrow {
-	border-right-color: #333;
-}
-
-.popover.top .arrow {
-	border-top-color: #333; 
-}
-
-.popover.bottom .arrow {
-	border-bottom-color: #444; /* different color to match with header */
-}
-
-.popover input {
-	background-color: #444;
-	border-color: #555;
-	color: white;
-}
-
-.add-on {
-	background-image: -webkit-linear-gradient(#555, #444);
-	border-color: #555 !important;
-	padding: 4px !important;
-}
-
-.add-on i {
-	width: 20px !important;
-	height: 20px !important;
 }.popover .btn {
 	background-image: -webkit-linear-gradient(#444, #333);
 	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
@@ -225,22 +132,7 @@ input:focus {
 .component.isMoving {
 	cursor: move !important;
 }
-.positionTypeAdorner {
-
-	position: absolute;
-	left: 5px;
-	top: 5px;
-	background-color: #ddd;
-	padding: 2px;
-	border-radius: 2px;
-	color: #333;
-	line-height: 10px;
-	font-size: 9px;
-	cursor: pointer;
-
-	background-color: #3276a9;
-	color: #eee;
-}.component.resizeLeft {
+.component.resizeLeft {
 	cursor: w-resize;
 }
 

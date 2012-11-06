@@ -1,5 +1,6 @@
 function Renderer(options) {
-	this.options = options;
+	var options = options || {};
+	this.items = options.items;
 	this.toElement = options.toElement;
 	this.latestDataRendered = [];
 };
@@ -7,7 +8,7 @@ function Renderer(options) {
 (function(me) {
 
 	/**
-	 * Transform an array of data objects to HTML using
+	 * Transform an item array of data objects to HTML using
 	 * the provided template function
 	 * @param func  pre-compiled template function
 	 * @param array array of {
@@ -17,36 +18,36 @@ function Renderer(options) {
 	 * }
 	 */
 	
-	me.prototype.render = function(template, array) {
-		array = array || this.options.array || [{}];
+	me.prototype.render = function(template, items) {
+		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
-		if($.isArray(array) === false) {
-			array = [array];
+		if($.isArray(items) === false) {
+			items = [items];
 		}		
 
-		var html = '', i = -1, len = array.length - 1;
+		var html = '', i = -1, len = items.length - 1;
 		while(i < len) {
-			html += template(array[i += 1]);			
+			html += template(items[i += 1]);			
 		}
 		
 		return html;
 	}
 
 
-	me.prototype.write = function(template, array, toElement, ignoreCache) {
-		// Optimize rendering by only doing it when array data has changed 
-		if(!ignoreCache && equals(array, this.latestDataRendered)) return;
-		this.latestDataRendered = clone(array); 
+	me.prototype.write = function(template, items, toElement, ignoreCache) {
+		// Optimize rendering by only doing it when item array data has changed 
+		if(!ignoreCache && equals(items, this.latestDataRendered)) return;
+		this.latestDataRendered = clone(items); 
 
-		toElement = toElement || this.options.toElement;
+		toElement = toElement || this.toElement;
 
 		// Creating empty div, set innerHTML and then replaceChild
 		// is a major performance boost compared to just innerHTML
 		var div = document.createElement('div');
 		div.style.width = toElement.style.width;
 		div.style.height = toElement.style.height;
-		div.innerHTML = this.render(template, array);
+		div.innerHTML = this.render(template, items);
 
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing

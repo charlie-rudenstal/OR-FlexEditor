@@ -2,46 +2,21 @@
 	// TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
 
 function Main(options) {
+	
 	var me = this;
 	options = options || {};
+	
+	var grid = new Grid();
+	var interactions = new Interactions();
+	var renderer = new Renderer();
 	
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
 	var buttons = options.buttons || [];
 	
-	var renderer = options.renderer || new Renderer({toElement: elmEditor});
-	var state = new cursorState();
-
-	// Display resize tool when mouse is this far from an edge
-	var resizeAdornerMouseDistane = 6;
 
 	// Compile templates from the tpl folder (and store in the Templates namespace)
 	Templates.compile();
-
-	me.load = function() {
-		// Init mouse handler and handle onPreSelection (grid selection)
-		var mouseHandler = new MouseHandler();
-		mouseHandler.register({
-			  element: elmEditor
-			, cellSize: cellSize 
-			, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
-			, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
-			, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
-			, onDoubleClick: eventHandler(onEvent, { event: 'doubleClick' })
-		});
-	};
-
-	/**
-	 * Renders a grid in the specified element 
-	 * using the cellsize supplied in the options to the current editor   
-	 * @param  {[type]} element [description]
-	 * @return {[type]}         [description]
-	 */
-	me.grid = function(element) {
-		// The renderer work on pure elements not wrapped by jQuery
-		if(element instanceof jQuery) element = element.get(0);
-		renderer.write(Templates.Grid, { cellSize: cellSize }, element, true);
-	}
 
 	me.getExport = function() {
 		var arr = [];
@@ -57,6 +32,129 @@ function Main(options) {
 			buttons.push(new Button(elmEditor, newButtonData[i]));
 		}
 		renderer.write(Templates.Button, buttons);	
+	}
+};
+
+function eventHandler(action, context) {
+	return function(e) {
+		action(e, context);
+	}
+    
+};
+
+function merge(a, b, deep) {
+	var isDeep = deep === true;
+	return $.extend(isDeep, {}, a, b);
+}
+
+function clone(a) {
+	if(a instanceof Array) {
+		var arr = [];
+		for(var i in a) arr.push(clone(a[i]));
+		return arr; 
+	} else {
+		return merge(a, a, true);
+	}
+}
+
+function limit(value, min, max) {
+	if(value < min) return min;
+	if(value > max) return max;
+	return value;
+}
+
+function between(value, min, max) {
+	return value >= min && value <= max;
+}
+
+function remove(item, array) {
+	var newArray = [];
+	for(var i in array) {
+		if(array[i] !== item) newArray.push(array[i]);
+	}
+	return newArray;
+}
+
+function replace(array, oldItem, newItem) {
+	var newArray = [];
+	for(var i in array) {
+		if(array[i] === oldItem) newArray.push(newItem);
+		else newArray.push(array[i]);
+	}
+	return newArray;
+}
+
+function snapPoint(point, cellSize) {
+	return {
+		// 					      ~~ is a fast way to trim decimals
+		x:      cellSize.width  * ~~(point.x / cellSize.width),
+		y:      cellSize.height * ~~(point.y / cellSize.height),
+		width:  cellSize.width,
+		height: cellSize.height
+	};
+}
+
+function snapRect(rect, cellSize) {
+	// Why math round and not floor, ceil, int cast or ~~?
+	// Because we want it to snap to the closest snap point availble,
+	// x: 0.8 should snap to 1, and x: 0.3 to 0
+	return {
+		x:      cellSize.width  * Math.round(rect.x / cellSize.width),
+		y:      cellSize.height * Math.round(rect.y / cellSize.height),
+		width:  cellSize.width  * Math.round(rect.width / cellSize.width),
+		height: cellSize.height * Math.round(rect.height / cellSize.height)
+	};	
+}
+
+function toAbsolute(fromRect) {
+	var editorWidth = 800;
+	toRect = {};
+	toRect.x = fromRect.x/100 * editorWidth;
+	toRect.y = fromRect.y/100 * editorWidth;
+	toRect.width = fromRect.width/100 * editorWidth;
+	toRect.height = fromRect.height/100 * editorWidth;
+	return toRect;
+}	
+
+function toRelative(fromRect) {
+	var editorWidth = 800;
+	toRect = {};
+	toRect.x = fromRect.x/editorWidth * 100;
+	toRect.y = fromRect.y/editorWidth * 100;
+	toRect.width = fromRect.width/editorWidth * 100;
+	toRect.height = fromRect.height/editorWidth * 100;
+	return toRect;
+}// TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
+
+function Interactions(options) {
+	var me = this;
+	options = options || {};
+	
+	var elmEditor = $(options.element).get(0);
+	var cellSize = options.cellSize || { width: 5, height: 5 };
+	var buttons = options.buttons || [];
+
+	var state = new cursorState();
+
+	// Display resize tool when mouse is this far from an edge
+	var resizeAdornerMouseDistane = 6;
+
+	me.load = function() {
+		// Init mouse handler and handle onPreSelection (grid selection)
+		var mouseHandler = new MouseHandler();
+		mouseHandler.register({
+			  element: elmEditor
+			, cellSize: cellSize 
+			, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
+			, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
+			, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
+			, onDoubleClick: eventHandler(onEvent, { event: 'doubleClick' })
+		});
+	};
+
+	var onEvent = function(e, context) {
+		var action = state[context.event];
+		if(action) action(e);
 	}
 
 	function frozenState() {
@@ -310,11 +408,6 @@ function Main(options) {
 			$(me).trigger('change');
 		}
 	}
-
-	var onEvent = function(e, context) {
-		var action = state[context.event];
-		if(action) action(e);
-	}
 	
 	var getButtonAtPosition = function(buttons, position) {
 		var snappedPoint = snapPoint({x: position.x, y: position.y}, cellSize);
@@ -341,42 +434,7 @@ function Main(options) {
 
 };
 
-// background-size: 10% 10%, 10% 10%;
-
-function GridRenderer() {
-
-
-};
-
-(function(me) {
-
-	// Beware: Vertical gridlines disappear for unknown reason
-	// around 644-750 (caused by pixel rounding?) 
-	me.prototype.render = function(element, cellSize) {
-		$(element).addClass('grid-single');
-
-		// var unit = '%';
-		var unit = '%';
-
-		// var elementWidth = $(element).width();
-		// var elementHeight = $(element).height();
-
-		// var absoluteWidth = (cellSize.width / 100) * elementWidth;
-		// var absoluteHeight = (cellSize.height / 100) * elementHeight;
-
-		// var width = ~~absoluteWidth + unit;
-		// var height = ~~absoluteHeight + unit;
-
-		var width = cellSize.width + unit;
-		var height = cellSize.height + unit;
-
-		var css = height +  ' ' + height + ', ' +
-				  width  +  ' ' + width;
-
-		element.style.backgroundSize = css;
-	}
-
-})(GridRenderer);function MouseHandler() {
+function MouseHandler() {
 	this.register = function(context) {
 		$(context.element).off('mousedown mouseup mousemove');
 		$(context.element).on('mousedown mouseup mousemove dblclick', eventHandler(MouseHandler.onMouseEvent, context));
@@ -527,303 +585,17 @@ function GridRenderer() {
 		return rect;
 	}
 
-})(MouseHandler);function eventHandler(action, context) {
-	return function(e) {
-		action(e, context);
-	}
-    
-};
-
-function merge(a, b, deep) {
-	var isDeep = deep === true;
-	return $.extend(isDeep, {}, a, b);
-}
-
-function clone(a) {
-	if(a instanceof Array) {
-		var arr = [];
-		for(var i in a) arr.push(clone(a[i]));
-		return arr; 
-	} else {
-		return merge(a, a, true);
-	}
-}
-
-function limit(value, min, max) {
-	if(value < min) return min;
-	if(value > max) return max;
-	return value;
-}
-
-function between(value, min, max) {
-	return value >= min && value <= max;
-}
-
-function remove(item, array) {
-	var newArray = [];
-	for(var i in array) {
-		if(array[i] !== item) newArray.push(array[i]);
-	}
-	return newArray;
-}
-
-function replace(array, oldItem, newItem) {
-	var newArray = [];
-	for(var i in array) {
-		if(array[i] === oldItem) newArray.push(newItem);
-		else newArray.push(array[i]);
-	}
-	return newArray;
-}
-
-function snapPoint(point, cellSize) {
-	return {
-		// 					      ~~ is a fast way to trim decimals
-		x:      cellSize.width  * ~~(point.x / cellSize.width),
-		y:      cellSize.height * ~~(point.y / cellSize.height),
-		width:  cellSize.width,
-		height: cellSize.height
-	};
-}
-
-function snapRect(rect, cellSize) {
-	// Why math round and not floor, ceil, int cast or ~~?
-	// Because we want it to snap to the closest snap point availble,
-	// x: 0.8 should snap to 1, and x: 0.3 to 0
-	return {
-		x:      cellSize.width  * Math.round(rect.x / cellSize.width),
-		y:      cellSize.height * Math.round(rect.y / cellSize.height),
-		width:  cellSize.width  * Math.round(rect.width / cellSize.width),
-		height: cellSize.height * Math.round(rect.height / cellSize.height)
-	};	
-}
-
-function toAbsolute(fromRect) {
-	var editorWidth = 800;
-	toRect = {};
-	toRect.x = fromRect.x/100 * editorWidth;
-	toRect.y = fromRect.y/100 * editorWidth;
-	toRect.width = fromRect.width/100 * editorWidth;
-	toRect.height = fromRect.height/100 * editorWidth;
-	return toRect;
-}	
-
-function toRelative(fromRect) {
-	var editorWidth = 800;
-	toRect = {};
-	toRect.x = fromRect.x/editorWidth * 100;
-	toRect.y = fromRect.y/editorWidth * 100;
-	toRect.width = fromRect.width/editorWidth * 100;
-	toRect.height = fromRect.height/editorWidth * 100;
-	return toRect;
-}function Button(parent, options) {
-	if(parent == null) throw "Parent for Button cannot be null";
-	options = options || {};
-
-	// Parent
-	this.parentWidth = $(parent).width();
-	this.parentHeight = $(parent).height(); 
-
-	// ID and text
-	this.id = Button.idCounter++;
-	
-	// Position
-	this.position = options.position || 'absolute';
-	this.rect = { x: 0, y: 0, width: 0, height: 0 };
-	if (options.rect) {
-		this.x(options.rect.x, this.position);
-		this.y(options.rect.y, this.position);
-		this.width(options.rect.width, this.position);
-		this.height(options.rect.height, this.position);
-	}
-
-	// States
-	this.showPositionType = options.showPositionType || false;
-	this.isMoving = options.isMoving || false;
-
-	// Colors, text and image
-	this.text = options.text || '';
-	this.background = options.background || '#3276a9';
-	this.foreground = options.foreground || '#ffffff';
-	this.image = options.image || null;
-	this.customClass = options.customClass;
-};
-
-Button.idCounter = 0;
-
-Button.prototype.getExport = function() {
-	return {
-		position: this.position,
-		rect: {
-			x: this.x(null, this.position),
-			y: this.y(null, this.position),
-			width: this.width(null, this.position),
-			height: this.height(null, this.position)
-		},
-		text: this.text,
-		background: this.background,
-		foreground: this.foreground,
-		image: this.image
-	};
-}
-
-Button.prototype.x = function(value, positionType) {
-	if (value == null) {
-		if(positionType == "relative")
-			return this.rect.x;
-		else {
-			return this.rect.x / 100 * this.parentWidth;
-		}
-	} else { 
-		if(positionType != "relative") value = value / this.parentWidth * 100;
-		if(value < 0) value = 0;
-		//if(value + this.rect.width <= 100) 
-		this.rect.x = value;
-	}
-};
-
-Button.prototype.y = function(value, positionType) {
-	if(value == null) {
-		if(positionType == "relative") 
-			 return this.rect.y;
-		else return this.rect.y / 100 * this.parentHeight;			
-	} else { 
-		if(positionType != "relative") value = value / this.parentHeight * 100;
-		if(value < 0) value = 0;
-		//if(value + this.rect.height <= 100) 
-		this.rect.y = value;
-	}
-};
-
-Button.prototype.width = function(value, positionType) {
-	if(value == null) 
-		if(positionType == "relative")
-			 return this.rect.width;
-		else return this.rect.width / 100 * this.parentWidth;
-	else {
-		if(positionType == "relative")		
-			 this.rect.width = value;
-		else this.rect.width = value / this.parentWidth * 100;	
-	}
-};
-
-Button.prototype.height = function(value, positionType) {
-	if(value == null) 
-		if(positionType == "relative") 
-			 return this.rect.height;
-		else return this.rect.height / 100 * this.parentHeight;
-	else 
-		if(positionType == "relative") 
-			 this.rect.height = value;
-		else this.rect.height = value / this.parentHeight * 100;
-};
-
-function Popover(options) {
-	return {
-		getResults: Popover.getResults.bind(Popover, options.contentsTemplate,
-												     options.renderer,
-												     options.onRetrieved)
-	};
-};
-
-(function(me) {
-
-
-	me.getResults = function(contentsTemplate, renderer, button, callbacks, existingButton) {
-
-		// Determine best placement depending on available screen area
-		var buttonPosition = button.position();
-
-		var buttonRect = getRect(button);
-  		var windowRect = getRect($(window));
-
-		var distanceToLeftEdge = buttonRect.x;
-		var distanceToRightEdge = windowRect.width - buttonRect.right;
-		var distanceToTopEdge = buttonRect.y;
-		var distanceToBottomEdge = windowRect.height - buttonRect.bottom;
-
-		// Find out which direction has the least distance to an edge
-		// and use to opposite placement (ie, if we're close to the left, the popover should
-		// be displayed to the right)
-		var popoverWidth = 236;
-		var popoverHeight = 146;
-		var placement = 'right'; // opposite of left edge
-		var minDistance = distanceToLeftEdge; 
-		if(minDistance > distanceToRightEdge) { placement = 'left'; minDistance = distanceToRightEdge };
-		if(minDistance > distanceToTopEdge) { placement = 'bottom'; minDistance = distanceToTopEdge };
-		if(minDistance > distanceToBottomEdge) { placement = 'top'; minDistance = distanceToBottomEdge };
-		
-		// Render a popover using the body template with the Create Button form
-		// Retrieve a reference to the generated popover element
-		// and enable js beaviors for twitter bootstrap
-		button.popover({
-			title: "Button",
-			placement: placement,
-			html: true,
-			content: renderer.render(Templates.CreateButtonPopover, existingButton),
-			trigger: 'manual'
-		});
-
-		button.popover('show');
-
-		var popover = $('.popover');
-
-		popover.find('.color').colorpicker();
-		
-		// Give focus to first text area (html5 autofocus doesn't work in twitter bootstraps popover)
-		popover.find('input:first-child')[0].focus();
-
-		var accepted = false;
-		popover.find('form').submit(function(e) {
-			var results = $(this).serializeObject();
-			callbacks.onSuccess(results);
-			button.popover('destroy');
-			e.preventDefault();
-		})
-
-		popover.find('*[data-dismiss=popover]').click(function(e) {
-			button.popover('destroy');
-			callbacks.onCancelled();
-		});
-
-
-		popover.on('keydown', function(e) {
-			if(e.keyCode == 27) {
-				button.popover('destroy');
-				callbacks.onCancelled(); 
-			}
-		});
-
-		function getRect(element) {
-			var rect = {};
-
-			rect.width = element.width();
-			rect.height = element.height();
-
-			// position is not supported for the window object
-			if (element.get(0) != window) {
-				var position = element.position();
-				rect.x = position.left;
-				rect.y = position.top;
-				rect.right = rect.x + rect.width;
-		  		rect.bottom = rect.y + rect.height;
-	  		}
-	  		return rect;
-		}
-
-	}
-
-})(Popover);function Renderer(options) {
-	this.options = options;
+})(MouseHandler);function Renderer(options) {
+	var options = options || {};
+	this.items = options.items;
 	this.toElement = options.toElement;
 	this.latestDataRendered = [];
-	this.hej = Math.random();
 };
 
 (function(me) {
 
 	/**
-	 * Transform an array of data objects to HTML using
+	 * Transform an item array of data objects to HTML using
 	 * the provided template function
 	 * @param func  pre-compiled template function
 	 * @param array array of {
@@ -833,36 +605,36 @@ function Popover(options) {
 	 * }
 	 */
 	
-	me.prototype.render = function(template, array) {
-		array = array || this.options.array || [{}];
+	me.prototype.render = function(template, items) {
+		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
-		if($.isArray(array) === false) {
-			array = [array];
+		if($.isArray(items) === false) {
+			items = [items];
 		}		
 
-		var html = '', i = -1, len = array.length - 1;
+		var html = '', i = -1, len = items.length - 1;
 		while(i < len) {
-			html += template(array[i += 1]);			
+			html += template(items[i += 1]);			
 		}
 		
 		return html;
 	}
 
 
-	me.prototype.write = function(template, array, toElement, ignoreCache) {
-		// Optimize rendering by only doing it when array data has changed 
-		if(!ignoreCache && equals(array, this.latestDataRendered)) return;
-		this.latestDataRendered = clone(array); 
+	me.prototype.write = function(template, items, toElement, ignoreCache) {
+		// Optimize rendering by only doing it when item array data has changed 
+		if(!ignoreCache && equals(items, this.latestDataRendered)) return;
+		this.latestDataRendered = clone(items); 
 
-		toElement = toElement || this.options.toElement;
+		toElement = toElement || this.toElement;
 
 		// Creating empty div, set innerHTML and then replaceChild
 		// is a major performance boost compared to just innerHTML
 		var div = document.createElement('div');
 		div.style.width = toElement.style.width;
 		div.style.height = toElement.style.height;
-		div.innerHTML = this.render(template, array);
+		div.innerHTML = this.render(template, items);
 
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing
@@ -924,7 +696,128 @@ function Popover(options) {
 		}
 	}
 
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Button = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div id="button_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.CreateButtonPopover = '<div class="createButtonPopover">	<form>		<div>			<div class="input-append color" data-color="{{=it.foreground}}" data-color-format="rgba">				<input type="text" name="inputText" class="input" id="inputText" placeholder="Text" value="{{? it.text}}{{! it.text}}{{?}}" />				<input type="text" name="inputForeground" value="{{=it.foreground}}" class="colorInput" id="inputForeground" style="display: none;" />				<span class="add-on"><i style="background-color: {{=it.foreground}}"></i></span>			</div>			<div class="input-append color" data-color="{{=it.background}}" data-color-format="rgba">				<input type="text" name="inputImage" class="input" id="inputImage" placeholder="Image URL" value="{{? it.image}}{{! it.image}}{{?}}" />				<input type="text" name="inputBackground" value="{{=it.background}}" class="colorInput" id="inputBackground" style="display: none;" />				<span class="add-on"><i style="background-color: {{=it.background}}"></i></span>			</div>		</div>		<div>  			<input type="submit" class="btn btn-primary" value="OK" data-accept="form" />			<a href="#" class="btn" data-dismiss="popover">Close</a>		</div>		</form></div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < 50; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < 50; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';
+})();function Grid(renderer, gridTemplate) {
+	this.renderer = renderer;
+	this.gridTemplate = gridTemplate;
+};
+
+(function(me) {
+
+	/**
+	 * Renders a grid in the specified element 
+	 * using the cellsize supplied in the options to the current editor   
+	 * @param  {[type]} element [description]
+	 * @return {[type]}         [description]
+	 */
+	me.prototype.render = function(element, cellSize) {
+		// The renderer work on pure elements not wrapped by jQuery
+		if(element instanceof jQuery) element = element.get(0);
+		this.renderer.write(Templates.Grid, { cellSize: cellSize }, element, true);
+	}
+
+})(Grid);function Element(parent, options) {
+	if(parent == null) throw "Parent for Element cannot be null";
+	options = options || {};
+
+	// Parent
+	this.parentWidth = $(parent).width();
+	this.parentHeight = $(parent).height(); 
+
+	// ID and text
+	this.id = Element.idCounter++;
+	
+	// Position
+	this.position = options.position || 'absolute';
+	this.rect = { x: 0, y: 0, width: 0, height: 0 };
+	if (options.rect) {
+		this.x(options.rect.x, this.position);
+		this.y(options.rect.y, this.position);
+		this.width(options.rect.width, this.position);
+		this.height(options.rect.height, this.position);
+	}
+
+	// States
+	this.showPositionType = options.showPositionType || false;
+	this.isMoving = options.isMoving || false;
+
+	// Colors, text and image
+	this.text = options.text || '';
+	this.background = options.background || '#3276a9';
+	this.foreground = options.foreground || '#ffffff';
+	this.image = options.image || null;
+	this.customClass = options.customClass;
+};
+
+Element.idCounter = 0;
+
+Element.prototype.getExport = function() {
+	return {
+		position: this.position,
+		rect: {
+			x: this.x(null, this.position),
+			y: this.y(null, this.position),
+			width: this.width(null, this.position),
+			height: this.height(null, this.position)
+		},
+		text: this.text,
+		background: this.background,
+		foreground: this.foreground,
+		image: this.image
+	};
+}
+
+Element.prototype.x = function(value, positionType) {
+	if (value == null) {
+		if(positionType == "relative")
+			return this.rect.x;
+		else {
+			return this.rect.x / 100 * this.parentWidth;
+		}
+	} else { 
+		if(positionType != "relative") value = value / this.parentWidth * 100;
+		if(value < 0) value = 0;
+		//if(value + this.rect.width <= 100) 
+		this.rect.x = value;
+	}
+};
+
+Element.prototype.y = function(value, positionType) {
+	if(value == null) {
+		if(positionType == "relative") 
+			 return this.rect.y;
+		else return this.rect.y / 100 * this.parentHeight;			
+	} else { 
+		if(positionType != "relative") value = value / this.parentHeight * 100;
+		if(value < 0) value = 0;
+		//if(value + this.rect.height <= 100) 
+		this.rect.y = value;
+	}
+};
+
+Element.prototype.width = function(value, positionType) {
+	if(value == null) 
+		if(positionType == "relative")
+			 return this.rect.width;
+		else return this.rect.width / 100 * this.parentWidth;
+	else {
+		if(positionType == "relative")		
+			 this.rect.width = value;
+		else this.rect.width = value / this.parentWidth * 100;	
+	}
+};
+
+Element.prototype.height = function(value, positionType) {
+	if(value == null) 
+		if(positionType == "relative") 
+			 return this.rect.height;
+		else return this.rect.height / 100 * this.parentHeight;
+	else 
+		if(positionType == "relative") 
+			 this.rect.height = value;
+		else this.rect.height = value / this.parentHeight * 100;
+};
+
+/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < 50; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < 50; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';
 	/**
 	 * Make Open Ratio a global object
 	 * and expose the Main module of FlexEditor

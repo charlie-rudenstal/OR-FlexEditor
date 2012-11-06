@@ -1,6 +1,7 @@
 // TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
 
 function Main(options) {
+	
 	var me = this;
 	options = options || {};
 	
