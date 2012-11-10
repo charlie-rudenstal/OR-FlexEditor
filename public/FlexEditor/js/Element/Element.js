@@ -2,6 +2,8 @@ function Element(parent, options) {
 	if(parent == null) throw "Parent for Element cannot be null";
 	options = options || {};
 
+	this.template = Templates.Element;
+
 	// Parent
 	this.parentWidth = $(parent).width();
 	this.parentHeight = $(parent).height(); 
@@ -10,15 +12,13 @@ function Element(parent, options) {
 	this.id = Element.idCounter++;
 	
 	// Position
-	this.position = options.position || 'absolute';
+	this.positionType = options.positionType || 'absolute';
 	this.rect = { x: 0, y: 0, width: 0, height: 0 };
-	if (options.rect) {
-		this.x(options.rect.x, this.position);
-		this.y(options.rect.y, this.position);
-		this.width(options.rect.width, this.position);
-		this.height(options.rect.height, this.position);
-	}
-
+	this.x(options.x || 0, this.positionType);
+	this.y(options.y || 0, this.positionType);
+	this.width(options.width || 0, this.positionType);
+	this.height(options.height || 0, this.positionType);
+	
 	// States
 	this.showPositionType = options.showPositionType || false;
 	this.isMoving = options.isMoving || false;
@@ -35,12 +35,12 @@ Element.idCounter = 0;
 
 Element.prototype.getExport = function() {
 	return {
-		position: this.position,
+		position: this.positionType,
 		rect: {
-			x: this.x(null, this.position),
-			y: this.y(null, this.position),
-			width: this.width(null, this.position),
-			height: this.height(null, this.position)
+			x: this.x(null, this.positionType),
+			y: this.y(null, this.positionType),
+			width: this.width(null, this.positionType),
+			height: this.height(null, this.positionType)
 		},
 		text: this.text,
 		background: this.background,

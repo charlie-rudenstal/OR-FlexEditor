@@ -270,28 +270,7 @@ function Interactions(options) {
 		}
 	}
 	
-	var getButtonAtPosition = function(buttons, position) {
-		var snappedPoint = snapPoint({x: position.x, y: position.y}, cellSize);
-		for(var i in buttons) {
-			var b = buttons[i];
-			if(position.x >= b.x() && position.x < b.x() + b.width() && 
-			   position.y >= b.y() && position.y < b.y() + b.height())
-
-				return { button: buttons[i]
-					   , index: parseInt(i)
-					   , buttonRectClone: {
-					   		x: buttons[i].x(),
-					   		y: buttons[i].y(),
-					   		width: buttons[i].width(),
-					   		height: buttons[i].height()
-					   }
-					   , deltaX: position.x - b.x()
-					   , deltaY: position.y - b.y()
-					   , deltaXSnapped: snappedPoint.x - b.x()
-					   , deltaYSnapped: snappedPoint.y - b.y() }
-		}
-		return null;
-	}
+	
 
 };
 

@@ -19,6 +19,7 @@ function MouseInput(element, cellSize) {
 		if(action) action(e, position);
 	}
 
+	// This State is Active and Handles Events When Mouse is Up
 	function isMouseUp() {
 		this.mousedown = function(e, position) {
 			$me.trigger({ type: 'mousedown', position: position });
@@ -34,6 +35,7 @@ function MouseInput(element, cellSize) {
 		}
 	}
 
+	// This State is Active and Handles Events When Mouse is Down
 	function isMouseDown(positionStart) {
 		this.mousemove = function(e, position) {
 			var delta = {};
@@ -57,6 +59,8 @@ function MouseInput(element, cellSize) {
 		}
 	}
 
+	// Helper method to get the mouse position relative to another element, 
+	// in this case the editor
 	function getMousePosition(e, relativeToElement) {
 		if(elementRect == null) elementRect = getElementRect(element);
 		return {
@@ -65,6 +69,7 @@ function MouseInput(element, cellSize) {
 		}
 	}
 
+	// Helper method to get the position and size of an element
 	function getElementRect(element) {
 		var position = $(element).position();			
 		return {
@@ -185,7 +190,7 @@ function MouseInput(element, cellSize) {
 	// 	}
 	// }
 
-	function rectFrom(rect1, rect2) {
+	/*function rectFrom(rect1, rect2) {
 		var rect = {};
 		rect.x = Math.min(rect1.x, rect2.x);
 		rect.y = Math.min(rect1.y, rect2.y);
@@ -206,6 +211,6 @@ function MouseInput(element, cellSize) {
 			  x: point.x / size.width * 100
 			, y: point.y / size.height * 100
 		}
-	}
+	}*/
 
 };

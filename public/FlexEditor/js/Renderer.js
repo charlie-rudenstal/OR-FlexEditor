@@ -18,7 +18,7 @@ function Renderer(options) {
 	 * }
 	 */
 
-	me.prototype.render = function(template, items) {
+	me.prototype.render = function(items, defaultTemplate) {
 		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
@@ -26,17 +26,24 @@ function Renderer(options) {
 			items = [items];
 		}	
 
-		// Try to do it the othe way around and count down instead of up, migth be faster
-		var html = '', i = -1, len = items.length - 1;
-		while(i < len) {
-			html += template(items[i += 1]);			
+		var html = '';
+		var i = -1;
+		var len = items.length - 1;
+		while(i++ < len) {
+			// Use custom template provided by item if existing,
+			// otherwise use default template
+			if(items[i].template) {
+				html += items[i].template(items[i]);
+			} else {
+				html += defaultTemplate(items[i]);	
+			}	
 		}
 		
 		return html;
 	}
 
 
-	me.prototype.write = function(template, items, toElement, ignoreCache) {
+	me.prototype.write = function(items, toElement, defaultTemplate, ignoreCache) {
 		// Optimize rendering by only doing it when item array data has changed 
 		if(!ignoreCache && equals(items, this.latestDataRendered)) return;
 		this.latestDataRendered = clone(items); 
@@ -48,7 +55,7 @@ function Renderer(options) {
 		var div = document.createElement('div');
 		div.style.width = toElement.style.width;
 		div.style.height = toElement.style.height;
-		div.innerHTML = this.render(template, items);
+		div.innerHTML = this.render(items, defaultTemplate);
 
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing

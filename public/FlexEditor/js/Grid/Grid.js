@@ -15,7 +15,7 @@ function Grid(renderer, cellSize) {
 	me.prototype.render = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		this.renderer.write(Templates.Grid, { cellSize: this.cellSize }, element, true);
+		this.renderer.write({ cellSize: this.cellSize }, element, Templates.Grid, true);
 	}
 
 })(Grid);

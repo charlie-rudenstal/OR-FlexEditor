@@ -1,42 +1,59 @@
 (function($) {
 	function Main(options) {
 	var me = this;
+	var elements = [];
+
 	options = options || {};
-	
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
-	var buttons = options.buttons || [];
 	
 	var interactions = new Interactions();
 	var renderer = new Renderer();
 	var grid = new Grid(renderer, cellSize);
 
 	me.load = function() {
-		
+
 		var mouseInput = new MouseInput(elmEditor, cellSize);
 		mouseInput.start();
 
-		$(mouseInput).on('mousedown mouseup', function(e) {
-			console.log(e.type, e.position.absolute);
-		});
-
 		$(mouseInput).on('drag', function(e) {
-			console.log(e.type, e.delta.snapped);
+			var elm = new Element(elmEditor);
+			elm.x(e.positionStart.snapped.x);
+			elm.y(e.positionStart.snapped.y);
+			elm.width(e.delta.snapped.x);
+			elm.height(e.delta.snapped.y);
+			renderer.write(elm, elmEditor);
 		});
 
-		// mouseInput.register({
-		// 	  element: elmEditor
-		// 	, cellSize: cellSize 
-		// 	, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
-		// 	, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
-		// 	, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
-		// 	, onDoubleClick: eventHandler(onEvent, { event: 'doubleClick' })
-		// });
+	};
 
+	me.render = function() {
+		renderer.write(elements, elmEditor);
 	}
 
 	me.grid = function(element) {
 		grid.render(element);
+	}
+
+	function getElementsAtPosition(position) {
+		var elementsAtPosition = [];
+		for(var i in elements) {
+			var elm = elements[i];
+			var isWithinHorizontal = (position.x >= elm.x() && position.x < elm.x() + elm.width());
+			var isWithinVertical = (position.y >= elm.y() && position.y < elm.y() + elm.height());
+			if(isWithinVertical && isWithinHorizontal) { 
+				elementsAtPosition.push(elm);
+			}
+		}
+		return null;
+	}
+
+	me.import = function(newButtonData) {
+		buttons = [];
+		for(var i in newButtonData) {
+			buttons.push(new Button(elmEditor, newButtonData[i]));
+		}
+		renderer.write(Templates.Button, buttons);	
 	}
 
 	me.getExport = function() {
@@ -46,14 +63,6 @@
 		}
 		return arr;
 	};
-
-	me.import = function(newButtonData) {
-		buttons = [];
-		for(var i in newButtonData) {
-			buttons.push(new Button(elmEditor, newButtonData[i]));
-		}
-		renderer.write(Templates.Button, buttons);	
-	}
 };
 
 // function eventHandler(action, context) {
@@ -424,28 +433,7 @@ function Interactions(options) {
 		}
 	}
 	
-	var getButtonAtPosition = function(buttons, position) {
-		var snappedPoint = snapPoint({x: position.x, y: position.y}, cellSize);
-		for(var i in buttons) {
-			var b = buttons[i];
-			if(position.x >= b.x() && position.x < b.x() + b.width() && 
-			   position.y >= b.y() && position.y < b.y() + b.height())
-
-				return { button: buttons[i]
-					   , index: parseInt(i)
-					   , buttonRectClone: {
-					   		x: buttons[i].x(),
-					   		y: buttons[i].y(),
-					   		width: buttons[i].width(),
-					   		height: buttons[i].height()
-					   }
-					   , deltaX: position.x - b.x()
-					   , deltaY: position.y - b.y()
-					   , deltaXSnapped: snappedPoint.x - b.x()
-					   , deltaYSnapped: snappedPoint.y - b.y() }
-		}
-		return null;
-	}
+	
 
 };
 
@@ -470,6 +458,7 @@ function MouseInput(element, cellSize) {
 		if(action) action(e, position);
 	}
 
+	// This State is Active and Handles Events When Mouse is Up
 	function isMouseUp() {
 		this.mousedown = function(e, position) {
 			$me.trigger({ type: 'mousedown', position: position });
@@ -485,6 +474,7 @@ function MouseInput(element, cellSize) {
 		}
 	}
 
+	// This State is Active and Handles Events When Mouse is Down
 	function isMouseDown(positionStart) {
 		this.mousemove = function(e, position) {
 			var delta = {};
@@ -508,6 +498,8 @@ function MouseInput(element, cellSize) {
 		}
 	}
 
+	// Helper method to get the mouse position relative to another element, 
+	// in this case the editor
 	function getMousePosition(e, relativeToElement) {
 		if(elementRect == null) elementRect = getElementRect(element);
 		return {
@@ -516,6 +508,7 @@ function MouseInput(element, cellSize) {
 		}
 	}
 
+	// Helper method to get the position and size of an element
 	function getElementRect(element) {
 		var position = $(element).position();			
 		return {
@@ -636,7 +629,7 @@ function MouseInput(element, cellSize) {
 	// 	}
 	// }
 
-	function rectFrom(rect1, rect2) {
+	/*function rectFrom(rect1, rect2) {
 		var rect = {};
 		rect.x = Math.min(rect1.x, rect2.x);
 		rect.y = Math.min(rect1.y, rect2.y);
@@ -657,7 +650,7 @@ function MouseInput(element, cellSize) {
 			  x: point.x / size.width * 100
 			, y: point.y / size.height * 100
 		}
-	}
+	}*/
 
 };function Renderer(options) {
 	var options = options || {};
@@ -679,7 +672,7 @@ function MouseInput(element, cellSize) {
 	 * }
 	 */
 
-	me.prototype.render = function(template, items) {
+	me.prototype.render = function(items, defaultTemplate) {
 		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
@@ -687,17 +680,24 @@ function MouseInput(element, cellSize) {
 			items = [items];
 		}	
 
-		// Try to do it the othe way around and count down instead of up, migth be faster
-		var html = '', i = -1, len = items.length - 1;
-		while(i < len) {
-			html += template(items[i += 1]);			
+		var html = '';
+		var i = -1;
+		var len = items.length - 1;
+		while(i++ < len) {
+			// Use custom template provided by item if existing,
+			// otherwise use default template
+			if(items[i].template) {
+				html += items[i].template(items[i]);
+			} else {
+				html += defaultTemplate(items[i]);	
+			}	
 		}
 		
 		return html;
 	}
 
 
-	me.prototype.write = function(template, items, toElement, ignoreCache) {
+	me.prototype.write = function(items, toElement, defaultTemplate, ignoreCache) {
 		// Optimize rendering by only doing it when item array data has changed 
 		if(!ignoreCache && equals(items, this.latestDataRendered)) return;
 		this.latestDataRendered = clone(items); 
@@ -709,7 +709,7 @@ function MouseInput(element, cellSize) {
 		var div = document.createElement('div');
 		div.style.width = toElement.style.width;
 		div.style.height = toElement.style.height;
-		div.innerHTML = this.render(template, items);
+		div.innerHTML = this.render(items, defaultTemplate);
 
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing
@@ -789,12 +789,14 @@ function Grid(renderer, cellSize) {
 	me.prototype.render = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		this.renderer.write(Templates.Grid, { cellSize: this.cellSize }, element, true);
+		this.renderer.write({ cellSize: this.cellSize }, element, Templates.Grid, true);
 	}
 
 })(Grid);function Element(parent, options) {
 	if(parent == null) throw "Parent for Element cannot be null";
 	options = options || {};
+
+	this.template = Templates.Element;
 
 	// Parent
 	this.parentWidth = $(parent).width();
@@ -804,15 +806,13 @@ function Grid(renderer, cellSize) {
 	this.id = Element.idCounter++;
 	
 	// Position
-	this.position = options.position || 'absolute';
+	this.positionType = options.positionType || 'absolute';
 	this.rect = { x: 0, y: 0, width: 0, height: 0 };
-	if (options.rect) {
-		this.x(options.rect.x, this.position);
-		this.y(options.rect.y, this.position);
-		this.width(options.rect.width, this.position);
-		this.height(options.rect.height, this.position);
-	}
-
+	this.x(options.x || 0, this.positionType);
+	this.y(options.y || 0, this.positionType);
+	this.width(options.width || 0, this.positionType);
+	this.height(options.height || 0, this.positionType);
+	
 	// States
 	this.showPositionType = options.showPositionType || false;
 	this.isMoving = options.isMoving || false;
@@ -829,12 +829,12 @@ Element.idCounter = 0;
 
 Element.prototype.getExport = function() {
 	return {
-		position: this.position,
+		position: this.positionType,
 		rect: {
-			x: this.x(null, this.position),
-			y: this.y(null, this.position),
-			width: this.width(null, this.position),
-			height: this.height(null, this.position)
+			x: this.x(null, this.positionType),
+			y: this.y(null, this.positionType),
+			width: this.width(null, this.positionType),
+			height: this.height(null, this.positionType)
 		},
 		text: this.text,
 		background: this.background,
@@ -894,7 +894,7 @@ Element.prototype.height = function(value, positionType) {
 		else this.rect.height = value / this.parentHeight * 100;
 };
 
-/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < 50; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < 50; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';
+/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < 50; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < 50; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';
 	// Auto-Compile templates from the tpl folder (and store in the Templates namespace)
 	Templates.compile();
 
