@@ -1,6 +1,7 @@
-function Grid(renderer, gridTemplate) {
+function Grid(renderer, cellSize) {
 	this.renderer = renderer;
-	this.gridTemplate = gridTemplate;
+	this.gridTemplate = Templates.Grid;
+	this.cellSize = cellSize;
 };
 
 (function(me) {
@@ -11,10 +12,10 @@ function Grid(renderer, gridTemplate) {
 	 * @param  {[type]} element [description]
 	 * @return {[type]}         [description]
 	 */
-	me.prototype.render = function(element, cellSize) {
+	me.prototype.render = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		this.renderer.write(Templates.Grid, { cellSize: cellSize }, element, true);
+		this.renderer.write(Templates.Grid, { cellSize: this.cellSize }, element, true);
 	}
 
 })(Grid);

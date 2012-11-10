@@ -1,20 +1,18 @@
-// TODO: Add source map, http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
-
 function Main(options) {
 	var me = this;
 	options = options || {};
-	
-	var grid = new Grid();
-	var interactions = new Interactions();
-	var renderer = new Renderer();
 	
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
 	var buttons = options.buttons || [];
 	
+	var interactions = new Interactions();
+	var renderer = new Renderer();
+	var grid = new Grid(renderer, cellSize);
 
-	// Compile templates from the tpl folder (and store in the Templates namespace)
-	Templates.compile();
+	me.grid = function(element) {
+		grid.render(element);
+	}
 
 	me.getExport = function() {
 		var arr = [];
