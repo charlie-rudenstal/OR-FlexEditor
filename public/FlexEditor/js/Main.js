@@ -15,8 +15,12 @@ function Main(options) {
 		var mouseInput = new MouseInput(elmEditor, cellSize);
 		mouseInput.start();
 
-		$(mouseInput).on('mousedown mouseup drag', function(e) {
-			console.log(e.type, e.position.absolute, e.delta && e.delta.absolute);
+		$(mouseInput).on('mousedown mouseup', function(e) {
+			console.log(e.type, e.position.absolute);
+		});
+
+		$(mouseInput).on('drag', function(e) {
+			console.log(e.type, e.delta.snapped);
 		});
 
 		// mouseInput.register({

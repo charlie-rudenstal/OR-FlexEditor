@@ -16,8 +16,12 @@
 		var mouseInput = new MouseInput(elmEditor, cellSize);
 		mouseInput.start();
 
-		$(mouseInput).on('mousedown mouseup drag', function(e) {
-			console.log(e.type, e.position.absolute, e.delta && e.delta.absolute);
+		$(mouseInput).on('mousedown mouseup', function(e) {
+			console.log(e.type, e.position.absolute);
+		});
+
+		$(mouseInput).on('drag', function(e) {
+			console.log(e.type, e.delta.snapped);
 		});
 
 		// mouseInput.register({
@@ -162,11 +166,6 @@ function Interactions(options) {
 
 	// Display resize tool when mouse is this far from an edge
 	var resizeAdornerMouseDistane = 6;
-
-	me.load = function() {
-		// Init mouse handler and handle onPreSelection (grid selection)
-		
-	};
 
 	var onEvent = function(e, context) {
 		var action = state[context.event];
@@ -486,18 +485,21 @@ function MouseInput(element, cellSize) {
 		}
 	}
 
-	function isMouseDown(startPosition) {
+	function isMouseDown(positionStart) {
 		this.mousemove = function(e, position) {
 			var delta = {};
 			delta.absolute = {
-				x: position.absolute.x - startPosition.absolute.x,
-				y: position.absolute.y - startPosition.absolute.y
+				x: position.absolute.x - positionStart.absolute.x,
+				y: position.absolute.y - positionStart.absolute.y
 			};
 			delta.snapped = {
-				x: position.snapped.x - startPosition.snapped.x,
-				y: position.snapped.y - startPosition.snapped.y
+				x: position.snapped.x - positionStart.snapped.x,
+				y: position.snapped.y - positionStart.snapped.y
 			};
-			$me.trigger({ type: 'drag', position: position, delta: delta });
+			$me.trigger({ type: 'drag', 
+						  position: position, 
+						  positionStart: positionStart,
+						  delta: delta });
 		}
 		
 		this.mouseup = function(e, position) {

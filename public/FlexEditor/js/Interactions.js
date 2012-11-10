@@ -13,11 +13,6 @@ function Interactions(options) {
 	// Display resize tool when mouse is this far from an edge
 	var resizeAdornerMouseDistane = 6;
 
-	me.load = function() {
-		// Init mouse handler and handle onPreSelection (grid selection)
-		
-	};
-
 	var onEvent = function(e, context) {
 		var action = state[context.event];
 		if(action) action(e);
