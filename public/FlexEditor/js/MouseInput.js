@@ -17,6 +17,8 @@ function MouseInput(element, cellSize) {
 
 		var action = state[e.type];
 		if(action) action(e, position);
+
+		e.preventDefault();
 	}
 
 	// This State is Active and Handles Events When Mouse is Up
@@ -71,12 +73,19 @@ function MouseInput(element, cellSize) {
 
 	// Helper method to get the position and size of an element
 	function getElementRect(element) {
-		var position = $(element).position();			
+		var $element = $(element);
+		var position = $element.position();	
+		var margin = {
+			top: parseInt($(element).css('marginTop')),	
+			right: parseInt($(element).css('marginRight')),	
+			bottom: parseInt($(element).css('marginBottom')),	
+			left: parseInt($(element).css('marginLeft'))	
+		}
 		return {
-			  x: position.left
-			, y: position.top
-			, width: $(element).width()
-			, height: $(element).height()
+			  x: position.left + margin.left
+			, y: position.top + margin.top
+			, width: $(element).width() + margin.left + margin.right
+			, height: $(element).height() + margin.top + margin.bottom
 		};
 	}
 

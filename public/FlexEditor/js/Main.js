@@ -5,10 +5,15 @@ function Main(options) {
 	options = options || {};
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
-	
+	var width = options.width || 12;
+	var height = options.height || 25;
+
+	elmEditor.style.width = width * cellSize.width + 'px';
+	elmEditor.style.height = height * cellSize.height + 'px';
+
 	var interactions = new Interactions();
 	var renderer = new Renderer();
-	var grid = new Grid(renderer, cellSize);
+	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
 
 	me.load = function() {
 

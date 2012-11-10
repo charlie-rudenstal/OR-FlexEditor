@@ -1,7 +1,11 @@
-function Grid(renderer, cellSize) {
+function Grid(renderer, options) {
 	this.renderer = renderer;
 	this.gridTemplate = Templates.Grid;
-	this.cellSize = cellSize;
+	
+	var options = options || {};
+	this.cellSize = options.cellSize || { width: 5, height: 5 };
+	this.width = options.width || 12;
+	this.height = options.height || 25;
 };
 
 (function(me) {
@@ -15,7 +19,14 @@ function Grid(renderer, cellSize) {
 	me.prototype.render = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		this.renderer.write({ cellSize: this.cellSize }, element, Templates.Grid, true);
+
+		element.style.width = this.width * this.cellSize.width + 'px';
+		element.style.height = this.height * this.cellSize.height + 'px';
+
+		this.renderer.write({ 
+			cellSize: this.cellSize, 
+			width: this.width, 
+			height: this.height }, element, Templates.Grid, true);
 	}
 
 })(Grid);

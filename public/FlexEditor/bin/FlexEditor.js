@@ -6,10 +6,15 @@
 	options = options || {};
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
-	
+	var width = options.width || 12;
+	var height = options.height || 25;
+
+	elmEditor.style.width = width * cellSize.width + 'px';
+	elmEditor.style.height = height * cellSize.height + 'px';
+
 	var interactions = new Interactions();
 	var renderer = new Renderer();
-	var grid = new Grid(renderer, cellSize);
+	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
 
 	me.load = function() {
 
@@ -456,6 +461,8 @@ function MouseInput(element, cellSize) {
 
 		var action = state[e.type];
 		if(action) action(e, position);
+
+		e.preventDefault();
 	}
 
 	// This State is Active and Handles Events When Mouse is Up
@@ -510,12 +517,19 @@ function MouseInput(element, cellSize) {
 
 	// Helper method to get the position and size of an element
 	function getElementRect(element) {
-		var position = $(element).position();			
+		var $element = $(element);
+		var position = $element.position();	
+		var margin = {
+			top: parseInt($(element).css('marginTop')),	
+			right: parseInt($(element).css('marginRight')),	
+			bottom: parseInt($(element).css('marginBottom')),	
+			left: parseInt($(element).css('marginLeft'))	
+		}
 		return {
-			  x: position.left
-			, y: position.top
-			, width: $(element).width()
-			, height: $(element).height()
+			  x: position.left + margin.left
+			, y: position.top + margin.top
+			, width: $(element).width() + margin.left + margin.right
+			, height: $(element).height() + margin.top + margin.bottom
 		};
 	}
 
@@ -772,10 +786,14 @@ function MouseInput(element, cellSize) {
 	}
 
 })();
-function Grid(renderer, cellSize) {
+function Grid(renderer, options) {
 	this.renderer = renderer;
 	this.gridTemplate = Templates.Grid;
-	this.cellSize = cellSize;
+	
+	var options = options || {};
+	this.cellSize = options.cellSize || { width: 5, height: 5 };
+	this.width = options.width || 12;
+	this.height = options.height || 25;
 };
 
 (function(me) {
@@ -789,7 +807,14 @@ function Grid(renderer, cellSize) {
 	me.prototype.render = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
-		this.renderer.write({ cellSize: this.cellSize }, element, Templates.Grid, true);
+
+		element.style.width = this.width * this.cellSize.width + 'px';
+		element.style.height = this.height * this.cellSize.height + 'px';
+
+		this.renderer.write({ 
+			cellSize: this.cellSize, 
+			width: this.width, 
+			height: this.height }, element, Templates.Grid, true);
 	}
 
 })(Grid);function Element(parent, options) {
@@ -894,7 +919,7 @@ Element.prototype.height = function(value, positionType) {
 		else this.rect.height = value / this.parentHeight * 100;
 };
 
-/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < 50; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < 50; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';
+/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 		 style="left: {{=it.x(null, it.position)}}{{#def.unit}};	 	     	top: {{=it.y(null, it.position)}}{{#def.unit}};	 	     	width: {{=it.width(null, it.position)}}{{#def.unit}};	 	     	height: {{=it.height(null, it.position)}}{{#def.unit}};">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < it.width; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < it.height; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';
 	// Auto-Compile templates from the tpl folder (and store in the Templates namespace)
 	Templates.compile();
 
