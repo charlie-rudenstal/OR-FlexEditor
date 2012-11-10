@@ -20,8 +20,8 @@ function Grid(renderer, options) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
 
-		element.style.width = this.width * this.cellSize.width + 'px';
-		element.style.height = this.height * this.cellSize.height + 'px';
+		element.style.width = this.width * this.cellSize.width + 1 + 'px';
+		element.style.height = this.height * this.cellSize.height + 1 + 'px';
 
 		this.renderer.write({ 
 			cellSize: this.cellSize, 

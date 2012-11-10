@@ -68,14 +68,14 @@
 
 	<style>
 		#editor, #grid {
-			margin: 20px;
+			margin: 10px;
 			position: absolute;
 			overflow: hidden;
 		}
 	</style>
 
 	<script type="text/javascript">
-		var options = { element: $('#editor'), width: 25, height: 25, cellSize: { width: 16, height: 16 }};
+		var options = { element: $('#editor'), width: 4, height: 4, cellSize: { width: 16, height: 16 }};
 		var editor = new OR.FlexEditor(options);
 		editor.grid($('#grid'));
 		editor.load();

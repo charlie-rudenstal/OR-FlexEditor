@@ -6,8 +6,12 @@ function MouseInput(element, cellSize) {
 	var elementRect;
 
 	this.start = function() {
-		$(element).off('mousedown mouseup mousemove');
-		$(element).on('mousedown mouseup mousemove dblclick', mouseHandler);	
+		$(element).off('mousedown dblclick');
+		$(element).on('mousedown dblclick', mouseHandler);	
+		
+		// binding mouseup and mousemove these to window makes the selection 
+		// more reliable when continues his dragging outside of the current editor
+		$(window).on('mouseup mousemove', mouseHandler);	
 	}
 
 	function mouseHandler(e) {
@@ -46,8 +50,8 @@ function MouseInput(element, cellSize) {
 				y: position.absolute.y - positionStart.absolute.y
 			};
 			delta.snapped = {
-				x: position.snapped.x - positionStart.snapped.x,
-				y: position.snapped.y - positionStart.snapped.y
+				x: position.snapped.x - positionStart.snapped.x + cellSize.width, // always add one cellsize to make current and last cell snapped  
+				y: position.snapped.y - positionStart.snapped.y + cellSize.height
 			};
 			$me.trigger({ type: 'drag', 
 						  position: position, 
@@ -102,7 +106,6 @@ function MouseInput(element, cellSize) {
 			width:  cellSize.width,
 			height: cellSize.height
 		};
-
 		return rect;
 	}
 
