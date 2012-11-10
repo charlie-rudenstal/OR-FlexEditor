@@ -13,7 +13,6 @@ function Main(options) {
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
 	var buttons = options.buttons || [];
-	
 
 	// Compile templates from the tpl folder (and store in the Templates namespace)
 	Templates.compile();
@@ -604,15 +603,16 @@ function MouseHandler() {
 	 * 	 width: 30, height: 20 
 	 * }
 	 */
-	
+
 	me.prototype.render = function(template, items) {
 		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
 		if($.isArray(items) === false) {
 			items = [items];
-		}		
+		}	
 
+		// Try to do it the othe way around and count down instead of up, migth be faster
 		var html = '', i = -1, len = items.length - 1;
 		while(i < len) {
 			html += template(items[i += 1]);			

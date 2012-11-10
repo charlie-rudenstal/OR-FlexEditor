@@ -2,11 +2,11 @@ output = bin
 src = js
 css = css
 
-start = 	$(src)/_start.js
-end =		$(src)/_end.js
+start = 	$(src)/Helpers/_start.js
+end =		$(src)/Helpers/_end.js
 			
 files = 	$(src)/Main.js\
-	 	 	$(src)/Helpers.js\
+	 	 	$(src)/Helpers/Helpers.js\
 			$(src)/Interactions.js\
 			$(src)/MouseHandler.js\
 			$(src)/Renderer.js\

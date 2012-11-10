@@ -17,15 +17,16 @@ function Renderer(options) {
 	 * 	 width: 30, height: 20 
 	 * }
 	 */
-	
+
 	me.prototype.render = function(template, items) {
 		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
 		if($.isArray(items) === false) {
 			items = [items];
-		}		
+		}	
 
+		// Try to do it the othe way around and count down instead of up, migth be faster
 		var html = '', i = -1, len = items.length - 1;
 		while(i < len) {
 			html += template(items[i += 1]);			
