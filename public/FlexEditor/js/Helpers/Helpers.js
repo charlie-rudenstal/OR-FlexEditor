@@ -1,8 +1,15 @@
-function eventHandler(action, context) {
+// function eventHandler(action, context) {
+// 	return function(e) {
+// 		action(e, context);
+// 	}    
+// };
+
+function delegate(eventHandler) {
 	return function(e) {
-		action(e, context);
+		if(eventHandler.hasOwnProperty(e.type)) {
+			eventHandler[e.type](e, before);
+		}
 	}
-    
 };
 
 function merge(a, b, deep) {

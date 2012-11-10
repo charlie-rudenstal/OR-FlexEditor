@@ -15,15 +15,7 @@ function Interactions(options) {
 
 	me.load = function() {
 		// Init mouse handler and handle onPreSelection (grid selection)
-		var mouseHandler = new MouseHandler();
-		mouseHandler.register({
-			  element: elmEditor
-			, cellSize: cellSize 
-			, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
-			, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
-			, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
-			, onDoubleClick: eventHandler(onEvent, { event: 'doubleClick' })
-		});
+		
 	};
 
 	var onEvent = function(e, context) {

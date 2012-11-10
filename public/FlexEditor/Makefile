@@ -8,7 +8,7 @@ end =		$(src)/Helpers/_end.js
 files = 	$(src)/Main.js\
 	 	 	$(src)/Helpers/Helpers.js\
 			$(src)/Interactions.js\
-			$(src)/MouseHandler.js\
+			$(src)/MouseInput.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js\
 			$(src)/Grid/Grid.js\

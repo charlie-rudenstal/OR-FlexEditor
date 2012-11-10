@@ -10,6 +10,26 @@ function Main(options) {
 	var renderer = new Renderer();
 	var grid = new Grid(renderer, cellSize);
 
+	me.load = function() {
+		
+		var mouseInput = new MouseInput(elmEditor, cellSize);
+		mouseInput.start();
+
+		$(mouseInput).on('mousedown mouseup drag', function(e) {
+			console.log(e.type, e.position.absolute, e.delta && e.delta.absolute);
+		});
+
+		// mouseInput.register({
+		// 	  element: elmEditor
+		// 	, cellSize: cellSize 
+		// 	, onMouseUp: eventHandler(onEvent,   { event: 'mouseUp' })
+		// 	, onMouseDown: eventHandler(onEvent, { event: 'mouseDown' })
+		// 	, onMouseMove: eventHandler(onEvent, { event: 'mouseMove' })
+		// 	, onDoubleClick: eventHandler(onEvent, { event: 'doubleClick' })
+		// });
+
+	}
+
 	me.grid = function(element) {
 		grid.render(element);
 	}
