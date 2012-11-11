@@ -52,14 +52,25 @@ function Main(options) {
 				me.render();
 			}
 		});
+
+		$(mouseInput).on('mousedown', function(e) {
+			var element = getElementByDomElement($(e.target).closest('.component').get(0));
+			me.select(element);
+		})
 	};
 
-	me.select = function(element) {
-		if(selectedElement) {
-			selectedElement.template = Templates.Element;
+	function getElementByDomElement(domElement) {
+		if(!domElement) return;
+		for(var i in elements) {
+			if(domElement.id == 'element_' + elements[i].id) return elements[i];
 		}
+	}
+
+	me.select = function(element) {
+		if(selectedElement) selectedElement.blur();
 		selectedElement = element;
-		element.select();
+		if(element) element.select();
+		me.render();
 	}
 
 	me.render = function() {

@@ -37,6 +37,11 @@ Element.prototype.select = function() {
 	this.template = Templates.ElementSelected;
 }
 
+
+Element.prototype.blur = function() {
+	this.template = Templates.Element;
+}
+
 Element.prototype.getExport = function() {
 	return {
 		position: this.positionType,

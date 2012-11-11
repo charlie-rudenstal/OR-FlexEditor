@@ -5,8 +5,7 @@ Templates.Raw.ElementSelected = '
 	<div id="element_{{=it.id}}" 
 	 	 class="component button {{=it.resizeDir}} 
 	 		    {{?it.isMoving}}isMoving{{?}}
-	 	     	{{?it.image}}hasImage{{?}}
-	 	     	element-selected"
+	 	     	{{?it.image}}hasImage{{?}}"
 	 	 style="left: {{=it.x(null, "absolute")}}px;
 	 	     	top: {{=it.y(null, "absolute")}}px;
 	 	     	width: {{=it.width(null, "absolute")}}px;
@@ -28,6 +27,8 @@ Templates.Raw.ElementSelected = '
 	 	{{? it.resizeDir}}
 	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>
 	 	{{?}}
+
+	 	<div class="resizeBorder"></div>
 
 	 	<div class="resizeBox resizeBox-topleft"></div>
 	 	<div class="resizeBox resizeBox-topright"></div>
