@@ -64,8 +64,8 @@ function MouseInput(element, cellSize, relativeToScreen) {
 				y: position.absolute.y - positionStart.absolute.y
 			};
 			delta.snapped = {
-				x: position.snapped.x - positionStart.snapped.x + cellSize.width, // always add one cellsize to make current and last cell snapped  
-				y: position.snapped.y - positionStart.snapped.y + cellSize.height
+				x: position.snapped.x - positionStart.snapped.x, // always add one cellsize to make current and last cell snapped  
+				y: position.snapped.y - positionStart.snapped.y
 			};
 			$me.trigger({ type: 'drag', 
 						  position: position, 
