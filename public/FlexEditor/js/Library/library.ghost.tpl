@@ -1,10 +1,10 @@
 /* Will be compressed into one line by Makefile */
 var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; 
-Templates.Raw.LibraryElement = '
+Templates.Raw.LibraryGhost = '
 
-	<div class="library-element" data-title="{{=it.title}}">
+	<div class="library-element library-ghost">
 		<h1 class="library-header">{{=it.title}}</h1>
-		<p class="library-description">{{=it.description}}</p>
+		<p class="library-description">Ghost</p>
 	</div>
 
 ';

@@ -1,9 +1,11 @@
-function MouseInput(element, cellSize) {
+function MouseInput(element, cellSize, relativeToScreen) {
 
 	var me = this;
 	var $me = $(this);
 	var state = new isMouseUp();
 	var elementRect;
+
+	cellSize = cellSize || { width: 1, height: 1 };
 
 	this.start = function() {
 		$(element).off('mousedown dblclick');
@@ -28,16 +30,21 @@ function MouseInput(element, cellSize) {
 	// This State is Active and Handles Events When Mouse is Up
 	function isMouseUp() {
 		this.mousedown = function(e, position) {
-			$me.trigger({ type: 'mousedown', position: position });
-			state = new isMouseDown(position);
+			var downPosition = merge({ type: 'mousedown', 
+									   position: position, 
+									   originalEvent: e,
+									   target: e.target }, 
+									   position)
+			$me.trigger(downPosition);
+			state = new isMouseDown(downPosition);
 		}
 
 		this.mousemove = function(e, position) {
-			$me.trigger({ type: 'mousemove', position: position });
+			$me.trigger({ type: 'mousemove', position: position, originalEvent: e });
 		}
 
 		this.dblclick = function(e, position) {
-			$me.trigger({ type: 'dblclick', position: position });
+			$me.trigger({ type: 'dblclick', position: position, originalEvent: e });
 		}
 	}
 
@@ -56,11 +63,13 @@ function MouseInput(element, cellSize) {
 			$me.trigger({ type: 'drag', 
 						  position: position, 
 						  positionStart: positionStart,
-						  delta: delta });
+						  delta: delta,
+						  originalEvent: e,
+						  target: positionStart.originalEvent.target });
 		}
 		
 		this.mouseup = function(e, position) {
-			$me.trigger({ type: 'mouseup', position: position });
+			$me.trigger({ type: 'mouseup', position: position, originalEvent: e, target: e.target });
 			state = new isMouseUp();
 		}
 	}
@@ -69,10 +78,19 @@ function MouseInput(element, cellSize) {
 	// in this case the editor
 	function getMousePosition(e, relativeToElement) {
 		if(elementRect == null) elementRect = getElementRect(element);
-		return {
-			x: e.pageX - elementRect.x,
-			y: e.pageY - elementRect.y
+		
+		if(relativeToScreen) {
+			return {
+				x: e.pageX, 
+				y: e.pageY
+			}
+		} else {
+			return {
+				x: e.pageX - elementRect.x,
+				y: e.pageY - elementRect.y
+			}	
 		}
+		
 	}
 
 	// Helper method to get the position and size of an element

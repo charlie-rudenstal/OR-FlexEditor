@@ -41,11 +41,11 @@ function Main(options) {
 
 	// Render the grid
 	me.grid = function(element) {
-		//grid.render(element);
+		grid.render(element);
 	}
 
 	me.library = function(element) {
-		library.render(element);
+		library.load(element);
 	}
 
 	function getElementsAtPosition(position) {

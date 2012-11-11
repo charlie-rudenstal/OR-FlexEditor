@@ -46,6 +46,11 @@ input:focus {
 	position: absolute;
 	/*background-color: #3674a2;*/
 	background-color: rgba(255, 255, 255, 0.1);
+}.library-ghost {
+	position: absolute;
+	border-radius: 4px;
+	background-color: #3b3b3b;
+	background-color: #2b2b2b;
 }.popover .btn {
 	background-image: -webkit-linear-gradient(#444, #333);
 	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
