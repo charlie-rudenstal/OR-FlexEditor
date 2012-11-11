@@ -4,7 +4,7 @@ Templates.Raw.LibraryGhost = '
 
 	<div class="library-element library-ghost">
 		<h1 class="library-header">{{=it.title}}</h1>
-		<p class="library-description">Ghost</p>
+		<p class="library-description">{{=it.description}}</p>
 	</div>
 
 ';

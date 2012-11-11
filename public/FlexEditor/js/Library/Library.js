@@ -1,6 +1,9 @@
 function Library(renderer) {
 
 	var element;
+	var $ghostLibraryElement;
+	var ghostLibraryElement;
+	var ghostStartPosition;
 
 	this.load = function(elementContainer) {
 		// The renderer work on pure elements not wrapped by jQuery
@@ -18,28 +21,24 @@ function Library(renderer) {
 	}
 
 	function onItemDown(e) {
-
+		$ghostLibraryElement = $(e.target).closest('.library-element');
+		ghostLibraryElement = Library.elements[$ghostLibraryElement.data('title')];
+		ghostStartPosition = $ghostLibraryElement.offset();
 	}
 
 	function onItemDragged(e) {
-		var libraryElementTitle = $(e.target).closest('.library-element').data('title');
-		if(!libraryElementTitle) return;
-
-		var libraryElement = Library.elements[libraryElementTitle];
-
 		if($('.library-ghost').size() == 0) {
-			var $ghost = $(renderer.render(libraryElement, Templates.LibraryGhost));
+			var $ghost = $(renderer.render(ghostLibraryElement, Templates.LibraryGhost));
 			$ghost.appendTo('body');
 		}
 
 		var $ghost = $('.library-ghost');
-		$ghost.css('left', e.position.absolute.x + 14);
-		$ghost.css('top', e.position.absolute.y - 2);
+		$ghost.css('left', ghostStartPosition.left + e.delta.absolute.x);
+		$ghost.css('top', ghostStartPosition.top + e.delta.absolute.y);
 	}
 
 	function onItemUp(e) {
-		console.log("up");
-		$('.ghost').remove();
+		$('.library-ghost').remove();
 	}
 
 	function render() {
