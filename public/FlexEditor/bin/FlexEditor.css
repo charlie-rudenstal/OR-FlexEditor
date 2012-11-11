@@ -49,8 +49,9 @@ input:focus {
 }.library-ghost {
 	position: absolute;
 	border-radius: 4px;
-	width: 191px;
-	background-color: #2b2b2b;
+	width: 170px;
+	/*background-color: #2b2b2b;*/
+	background-color: rgba(43, 43, 43, 0.4);
 }.popover .btn {
 	background-image: -webkit-linear-gradient(#444, #333);
 	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;

@@ -24,6 +24,8 @@ function Library(renderer) {
 		$ghostLibraryElement = $(e.target).closest('.library-element');
 		ghostLibraryElement = Library.elements[$ghostLibraryElement.data('title')];
 		ghostStartPosition = $ghostLibraryElement.offset();
+
+		DragDrop.current = ghostLibraryElement;
 	}
 
 	function onItemDragged(e) {
@@ -33,11 +35,15 @@ function Library(renderer) {
 		}
 
 		var $ghost = $('.library-ghost');
+
 		$ghost.css('left', ghostStartPosition.left + e.delta.absolute.x);
 		$ghost.css('top', ghostStartPosition.top + e.delta.absolute.y);
 	}
 
 	function onItemUp(e) {
+
+		DragDrop.current = null;
+
 		$('.library-ghost').remove();
 	}
 

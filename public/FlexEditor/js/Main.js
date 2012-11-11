@@ -33,6 +33,21 @@ function Main(options) {
 			renderer.write(elm, elmEditor);
 		});
 
+		$(mouseInput).on('mousemove', function(e) {
+
+			if(DragDrop.current) {
+				var elm = new Element(elmEditor);
+				elm.x(e.position.snapped.x - (cellSize.width * 3));
+				elm.y(e.position.snapped.y - (cellSize.height * 3));
+				elm.width(cellSize.width * 6);
+				elm.height(cellSize.height * 6);
+				elm.template = Templates.ElementGhost;
+				renderer.write(elm, elmEditor);
+
+			}
+
+		});
+
 	};
 
 	me.render = function() {

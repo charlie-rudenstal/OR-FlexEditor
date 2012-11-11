@@ -12,6 +12,7 @@ files = 	$(src)/Main.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js\
 			$(src)/Grid/Grid.js\
+			$(src)/DragDrop.js\
 			$(src)/Element/Element.js\
 			$(src)/Library/Library.js\
 			$(src)/Library/Text.js\
@@ -19,6 +20,7 @@ files = 	$(src)/Main.js\
 			
 templates = $(src)/Element/element.tpl\
 			$(src)/Element/element.selection.tpl\
+			$(src)/Element/element.ghost.tpl\
  		    $(src)/Grid/grid.tpl\
  		    $(src)/Library/library.element.tpl\
  		    $(src)/Library/library.ghost.tpl
