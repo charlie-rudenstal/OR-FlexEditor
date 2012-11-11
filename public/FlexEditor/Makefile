@@ -20,6 +20,7 @@ files = 	$(src)/Main.js\
 			
 templates = $(src)/Element/element.tpl\
 			$(src)/Element/element.selection.tpl\
+			$(src)/Element/element.selected.tpl\
 			$(src)/Element/element.ghost.tpl\
  		    $(src)/Grid/grid.tpl\
  		    $(src)/Library/library.element.tpl\
@@ -29,7 +30,6 @@ cssFiles = 	$(css)/Base.css\
 			$(css)/Editor.css\
 			$(css)/Grid.css\
 			$(css)/Library.css\
-			$(css)/Button.css\
 			$(css)/Component.css\
 			$(css)/Adorner.Resize.css
 

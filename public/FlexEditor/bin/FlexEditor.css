@@ -52,34 +52,6 @@ input:focus {
 	width: 170px;
 	/*background-color: #2b2b2b;*/
 	background-color: rgba(43, 43, 43, 0.4);
-}.popover .btn {
-	background-image: -webkit-linear-gradient(#444, #333);
-	-webkit-box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
-	box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.0470588) 0px 1px 2px;
-	border-color: #333;
-	text-shadow: none;
-	color: #bbb;
-	background-color: #373737;
-}
-
-.popover .btn-primary, .popover input.btn-primary {
-	color: #ccc;
-
-	background-color: #004DCC;
-	background-image: -webkit-linear-gradient(top, #458, #458);
-
-	background-color: #004DCC;
-	background-image: -webkit-linear-gradient(top, #08C, #04C);
-	
-	background-color: #004DCC;
-	background-image: -webkit-linear-gradient(top, #369, #247);
-	
-}
-
-.popover .btn:hover {
-	background-color: #373737;
-	color: #ddd;
-	background-position: 0px 0px;
 }
 .component {
 	/*background-color: #3276a9;*/
@@ -132,12 +104,77 @@ input:focus {
 	background: rgba(66,134,185,0.3);
 }
 
-
-
-
 .component.isMoving {
 	cursor: move !important;
 }
+
+.element-selected {
+	border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.resizeBox {
+	width: 6px;
+	height: 6px;
+	background-color: rgba(255, 255, 255, 0.5);
+	position: absolute;
+}
+
+.resizeBox.resizeBox-topleft {
+	left: -3px;
+	top: -3px;
+}
+
+.resizeBox.resizeBox-topright {
+	right: -3px;
+	top: -3px;
+}
+
+.resizeBox.resizeBox-bottomleft {
+	left: -3px;
+	bottom: -3px;
+}
+
+.resizeBox.resizeBox-bottomright {
+	right: -3px;
+	bottom: -3px;
+}
+
+.resizeBox.resizeBox-middleleft {
+	left: -3px;
+	top: 50%;
+	margin-top: -3px;
+}
+
+.resizeBox.resizeBox-middleright {
+	right: -3px;
+	top: 50%;
+	margin-top: -3px;
+}
+
+.resizeBox.resizeBox-middletop {
+	top: -3px;
+	left: 50%;
+	margin-left: -3px;
+}
+
+.resizeBox.resizeBox-middlebottom {
+	bottom: -3px;
+	left: 50%;
+	margin-left: -3px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 .component.resizeLeft {
 	cursor: w-resize;
 }

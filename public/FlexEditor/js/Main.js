@@ -1,6 +1,7 @@
 function Main(options) {
 	var me = this;
 	var elements = [];
+	var selectedElement = null;
 
 	// Set options
 	options = options || {};
@@ -32,6 +33,7 @@ function Main(options) {
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.ElementGhost;
+
 				renderer.write(elements.concat(elm), elmEditor);
 			}
 		});
@@ -44,11 +46,21 @@ function Main(options) {
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.Element;
+				me.select(elm);
+
 				elements.push(elm);
 				me.render();
 			}
 		});
 	};
+
+	me.select = function(element) {
+		if(selectedElement) {
+			selectedElement.template = Templates.Element;
+		}
+		selectedElement = element;
+		element.select();
+	}
 
 	me.render = function() {
 		renderer.write(elements, elmEditor);

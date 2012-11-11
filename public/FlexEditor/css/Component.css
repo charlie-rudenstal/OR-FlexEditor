@@ -50,9 +50,74 @@
 	background: rgba(66,134,185,0.3);
 }
 
-
-
-
 .component.isMoving {
 	cursor: move !important;
 }
+
+.element-selected {
+	border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.resizeBox {
+	width: 6px;
+	height: 6px;
+	background-color: rgba(255, 255, 255, 0.5);
+	position: absolute;
+}
+
+.resizeBox.resizeBox-topleft {
+	left: -3px;
+	top: -3px;
+}
+
+.resizeBox.resizeBox-topright {
+	right: -3px;
+	top: -3px;
+}
+
+.resizeBox.resizeBox-bottomleft {
+	left: -3px;
+	bottom: -3px;
+}
+
+.resizeBox.resizeBox-bottomright {
+	right: -3px;
+	bottom: -3px;
+}
+
+.resizeBox.resizeBox-middleleft {
+	left: -3px;
+	top: 50%;
+	margin-top: -3px;
+}
+
+.resizeBox.resizeBox-middleright {
+	right: -3px;
+	top: 50%;
+	margin-top: -3px;
+}
+
+.resizeBox.resizeBox-middletop {
+	top: -3px;
+	left: 50%;
+	margin-left: -3px;
+}
+
+.resizeBox.resizeBox-middlebottom {
+	bottom: -3px;
+	left: 50%;
+	margin-left: -3px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

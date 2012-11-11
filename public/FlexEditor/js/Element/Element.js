@@ -33,6 +33,10 @@ function Element(parent, options) {
 
 Element.idCounter = 0;
 
+Element.prototype.select = function() {
+	this.template = Templates.ElementSelected;
+}
+
 Element.prototype.getExport = function() {
 	return {
 		position: this.positionType,
