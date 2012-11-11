@@ -25,17 +25,7 @@
 		var mouseInput = new MouseInput(elmEditor, cellSize);
 		mouseInput.start();
 
-		$(mouseInput).on('drag', function(e) {
-			var elm = new Element(elmEditor);
-			elm.x(e.positionStart.snapped.x);
-			elm.y(e.positionStart.snapped.y);
-			elm.width(e.delta.snapped.x);
-			elm.height(e.delta.snapped.y);
-			renderer.write(elm, elmEditor);
-		});
-
 		$(mouseInput).on('mousemove', function(e) {
-
 			if(DragDrop.current) {
 				var elm = new Element(elmEditor);
 				elm.x(e.position.snapped.x - (cellSize.width * 3));
@@ -43,12 +33,22 @@
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.ElementGhost;
-				renderer.write(elm, elmEditor);
-
+				renderer.write(elements.concat(elm), elmEditor);
 			}
-
 		});
 
+		$(mouseInput).on('mouseup', function(e) {
+			if(DragDrop.current) {
+				var elm = new Element(elmEditor);
+				elm.x(e.position.snapped.x - (cellSize.width * 3));
+				elm.y(e.position.snapped.y - (cellSize.height * 3));
+				elm.width(cellSize.width * 6);
+				elm.height(cellSize.height * 6);
+				elm.template = Templates.Element;
+				elements.push(elm);
+				me.render();
+			}
+		});
 	};
 
 	me.render = function() {
@@ -511,6 +511,13 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		this.dblclick = function(e, position) {
 			$me.trigger({ type: 'dblclick', position: position, originalEvent: e });
 		}
+
+		// a mouse up can be triggered in mouseup state if the mousedown
+		// was triggered outside of this handler
+		this.mouseup = function(e, position) {
+			$me.trigger({ type: 'mouseup', 		   position: position, originalEvent: e });
+			$me.trigger({ type: 'mouseup.mouseup', position: position, originalEvent: e });
+		}
 	}
 
 	// This State is Active and Handles Events When Mouse is Down
@@ -534,7 +541,8 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		}
 		
 		this.mouseup = function(e, position) {
-			$me.trigger({ type: 'mouseup', position: position, originalEvent: e, target: e.target });
+			$me.trigger({ type: 'mouseup', 			 position: position, originalEvent: e, target: e.target });
+			$me.trigger({ type: 'mousedown.mouseup', position: position, originalEvent: e, target: e.target });
 			state = new isMouseUp();
 		}
 	}
@@ -1010,10 +1018,12 @@ function Library(renderer) {
 	}
 
 	function onItemUp(e) {
-
-		DragDrop.current = null;
-
 		$('.library-ghost').remove();
+		
+		// set timeout to let listeners of mouseup retrieve the dragdrop data before it's cleared
+		setTimeout(function() {
+			DragDrop.current = null;
+		}, 0);
 	}
 
 	function render() {

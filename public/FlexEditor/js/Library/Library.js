@@ -41,10 +41,12 @@ function Library(renderer) {
 	}
 
 	function onItemUp(e) {
-
-		DragDrop.current = null;
-
 		$('.library-ghost').remove();
+		
+		// set timeout to let listeners of mouseup retrieve the dragdrop data before it's cleared
+		setTimeout(function() {
+			DragDrop.current = null;
+		}, 0);
 	}
 
 	function render() {

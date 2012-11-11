@@ -24,17 +24,7 @@ function Main(options) {
 		var mouseInput = new MouseInput(elmEditor, cellSize);
 		mouseInput.start();
 
-		$(mouseInput).on('drag', function(e) {
-			var elm = new Element(elmEditor);
-			elm.x(e.positionStart.snapped.x);
-			elm.y(e.positionStart.snapped.y);
-			elm.width(e.delta.snapped.x);
-			elm.height(e.delta.snapped.y);
-			renderer.write(elm, elmEditor);
-		});
-
 		$(mouseInput).on('mousemove', function(e) {
-
 			if(DragDrop.current) {
 				var elm = new Element(elmEditor);
 				elm.x(e.position.snapped.x - (cellSize.width * 3));
@@ -42,12 +32,22 @@ function Main(options) {
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.ElementGhost;
-				renderer.write(elm, elmEditor);
-
+				renderer.write(elements.concat(elm), elmEditor);
 			}
-
 		});
 
+		$(mouseInput).on('mouseup', function(e) {
+			if(DragDrop.current) {
+				var elm = new Element(elmEditor);
+				elm.x(e.position.snapped.x - (cellSize.width * 3));
+				elm.y(e.position.snapped.y - (cellSize.height * 3));
+				elm.width(cellSize.width * 6);
+				elm.height(cellSize.height * 6);
+				elm.template = Templates.Element;
+				elements.push(elm);
+				me.render();
+			}
+		});
 	};
 
 	me.render = function() {

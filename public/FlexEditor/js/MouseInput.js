@@ -46,6 +46,13 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		this.dblclick = function(e, position) {
 			$me.trigger({ type: 'dblclick', position: position, originalEvent: e });
 		}
+
+		// a mouse up can be triggered in mouseup state if the mousedown
+		// was triggered outside of this handler
+		this.mouseup = function(e, position) {
+			$me.trigger({ type: 'mouseup', 		   position: position, originalEvent: e });
+			$me.trigger({ type: 'mouseup.mouseup', position: position, originalEvent: e });
+		}
 	}
 
 	// This State is Active and Handles Events When Mouse is Down
@@ -69,7 +76,8 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		}
 		
 		this.mouseup = function(e, position) {
-			$me.trigger({ type: 'mouseup', position: position, originalEvent: e, target: e.target });
+			$me.trigger({ type: 'mouseup', 			 position: position, originalEvent: e, target: e.target });
+			$me.trigger({ type: 'mousedown.mouseup', position: position, originalEvent: e, target: e.target });
 			state = new isMouseUp();
 		}
 	}
