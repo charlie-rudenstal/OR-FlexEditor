@@ -2,18 +2,22 @@ function Main(options) {
 	var me = this;
 	var elements = [];
 
+	// Set options
 	options = options || {};
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
 	var width = options.width || 12;
 	var height = options.height || 25;
 
+	// Resize the editor element to match the size specified in options
 	elmEditor.style.width = width * cellSize.width + 'px';
 	elmEditor.style.height = height * cellSize.height + 'px';
 
+	// Initialize modules 
 	var interactions = new Interactions();
 	var renderer = new Renderer();
 	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
+	var library = new Library(renderer);
 
 	me.load = function() {
 
@@ -35,8 +39,13 @@ function Main(options) {
 		renderer.write(elements, elmEditor);
 	}
 
+	// Render the grid
 	me.grid = function(element) {
-		grid.render(element);
+		//grid.render(element);
+	}
+
+	me.library = function(element) {
+		library.render(element);
 	}
 
 	function getElementsAtPosition(position) {

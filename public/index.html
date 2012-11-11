@@ -47,7 +47,7 @@
 		<div class="bar bar-right">
 			<div class="section section-single">Preview on your Phone</div>
 			<div class="section section-header">Library</div>
-			<div class="section section-library">
+			<div class="section section-library" id="library">
 				<div class="library-element">
 					<h1 class="library-header">Image</h1>
 					<p class="library-description">Import an image you have already created from a URL</p>
@@ -75,9 +75,10 @@
 	</style>
 
 	<script type="text/javascript">
-		var options = { element: $('#editor'), width: 4, height: 4, cellSize: { width: 16, height: 16 }};
+		var options = { element: $('#editor'), width: 30, height: 25, cellSize: { width: 16, height: 16 }};
 		var editor = new OR.FlexEditor(options);
 		editor.grid($('#grid'));
+		editor.library($('#library'))
 		editor.load();
 	</script>
 

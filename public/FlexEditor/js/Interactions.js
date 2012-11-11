@@ -269,8 +269,5 @@ function Interactions(options) {
 			$(me).trigger('change');
 		}
 	}
-	
-	
-
 };
 

@@ -29,6 +29,7 @@ function Renderer(options) {
 		var html = '';
 		var i = -1;
 		var len = items.length - 1;
+
 		while(i++ < len) {
 			// Use custom template provided by item if existing,
 			// otherwise use default template

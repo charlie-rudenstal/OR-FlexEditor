@@ -12,11 +12,15 @@ files = 	$(src)/Main.js\
 			$(src)/Renderer.js\
 			$(src)/Templates.js\
 			$(src)/Grid/Grid.js\
-			$(src)/Element/Element.js
+			$(src)/Element/Element.js\
+			$(src)/Library/Library.js\
+			$(src)/Library/Text.js\
+			$(src)/Library/Image.js
 			
 templates = $(src)/Element/element.tpl\
 			$(src)/Element/element.selection.tpl\
- 		    $(src)/Grid/grid.tpl
+ 		    $(src)/Grid/grid.tpl\
+ 		    $(src)/Library/library.element.tpl
 
 cssFiles = 	$(css)/Base.css\
 			$(css)/Editor.css\
