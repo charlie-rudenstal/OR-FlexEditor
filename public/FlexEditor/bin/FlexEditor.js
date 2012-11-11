@@ -3,6 +3,7 @@
 	var me = this;
 	var elements = [];
 	var selectedElement = null;
+	var selectedElementStartPosition;
 
 	// Set options
 	options = options || {};
@@ -58,6 +59,15 @@
 			var element = getElementByDomElement($(e.target).closest('.component').get(0));
 			me.select(element);
 		})
+
+		$(mouseInput).on('drag', function(e) {
+			if(selectedElement) {
+				selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
+				selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
+				me.render();
+			}
+		});
+
 	};
 
 	function getElementByDomElement(domElement) {
@@ -70,7 +80,10 @@
 	me.select = function(element) {
 		if(selectedElement) selectedElement.blur();
 		selectedElement = element;
-		if(element) element.select();
+		if(element) { 
+			element.select();
+			selectedElementStartPosition = { x: element.x(), y: element.y() };
+		}
 		me.render();
 	}
 
