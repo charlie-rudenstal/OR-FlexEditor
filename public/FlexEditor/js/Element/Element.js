@@ -29,17 +29,21 @@ function Element(parent, options) {
 	this.foreground = options.foreground || '#ffffff';
 	this.image = options.image || null;
 	this.customClass = options.customClass;
+
+	this.selected = false;
 };
 
 Element.idCounter = 0;
 
 Element.prototype.select = function() {
 	this.template = Templates.ElementSelected;
+	this.selected = true;
 }
 
 
 Element.prototype.blur = function() {
 	this.template = Templates.Element;
+	this.selected = false;
 }
 
 Element.prototype.getExport = function() {

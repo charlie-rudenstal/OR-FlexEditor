@@ -30,8 +30,8 @@
 		<div class="bar bar-left">
 			<div class="section section-single logo">OpenRatio</div>
 			<div class="section section-header">Elements</div>
-			<div class="section section-elements">
-				<div class="element">Button 2</div>
+			<div class="section section-elements" id="layers">
+				<!-- <div class="element">Button 2</div>
 				<div class="element">Button 1</div>
 				<div class="element">Header</div>
 				<div class="element">
@@ -40,7 +40,7 @@
 						<div class="attribute attribute-bg"></div>
 					</div>
 					Background
-				</div>
+				</div> -->
 			</div>
 		</div>
 
@@ -72,7 +72,14 @@
 		var editor = new OR.FlexEditor(options);
 		editor.grid($('#grid'));
 		editor.library($('#library'))
+		editor.layers($('#layers'))
 		editor.load();
+
+		$(editor).on('change', function() {
+
+		});
+
+
 	</script>
 
 	</body>

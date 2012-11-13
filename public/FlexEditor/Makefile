@@ -14,6 +14,7 @@ files = 	$(src)/Main.js\
 			$(src)/Grid/Grid.js\
 			$(src)/DragDrop.js\
 			$(src)/Element/Element.js\
+			$(src)/Layers/Layers.js\
 			$(src)/Library/Library.js\
 			$(src)/Library/Text.js\
 			$(src)/Library/Image.js
@@ -23,6 +24,7 @@ templates = $(src)/Element/element.tpl\
 			$(src)/Element/element.selected.tpl\
 			$(src)/Element/element.ghost.tpl\
  		    $(src)/Grid/grid.tpl\
+ 		    $(src)/Layers/layer.tpl\
  		    $(src)/Library/library.element.tpl\
  		    $(src)/Library/library.ghost.tpl
 
@@ -30,6 +32,7 @@ cssFiles = 	$(css)/Base.css\
 			$(css)/Editor.css\
 			$(css)/Grid.css\
 			$(css)/Library.css\
+			$(css)/Layers.css\
 			$(css)/Component.css\
 			$(css)/Adorner.Resize.css
 

@@ -20,6 +20,7 @@ function Main(options) {
 	var renderer = new Renderer();
 	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
 	var library = new Library(renderer);
+	var layers = new Layers(renderer);
 
 	me.load = function() {
 
@@ -48,9 +49,7 @@ function Main(options) {
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.Element;
 				me.select(elm);
-
-				elements.push(elm);
-				me.render();
+				me.addElement(elm);
 			}
 		});
 
@@ -76,6 +75,12 @@ function Main(options) {
 		}
 	}
 
+	me.addElement = function(elm) {
+		elements.push(elm);
+		me.render();
+		$(me).trigger('change');
+	}
+
 	me.select = function(element) {
 		if(selectedElement) selectedElement.blur();
 		selectedElement = element;
@@ -88,6 +93,7 @@ function Main(options) {
 
 	me.render = function() {
 		renderer.write(elements, elmEditor);
+		layers.render(elements);
 	}
 
 	// Render the grid
@@ -97,6 +103,13 @@ function Main(options) {
 
 	me.library = function(element) {
 		library.load(element);
+	}
+
+	me.layers = function(element) {
+		layers.load(element);
+		$(layers).on('selection', function(e) {
+			me.select(e.element);
+		});
 	}
 
 	function getElementsAtPosition(position) {

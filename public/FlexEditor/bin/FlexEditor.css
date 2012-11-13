@@ -53,6 +53,47 @@ input:focus {
 	/*background-color: #2b2b2b;*/
 	background-color: rgba(43, 43, 43, 0.4);
 }
+.element {
+	color: #bebebe;
+	font-size: 14px;
+	padding: 12px 10px;
+	text-shadow: 0px 1px #000;
+}
+
+.element:hover {
+	background-color: #3b3b3b;
+}
+
+.element-selected, .element-selected:hover  {
+	background-color: #d1d1d1;
+	color: #090909;
+	text-shadow: none;
+	font-weight:lighter;
+	font-family: arial, helvetica, sans-serif;
+}
+
+.element-attributes {
+	float: right;
+}
+
+.attribute {
+	width: 13px;
+	height: 13px;
+	background-color: #454444;
+	float: left;
+	margin: 3px 1px;
+	text-align: center;
+	line-height: 13px;
+}
+
+.attribute-bg {
+	background-color: #d7f3e4;
+}
+
+.attribute-position {
+	font-size: 10px;
+	text-shadow: none;
+}
 .component {
 	/*background-color: #3276a9;*/
 	position: absolute;

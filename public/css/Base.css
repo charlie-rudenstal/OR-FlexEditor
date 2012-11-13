@@ -71,40 +71,6 @@ body {
 	padding: 0px;
 }
 
-.element {
-	color: #bebebe;
-	font-size: 14px;
-	padding: 12px 10px;
-	text-shadow: 0px 1px #000;
-}
-
-.element:hover {
-	background-color: #3b3b3b;
-}
-
-.element-attributes {
-	float: right;
-}
-
-.attribute {
-	width: 13px;
-	height: 13px;
-	background-color: #454444;
-	float: left;
-	margin: 3px 1px;
-	text-align: center;
-	line-height: 13px;
-}
-
-.attribute-bg {
-	background-color: #d7f3e4;
-}
-
-.attribute-position {
-	font-size: 10px;
-	text-shadow: none;
-}
-
 .section-library {
 	border-top: 1px solid #3f3f3f;
 	border-bottom: none;	
