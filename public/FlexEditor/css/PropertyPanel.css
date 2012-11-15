@@ -1,7 +1,7 @@
 .propertyPanel {
 	position: absolute;
 	z-index: 2;
-	width: 235px;
+	width: 190px;
 	background-color: #272525;
 }
 
@@ -22,7 +22,7 @@
 
 .property {
 	margin-top: 12px;
-	margin-left: 12px;
+	margin-left: 10px;
 }
 
 .property-label {
@@ -37,7 +37,7 @@
 }
 
 .property-input input {
-	width: 150px;
+	width: 109px;
 	padding: 8px 4px;
 	background-color: #3d3d3d;
 	border: none;
