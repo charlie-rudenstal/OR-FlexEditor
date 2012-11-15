@@ -24,6 +24,14 @@ function Main(options) {
 	var scene = new Scene(renderer, elmEditor, cellSize);
 
 	$(ElementCollection).on('change', function() { me.render(); });
+	$(ElementCollection).on('selection', function(e) {
+		var element = e.element;	
+		if(element) {
+			PropertyPanel.show(element, renderer, document.body, 190, 100);
+		} else {
+			PropertyPanel.closeAll();
+		}
+	});
 
 	me.load = function() {
 		scene.init();

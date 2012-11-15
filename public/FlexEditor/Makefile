@@ -26,6 +26,7 @@ templates = $(src)/Element/element.tpl\
 			$(src)/Element/element.selection.tpl\
 			$(src)/Element/element.selected.tpl\
 			$(src)/Element/element.ghost.tpl\
+			$(src)/PropertyPanel/properties.text.tpl\
  		    $(src)/Grid/grid.tpl\
  		    $(src)/Layers/layer.tpl\
  		    $(src)/Library/library.element.tpl\
@@ -36,6 +37,7 @@ cssFiles = 	$(css)/Base.css\
 			$(css)/Grid.css\
 			$(css)/Library.css\
 			$(css)/Layers.css\
+			$(css)/PropertyPanel.css\
 			$(css)/Component.css\
 			$(css)/Adorner.Resize.css
 

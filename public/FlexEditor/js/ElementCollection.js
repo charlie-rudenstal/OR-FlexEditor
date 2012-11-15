@@ -11,9 +11,10 @@ var ElementCollection = (function(me) {
 	me.select = function(elementToSelect) {
 		if(elementToSelect == selectedElement) return;
 		if(selectedElement) selectedElement.blur();
-		if(elementToSelect) elementToSelect.select();
 		selectedElement = elementToSelect;
+		if(elementToSelect) elementToSelect.select();
 		$(me).trigger('change');
+		$(me).trigger({type: 'selection', element: elementToSelect});
 	}
 
 	me.getById = function(elementId) {
