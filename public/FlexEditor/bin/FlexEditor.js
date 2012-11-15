@@ -95,6 +95,10 @@ function clone(a) {
 	}
 }
 
+function cloneArrayShallow(array) {
+	return array.slice();
+}
+
 function limit(value, min, max) {
 	if(value < min) return min;
 	if(value > max) return max;
@@ -1077,7 +1081,7 @@ function Layers(renderer) {
 		mouseInput.start();
 
 		$(mouseInput).on('mousedown', onItemDown.bind(this));
-		
+
 		this.render([]);
 	}
 
@@ -1088,8 +1092,9 @@ function Layers(renderer) {
 	}
 
 	this.render = function(elements) {
-		loadedElements = elements;
-		renderer.write(elements, renderToElement, Templates.Layer, false, true);
+		loadedElements = cloneArrayShallow(elements);
+		loadedElements.reverse(); // latest layer at top
+		renderer.write(loadedElements, renderToElement, Templates.Layer, false, true);
 	}
 
 }var PropertyPanel = {};

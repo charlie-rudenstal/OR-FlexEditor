@@ -27,6 +27,10 @@ function clone(a) {
 	}
 }
 
+function cloneArrayShallow(array) {
+	return array.slice();
+}
+
 function limit(value, min, max) {
 	if(value < min) return min;
 	if(value > max) return max;

@@ -12,7 +12,7 @@ function Layers(renderer) {
 		mouseInput.start();
 
 		$(mouseInput).on('mousedown', onItemDown.bind(this));
-		
+
 		this.render([]);
 	}
 
@@ -23,8 +23,9 @@ function Layers(renderer) {
 	}
 
 	this.render = function(elements) {
-		loadedElements = elements;
-		renderer.write(elements, renderToElement, Templates.Layer, false, true);
+		loadedElements = cloneArrayShallow(elements);
+		loadedElements.reverse(); // latest layer at top
+		renderer.write(loadedElements, renderToElement, Templates.Layer, false, true);
 	}
 
 }
