@@ -23,6 +23,8 @@
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
 
+	$(ElementCollection).on('change', function() { me.render(); });
+
 	me.load = function() {
 
 		var mouseInput = new MouseInput(elmEditor, cellSize);
@@ -36,8 +38,7 @@
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.ElementGhost;
-
-				renderer.write(elements.concat(elm), elmEditor);
+				renderer.write(ElementCollection.getAsArray().concat(elm), elmEditor);
 			}
 		});
 
@@ -49,17 +50,20 @@
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.Element;
-				me.select(elm);
+				ElementCollection.select(elm);
 				me.addElement(elm);
 			}
 		});
 
 		$(mouseInput).on('mousedown', function(e) {
-			var element = getElementByDomElement($(e.target).closest('.component').get(0));
-			me.select(element);
+			var domElement = $(e.target).closest('.component').get(0);
+			var element = getElementByDomElement(domElement);
+			ElementCollection.select(element);
+			selectedElementStartPosition = { x: element.x(), y: element.y() };
 		})
 
 		$(mouseInput).on('drag', function(e) {
+			var selectedElement = ElementCollection.getSelected();
 			if(selectedElement) {
 				selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
 				selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
@@ -69,32 +73,24 @@
 
 	};
 
-	function getElementByDomElement(domElement) {
-		if(!domElement) return;
-		for(var i in elements) {
-			if(domElement.id == 'element_' + elements[i].id) return elements[i];
-		}
-	}
-
 	me.addElement = function(elm) {
-		elements.push(elm);
+		ElementCollection.add(elm);
 		me.render();
 		$(me).trigger('change');
 	}
 
-	me.select = function(element) {
-		if(selectedElement) selectedElement.blur();
-		selectedElement = element;
-		if(element) { 
-			element.select();
-			selectedElementStartPosition = { x: element.x(), y: element.y() };
-		}
-		me.render();
-	}
-
 	me.render = function() {
+		var elements = ElementCollection.getAsArray();
 		renderer.write(elements, elmEditor);
 		layers.render(elements);
+	}
+
+	function getElementByDomElement(domElement) {
+		if(!domElement) return;
+		var elements = ElementCollection.getAsArray(); 
+		for(var i in elements) {
+			if(domElement.id == 'element_' + elements[i].id) return elements[i];
+		}
 	}
 
 	// Render the grid
@@ -108,9 +104,6 @@
 
 	me.layers = function(element) {
 		layers.load(element);
-		$(layers).on('selection', function(e) {
-			me.select(e.element);
-		});
 	}
 
 	function getElementsAtPosition(position) {
@@ -126,21 +119,21 @@
 		return null;
 	}
 
-	me.import = function(newButtonData) {
-		buttons = [];
-		for(var i in newButtonData) {
-			buttons.push(new Button(elmEditor, newButtonData[i]));
-		}
-		renderer.write(Templates.Button, buttons);	
-	}
+	// me.import = function(newButtonData) {
+	// 	buttons = [];
+	// 	for(var i in newButtonData) {
+	// 		buttons.push(new Button(elmEditor, newButtonData[i]));
+	// 	}
+	// 	me.render();
+	// }
 
-	me.getExport = function() {
-		var arr = [];
-		for(var i in buttons) {
-			arr.push(buttons[i].getExport());
-		}
-		return arr;
-	};
+	// me.getExport = function() {
+	// 	var arr = [];
+	// 	for(var i in buttons) {
+	// 		arr.push(buttons[i].getExport());
+	// 	}
+	// 	return arr;
+	// };
 };
 
 // function eventHandler(action, context) {
@@ -785,7 +778,7 @@ function MouseInput(element, cellSize, relativeToScreen) {
 	 * }
 	 */
 
-	me.prototype.render = function(items, defaultTemplate) {
+	me.prototype.render = function(items, defaultTemplate, alwaysUseDefaultTemplate) {
 		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
@@ -800,7 +793,7 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		while(i++ < len) {
 			// Use custom template provided by item if existing,
 			// otherwise use default template
-			if(items[i].template) {
+			if(items[i].template && !alwaysUseDefaultTemplate) {
 				html += items[i].template(items[i]);
 			} else {
 				html += defaultTemplate(items[i]);	
@@ -811,7 +804,7 @@ function MouseInput(element, cellSize, relativeToScreen) {
 	}
 
 
-	me.prototype.write = function(items, toElement, defaultTemplate, ignoreCache) {
+	me.prototype.write = function(items, toElement, defaultTemplate, ignoreCache, alwaysUseDefaultTemplate) {
 		// Optimize rendering by only doing it when item array data has changed 
 		if(!ignoreCache && equals(items, this.latestDataRendered)) return;
 		this.latestDataRendered = clone(items); 
@@ -823,7 +816,7 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		var div = document.createElement('div');
 		div.style.width = toElement.style.width;
 		div.style.height = toElement.style.height;
-		div.innerHTML = this.render(items, defaultTemplate);
+		div.innerHTML = this.render(items, defaultTemplate, alwaysUseDefaultTemplate);
 
 		// We need a child element inside the Editor div which 
 		// we can replace, create if not existing
@@ -922,7 +915,42 @@ function Grid(renderer, options) {
 	me.current = null;
 
 	return me;
-})({});function Element(parent, options) {
+})({});var ElementCollection = (function(me) {
+
+	var elements = {};
+	var selectedElement;
+
+	me.add = function(element) {
+		elements[element.id] = element;
+	}
+
+	me.select = function(elementToSelect) {
+		if(elementToSelect == selectedElement) return;
+		if(selectedElement) selectedElement.blur();
+		if(elementToSelect) elementToSelect.select();
+		selectedElement = elementToSelect;
+		$(me).trigger('change');
+	}
+
+	me.getById = function(elementId) {
+		return elements[elementId];
+	}
+
+	me.getAsArray = function() {
+		var elmArray = [];
+		for(var i in elements) {
+			elmArray.push(elements[i]);
+		}
+		return elmArray;
+	}
+
+	me.getSelected = function() {
+		return selectedElement;
+	}
+
+	return me;
+})({});
+function Element(parent, options) {
 	if(parent == null) throw "Parent for Element cannot be null";
 	options = options || {};
 
@@ -1039,44 +1067,38 @@ Element.prototype.height = function(value, positionType) {
 
 function Layers(renderer) {
 
-	var element;
-	var layers = [];
+	var renderToElement;
+	var loadedElements;
 
 	this.load = function(elementContainer) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(elementContainer instanceof jQuery) elementContainer = elementContainer.get(0);
-		element = elementContainer;
+		renderToElement = elementContainer;
 		
-		var mouseInput = new MouseInput(element, null, true);
+		var mouseInput = new MouseInput(renderToElement, null, true);
 		mouseInput.start();
 
 		$(mouseInput).on('mousedown', onItemDown.bind(this));
-
+		
 		this.render([]);
 	}
 
 	function onItemDown(e) {
-		var index  = $(e.target).data('index');
-		var layer = layers[index];
-		var element = layer.element;
-		$(this).trigger({ type: 'selection', 
-						  element: element });
+		var elementId  = $(e.target).data('element-id');
+		var element = ElementCollection.getById(elementId);
+		ElementCollection.select(element);
 	}
 
 	this.render = function(elements) {
-		layers = [];
-		for(var i in elements) {
-			layers.push({
-				name: "Test",
-				selected: elements[i].selected,
-				element: elements[i],
-				index: i
-			});
-		}
-		renderer.write(layers, element, Templates.Layer);
+		loadedElements = elements;
+		renderer.write(elements, renderToElement, Templates.Layer, false, true);
 	}
 
-}function Library(renderer) {
+}var PropertyPanel = {};
+
+PropertyPanel.show = function(element) {
+
+};function Library(renderer) {
 
 	var element;
 	var $ghostLibraryElement;
@@ -1164,7 +1186,7 @@ Library.elements = Library.elements || [];
 
 	Library.elements.Image = me; //merge(me, Element);
 
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementSelected = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	 	<div class="resizeBorder"></div>	 	<div class="resizeBox resizeBox-topleft"></div>	 	<div class="resizeBox resizeBox-topright"></div>	 	<div class="resizeBox resizeBox-bottomleft"></div>	 	<div class="resizeBox resizeBox-bottomright"></div>	 		 	<div class="resizeBox resizeBox-middleleft"></div>	 	<div class="resizeBox resizeBox-middleright"></div>	 	<div class="resizeBox resizeBox-middletop"></div>	 	<div class="resizeBox resizeBox-middlebottom"></div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementGhost = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: none;	 	     	border: 1px solid {{=it.background}};	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">					</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < it.width + 1; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < it.height + 1; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Layer = '	<div class="element {{?it.selected}}element-selected{{?}}" data-index="{{=it.index}}">		<div class="element-attributes">			<div class="attribute attribute-position">R</div>			<div class="attribute attribute-bg"></div>		</div>		Layer	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryElement = '	<div class="library-element" data-title="{{=it.title}}">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryGhost = '	<div class="library-element library-ghost">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Preselection = '	{{##def.unit:		{{? it.position == "relative" }}		%		{{?? it.position == "absolute" }}		px		{{??}} 		px		{{?}}	#}}	<div class="component preselection {{=it.customClass || ""}}				{{?it.image}}hasImage{{?}}" 	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;">	 		 		 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat center center; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}		<span class="label label-info" style="position: absolute; 											  top: 50%; 											  left: 50%; 											  margin-top: -9px; 											  margin-left: -35px;">			{{=Math.round(it.width(null, it.position))}}{{#def.unit}} 			<span style="color: #2A779D;">x</span> 			{{=Math.round(it.height(null, it.position))}}{{#def.unit}}		</span>			</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementSelected = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background-color: {{=it.background}}	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">			{{=it.text}}		</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	 	<div class="resizeBorder"></div>	 	<div class="resizeBox resizeBox-topleft"></div>	 	<div class="resizeBox resizeBox-topright"></div>	 	<div class="resizeBox resizeBox-bottomleft"></div>	 	<div class="resizeBox resizeBox-bottomright"></div>	 		 	<div class="resizeBox resizeBox-middleleft"></div>	 	<div class="resizeBox resizeBox-middleright"></div>	 	<div class="resizeBox resizeBox-middletop"></div>	 	<div class="resizeBox resizeBox-middlebottom"></div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementGhost = '	<div id="element_{{=it.id}}" 	 	 class="component button {{=it.resizeDir}} 	 		    {{?it.isMoving}}isMoving{{?}}	 	     	{{?it.image}}hasImage{{?}}"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: none;	 	     	border: 1px solid {{=it.background}};	 	     	">	 	{{?it.image}}			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;						background-size: {{=it.width(null, "absolute")}}px auto;						width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;"></div>	 	{{?}}		<div class="content" style="color: {{=it.foreground}}">					</div>	 	{{? it.resizeDir}}	 		<div class="resizeAdorner {{=it.resizeDir}}"></div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < it.width + 1; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < it.height + 1; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Layer = '	<div class="element {{?it.selected}}element-selected{{?}}" data-element-id="{{=it.id}}">		<div class="element-attributes">			<div class="attribute attribute-position">R</div>			<div class="attribute attribute-bg"></div>		</div>		Layer	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryElement = '	<div class="library-element" data-title="{{=it.title}}">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryGhost = '	<div class="library-element library-ghost">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';
 	// Auto-Compile templates from the tpl folder (and store in the Templates namespace)
 	Templates.compile();
 

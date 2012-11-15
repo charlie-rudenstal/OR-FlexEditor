@@ -13,8 +13,10 @@ files = 	$(src)/Main.js\
 			$(src)/Templates.js\
 			$(src)/Grid/Grid.js\
 			$(src)/DragDrop.js\
+			$(src)/ElementCollection.js\
 			$(src)/Element/Element.js\
 			$(src)/Layers/Layers.js\
+			$(src)/PropertyPanel/PropertyPanel.js\
 			$(src)/Library/Library.js\
 			$(src)/Library/Text.js\
 			$(src)/Library/Image.js

@@ -1,40 +1,30 @@
 function Layers(renderer) {
 
-	var element;
-	var layers = [];
+	var renderToElement;
+	var loadedElements;
 
 	this.load = function(elementContainer) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(elementContainer instanceof jQuery) elementContainer = elementContainer.get(0);
-		element = elementContainer;
+		renderToElement = elementContainer;
 		
-		var mouseInput = new MouseInput(element, null, true);
+		var mouseInput = new MouseInput(renderToElement, null, true);
 		mouseInput.start();
 
 		$(mouseInput).on('mousedown', onItemDown.bind(this));
-
+		
 		this.render([]);
 	}
 
 	function onItemDown(e) {
-		var index  = $(e.target).data('index');
-		var layer = layers[index];
-		var element = layer.element;
-		$(this).trigger({ type: 'selection', 
-						  element: element });
+		var elementId  = $(e.target).data('element-id');
+		var element = ElementCollection.getById(elementId);
+		ElementCollection.select(element);
 	}
 
 	this.render = function(elements) {
-		layers = [];
-		for(var i in elements) {
-			layers.push({
-				name: "Test",
-				selected: elements[i].selected,
-				element: elements[i],
-				index: i
-			});
-		}
-		renderer.write(layers, element, Templates.Layer);
+		loadedElements = elements;
+		renderer.write(elements, renderToElement, Templates.Layer, false, true);
 	}
 
 }

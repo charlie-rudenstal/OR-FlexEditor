@@ -22,6 +22,8 @@ function Main(options) {
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
 
+	$(ElementCollection).on('change', function() { me.render(); });
+
 	me.load = function() {
 
 		var mouseInput = new MouseInput(elmEditor, cellSize);
@@ -35,8 +37,7 @@ function Main(options) {
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.ElementGhost;
-
-				renderer.write(elements.concat(elm), elmEditor);
+				renderer.write(ElementCollection.getAsArray().concat(elm), elmEditor);
 			}
 		});
 
@@ -48,17 +49,20 @@ function Main(options) {
 				elm.width(cellSize.width * 6);
 				elm.height(cellSize.height * 6);
 				elm.template = Templates.Element;
-				me.select(elm);
+				ElementCollection.select(elm);
 				me.addElement(elm);
 			}
 		});
 
 		$(mouseInput).on('mousedown', function(e) {
-			var element = getElementByDomElement($(e.target).closest('.component').get(0));
-			me.select(element);
+			var domElement = $(e.target).closest('.component').get(0);
+			var element = getElementByDomElement(domElement);
+			ElementCollection.select(element);
+			selectedElementStartPosition = { x: element.x(), y: element.y() };
 		})
 
 		$(mouseInput).on('drag', function(e) {
+			var selectedElement = ElementCollection.getSelected();
 			if(selectedElement) {
 				selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
 				selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
@@ -68,32 +72,24 @@ function Main(options) {
 
 	};
 
-	function getElementByDomElement(domElement) {
-		if(!domElement) return;
-		for(var i in elements) {
-			if(domElement.id == 'element_' + elements[i].id) return elements[i];
-		}
-	}
-
 	me.addElement = function(elm) {
-		elements.push(elm);
+		ElementCollection.add(elm);
 		me.render();
 		$(me).trigger('change');
 	}
 
-	me.select = function(element) {
-		if(selectedElement) selectedElement.blur();
-		selectedElement = element;
-		if(element) { 
-			element.select();
-			selectedElementStartPosition = { x: element.x(), y: element.y() };
-		}
-		me.render();
-	}
-
 	me.render = function() {
+		var elements = ElementCollection.getAsArray();
 		renderer.write(elements, elmEditor);
 		layers.render(elements);
+	}
+
+	function getElementByDomElement(domElement) {
+		if(!domElement) return;
+		var elements = ElementCollection.getAsArray(); 
+		for(var i in elements) {
+			if(domElement.id == 'element_' + elements[i].id) return elements[i];
+		}
 	}
 
 	// Render the grid
@@ -107,9 +103,6 @@ function Main(options) {
 
 	me.layers = function(element) {
 		layers.load(element);
-		$(layers).on('selection', function(e) {
-			me.select(e.element);
-		});
 	}
 
 	function getElementsAtPosition(position) {
@@ -125,20 +118,20 @@ function Main(options) {
 		return null;
 	}
 
-	me.import = function(newButtonData) {
-		buttons = [];
-		for(var i in newButtonData) {
-			buttons.push(new Button(elmEditor, newButtonData[i]));
-		}
-		renderer.write(Templates.Button, buttons);	
-	}
+	// me.import = function(newButtonData) {
+	// 	buttons = [];
+	// 	for(var i in newButtonData) {
+	// 		buttons.push(new Button(elmEditor, newButtonData[i]));
+	// 	}
+	// 	me.render();
+	// }
 
-	me.getExport = function() {
-		var arr = [];
-		for(var i in buttons) {
-			arr.push(buttons[i].getExport());
-		}
-		return arr;
-	};
+	// me.getExport = function() {
+	// 	var arr = [];
+	// 	for(var i in buttons) {
+	// 		arr.push(buttons[i].getExport());
+	// 	}
+	// 	return arr;
+	// };
 };
 
