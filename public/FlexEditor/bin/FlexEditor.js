@@ -22,75 +22,18 @@
 	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
+	var scene = new Scene(renderer, elmEditor, cellSize);
 
 	$(ElementCollection).on('change', function() { me.render(); });
 
 	me.load = function() {
-
-		var mouseInput = new MouseInput(elmEditor, cellSize);
-		mouseInput.start();
-
-		$(mouseInput).on('mousemove', function(e) {
-			if(DragDrop.current) {
-				var elm = new Element(elmEditor);
-				elm.x(e.position.snapped.x - (cellSize.width * 3));
-				elm.y(e.position.snapped.y - (cellSize.height * 3));
-				elm.width(cellSize.width * 6);
-				elm.height(cellSize.height * 6);
-				elm.template = Templates.ElementGhost;
-				renderer.write(ElementCollection.getAsArray().concat(elm), elmEditor);
-			}
-		});
-
-		$(mouseInput).on('mouseup', function(e) {
-			if(DragDrop.current) {
-				var elm = new Element(elmEditor);
-				elm.x(e.position.snapped.x - (cellSize.width * 3));
-				elm.y(e.position.snapped.y - (cellSize.height * 3));
-				elm.width(cellSize.width * 6);
-				elm.height(cellSize.height * 6);
-				elm.template = Templates.Element;
-				ElementCollection.select(elm);
-				me.addElement(elm);
-			}
-		});
-
-		$(mouseInput).on('mousedown', function(e) {
-			var domElement = $(e.target).closest('.component').get(0);
-			var element = getElementByDomElement(domElement);
-			ElementCollection.select(element);
-			selectedElementStartPosition = { x: element.x(), y: element.y() };
-		})
-
-		$(mouseInput).on('drag', function(e) {
-			var selectedElement = ElementCollection.getSelected();
-			if(selectedElement) {
-				selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
-				selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
-				me.render();
-			}
-		});
-
+		scene.init();
 	};
-
-	me.addElement = function(elm) {
-		ElementCollection.add(elm);
-		me.render();
-		$(me).trigger('change');
-	}
-
+ 
 	me.render = function() {
 		var elements = ElementCollection.getAsArray();
-		renderer.write(elements, elmEditor);
+		scene.render(elements);
 		layers.render(elements);
-	}
-
-	function getElementByDomElement(domElement) {
-		if(!domElement) return;
-		var elements = ElementCollection.getAsArray(); 
-		for(var i in elements) {
-			if(domElement.id == 'element_' + elements[i].id) return elements[i];
-		}
 	}
 
 	// Render the grid
@@ -104,19 +47,6 @@
 
 	me.layers = function(element) {
 		layers.load(element);
-	}
-
-	function getElementsAtPosition(position) {
-		var elementsAtPosition = [];
-		for(var i in elements) {
-			var elm = elements[i];
-			var isWithinHorizontal = (position.x >= elm.x() && position.x < elm.x() + elm.width());
-			var isWithinVertical = (position.y >= elm.y() && position.y < elm.y() + elm.height());
-			if(isWithinVertical && isWithinHorizontal) { 
-				elementsAtPosition.push(elm);
-			}
-		}
-		return null;
 	}
 
 	// me.import = function(newButtonData) {
@@ -922,6 +852,7 @@ function Grid(renderer, options) {
 
 	me.add = function(element) {
 		elements[element.id] = element;
+		$(me).trigger('change');
 	}
 
 	me.select = function(elementToSelect) {
@@ -950,6 +881,73 @@ function Grid(renderer, options) {
 
 	return me;
 })({});
+var Scene = function(renderer, renderToElement, cellSize) {
+	var me = {};
+	
+
+	me.init = function() {
+
+		var mouseInput = new MouseInput(renderToElement, cellSize);
+		mouseInput.start();
+
+		$(mouseInput).on('mousemove', function(e) {
+			if(DragDrop.current) {
+				var elm = new Element(renderToElement);
+				elm.x(e.position.snapped.x - (cellSize.width * 3));
+				elm.y(e.position.snapped.y - (cellSize.height * 3));
+				elm.width(cellSize.width * 6);
+				elm.height(cellSize.height * 6);
+				elm.template = Templates.ElementGhost;
+				renderer.write(ElementCollection.getAsArray().concat(elm), renderToElement);
+			}
+		});
+
+		$(mouseInput).on('mouseup', function(e) {
+			if(DragDrop.current) {
+				var elm = new Element(renderToElement);
+				elm.x(e.position.snapped.x - (cellSize.width * 3));
+				elm.y(e.position.snapped.y - (cellSize.height * 3));
+				elm.width(cellSize.width * 6);
+				elm.height(cellSize.height * 6);
+				elm.template = Templates.Element;
+				ElementCollection.add(elm);
+				ElementCollection.select(elm);
+			}
+		});
+
+		$(mouseInput).on('mousedown', function(e) {
+			var domElement = $(e.target).closest('.component').get(0);
+			var element = getElementByDomElement(domElement);
+			ElementCollection.select(element);
+			if(element) {
+				selectedElementStartPosition = { x: element.x(), y: element.y() };
+			}
+		})
+
+		$(mouseInput).on('drag', function(e) {
+			var selectedElement = ElementCollection.getSelected();
+			if(selectedElement) {
+				selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
+				selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
+				me.render(ElementCollection.getAsArray());
+			}
+		});
+	}
+
+	me.render = function(elements) {
+		renderer.write(elements, renderToElement);
+	}
+
+	function getElementByDomElement(domElement) {
+		if(!domElement) return;
+		var elements = ElementCollection.getAsArray(); 
+		for(var i in elements) {
+			if(domElement.id == 'element_' + elements[i].id) return elements[i];
+		}
+	}
+
+	return me;
+}
 function Element(parent, options) {
 	if(parent == null) throw "Parent for Element cannot be null";
 	options = options || {};

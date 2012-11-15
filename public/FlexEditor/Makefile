@@ -14,6 +14,7 @@ files = 	$(src)/Main.js\
 			$(src)/Grid/Grid.js\
 			$(src)/DragDrop.js\
 			$(src)/ElementCollection.js\
+			$(src)/Scene.js\
 			$(src)/Element/Element.js\
 			$(src)/Layers/Layers.js\
 			$(src)/PropertyPanel/PropertyPanel.js\

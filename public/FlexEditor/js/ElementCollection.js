@@ -5,6 +5,7 @@ var ElementCollection = (function(me) {
 
 	me.add = function(element) {
 		elements[element.id] = element;
+		$(me).trigger('change');
 	}
 
 	me.select = function(elementToSelect) {
