@@ -1,4 +1,4 @@
-var Scene = function(renderer, renderToElement, cellSize) {
+var Scene = function(renderer, renderToElement, size, cellSize) {
 	var me = {};
 	
 
@@ -21,18 +21,30 @@ var Scene = function(renderer, renderToElement, cellSize) {
 		});
 
 		$(mouseInput).on('mouseup', function(e) {
+
+			var isInsideScene = e.position.absolute.x < size.width &&
+								e.position.absolute.y < size.height;
+
 			if(DragDrop.current) {
-				var elm = new Element(renderToElement);
-				elm.template = Templates.Element;
-				console.log(elm);
-				elm.contentType(DragDrop.current.title);
-				elm.x(e.position.snapped.x - (cellSize.width * 3));
-				elm.y(e.position.snapped.y - (cellSize.height * 3));
-				elm.width(cellSize.width * 6);
-				elm.height(cellSize.height * 6);
-				ElementCollection.add(elm);
-				ElementCollection.select(elm);
+				if(isInsideScene) {
+					var elm = new Element(renderToElement);
+					elm.template = Templates.Element;
+					console.log(elm);
+					elm.contentType(DragDrop.current.title);
+					elm.x(e.position.snapped.x - (cellSize.width * 3));
+					elm.y(e.position.snapped.y - (cellSize.height * 3));
+					elm.width(cellSize.width * 6);
+					elm.height(cellSize.height * 6);
+					ElementCollection.add(elm);
+					ElementCollection.select(elm);
+				} else {
+					// Render to get rid of the ghost element if the mouse was 
+					// slightly outside of the scene, but with a part of the element inside
+					me.render(ElementCollection.getAsArray());
+				}
 			}
+
+
 		});
 
 		$(mouseInput).on('mousedown', function(e) {

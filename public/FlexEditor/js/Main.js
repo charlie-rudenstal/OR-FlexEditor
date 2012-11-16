@@ -11,9 +11,12 @@ function Main(options) {
 	var width = options.width || 12;
 	var height = options.height || 25;
 
+	var size = { width: width * cellSize.width, 
+				 height: height * cellSize.height }
+
 	// Resize the editor element to match the size specified in options
-	elmEditor.style.width = width * cellSize.width + 'px';
-	elmEditor.style.height = height * cellSize.height + 'px';
+	elmEditor.style.width = size.width + 'px';
+	elmEditor.style.height = size.height + 'px';
 
 	// Initialize modules 
 	var interactions = new Interactions();
@@ -21,7 +24,7 @@ function Main(options) {
 	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
-	var scene = new Scene(renderer, elmEditor, cellSize);
+	var scene = new Scene(renderer, elmEditor, size, cellSize);
 
 	$(ElementCollection).on('change', function() { me.render(); });
 	$(ElementCollection).on('selection', function(e) {

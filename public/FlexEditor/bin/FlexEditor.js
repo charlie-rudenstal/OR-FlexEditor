@@ -12,9 +12,12 @@
 	var width = options.width || 12;
 	var height = options.height || 25;
 
+	var size = { width: width * cellSize.width, 
+				 height: height * cellSize.height }
+
 	// Resize the editor element to match the size specified in options
-	elmEditor.style.width = width * cellSize.width + 'px';
-	elmEditor.style.height = height * cellSize.height + 'px';
+	elmEditor.style.width = size.width + 'px';
+	elmEditor.style.height = size.height + 'px';
 
 	// Initialize modules 
 	var interactions = new Interactions();
@@ -22,7 +25,7 @@
 	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
-	var scene = new Scene(renderer, elmEditor, cellSize);
+	var scene = new Scene(renderer, elmEditor, size, cellSize);
 
 	$(ElementCollection).on('change', function() { me.render(); });
 	$(ElementCollection).on('selection', function(e) {
@@ -902,7 +905,7 @@ function Grid(renderer, options) {
 
 	return me;
 })({});
-var Scene = function(renderer, renderToElement, cellSize) {
+var Scene = function(renderer, renderToElement, size, cellSize) {
 	var me = {};
 	
 
@@ -925,18 +928,30 @@ var Scene = function(renderer, renderToElement, cellSize) {
 		});
 
 		$(mouseInput).on('mouseup', function(e) {
+
+			var isInsideScene = e.position.absolute.x < size.width &&
+								e.position.absolute.y < size.height;
+
 			if(DragDrop.current) {
-				var elm = new Element(renderToElement);
-				elm.template = Templates.Element;
-				console.log(elm);
-				elm.contentType(DragDrop.current.title);
-				elm.x(e.position.snapped.x - (cellSize.width * 3));
-				elm.y(e.position.snapped.y - (cellSize.height * 3));
-				elm.width(cellSize.width * 6);
-				elm.height(cellSize.height * 6);
-				ElementCollection.add(elm);
-				ElementCollection.select(elm);
+				if(isInsideScene) {
+					var elm = new Element(renderToElement);
+					elm.template = Templates.Element;
+					console.log(elm);
+					elm.contentType(DragDrop.current.title);
+					elm.x(e.position.snapped.x - (cellSize.width * 3));
+					elm.y(e.position.snapped.y - (cellSize.height * 3));
+					elm.width(cellSize.width * 6);
+					elm.height(cellSize.height * 6);
+					ElementCollection.add(elm);
+					ElementCollection.select(elm);
+				} else {
+					// Render to get rid of the ghost element if the mouse was 
+					// slightly outside of the scene, but with a part of the element inside
+					me.render(ElementCollection.getAsArray());
+				}
 			}
+
+
 		});
 
 		$(mouseInput).on('mousedown', function(e) {
