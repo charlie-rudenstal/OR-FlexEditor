@@ -24,7 +24,7 @@ function Element(parent, options) {
 	this.isMoving = options.isMoving || false;
 
 	// Colors, text and image
-	this.text = options.text || '';
+	this.text = options.text || 'New Element';
 	this.background = options.background || '#3276a9';
 	this.foreground = options.foreground || '#ffffff';
 	this.image = options.image || null;
@@ -40,10 +40,15 @@ Element.prototype.select = function() {
 	this.selected = true;
 }
 
-
 Element.prototype.blur = function() {
 	this.template = Templates.Element;
 	this.selected = false;
+}
+
+// Should be called after raw attributes has been changed, like for example text
+// to notify this object and other listener about the change
+Element.prototype.invalidate = function() {
+	$(this).trigger('change');
 }
 
 Element.prototype.getExport = function() {

@@ -9,15 +9,15 @@ Templates.Raw.PropertiesText = '
 		<div class="properties">
 			<div class="property">
 				<div class="property-label">Text</div>
-				<div class="property-input"><input type="text" value="{{=it.element.text}}" /></div>
+				<div class="property-input"><input type="text" value="{{=it.element.text}}" data-property="text" /></div>
 			</div>
 			<div class="property">
 				<div class="property-label">Bg</div>
-				<div class="property-input"><input type="text" value="{{=it.element.background}}" /></div>
+				<div class="property-input"><input type="text" value="{{=it.element.background}}" data-property="background" /></div>
 			</div>
 			<div class="property">
 				<div class="property-label">Fg</div>
-				<div class="property-input"><input type="text" value="{{=it.element.foreground}}" /></div>
+				<div class="property-input"><input type="text" value="{{=it.element.foreground}}" data-property="foreground" /></div>
 			</div>
 		</div>
 

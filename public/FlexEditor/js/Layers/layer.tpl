@@ -7,7 +7,7 @@ Templates.Raw.Layer = '
 			<div class="attribute attribute-position">{{?it.positionType == "absolute"}}A{{??}}R{{?}}</div>
 			<div class="attribute attribute-bg" style="background-color: {{=it.background}}"></div>
 		</div>
-		Layer
+		{{=it.text}}
 	</div>
 
 ';

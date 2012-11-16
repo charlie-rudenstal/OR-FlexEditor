@@ -5,6 +5,7 @@ var ElementCollection = (function(me) {
 
 	me.add = function(element) {
 		elements[element.id] = element;
+		$(element).on('change', function() { $(me).trigger('change'); });
 		$(me).trigger('change');
 	}
 
