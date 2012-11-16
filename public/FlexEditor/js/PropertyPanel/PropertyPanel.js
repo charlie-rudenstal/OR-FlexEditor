@@ -8,7 +8,12 @@ var PropertyPanel = (function(me) {
 		render();
 		
 		function render() {
-			renderer.write({ element: element, x: x,  y: y }, renderToElement, Templates.PropertiesText, false, true);
+
+			var templateName = 'Properties' + element.contentType();
+			var template = Templates[templateName];
+			if(!template) console.log("Warning: Property Template for Element type ", element.type, "not found");
+
+			renderer.write({ element: element, x: x,  y: y }, renderToElement, template, false, true);
 			setTimeout(function() { $('.propertyPanel input').first().select() }, 0)
 		}
 

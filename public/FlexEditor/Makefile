@@ -23,10 +23,12 @@ files = 	$(src)/Main.js\
 			$(src)/Library/Image.js
 			
 templates = $(src)/Element/element.tpl\
-			$(src)/Element/element.selection.tpl\
 			$(src)/Element/element.selected.tpl\
 			$(src)/Element/element.ghost.tpl\
+			$(src)/Element/element.type.text.tpl\
+			$(src)/Element/element.type.image.tpl\
 			$(src)/PropertyPanel/properties.text.tpl\
+			$(src)/PropertyPanel/properties.image.tpl\
  		    $(src)/Grid/grid.tpl\
  		    $(src)/Layers/layer.tpl\
  		    $(src)/Library/library.element.tpl\

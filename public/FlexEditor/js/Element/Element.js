@@ -10,6 +10,9 @@ function Element(parent, options) {
 
 	// ID and text
 	this.id = Element.idCounter++;
+
+	// Type of Element (based on Text, Image etc)
+	this.contentType(options.type || 'Text');
 	
 	// Position
 	this.positionType = options.positionType || 'absolute';
@@ -24,11 +27,12 @@ function Element(parent, options) {
 	this.isMoving = options.isMoving || false;
 
 	// Colors, text and image
-	this.text = options.text || 'New Element';
+	this.text = options.text || '';
 	this.background = options.background || '#3276a9';
 	this.foreground = options.foreground || '#ffffff';
 	this.image = options.image || null;
 	this.customClass = options.customClass;
+
 
 	this.selected = false;
 };
@@ -43,6 +47,16 @@ Element.prototype.select = function() {
 Element.prototype.blur = function() {
 	this.template = Templates.Element;
 	this.selected = false;
+}
+
+Element.prototype.contentType = function(value) {
+	if(value) {
+		this._contentType = value;
+		this.contentTemplate = Templates['ElementType' + value];
+		if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', value);
+	} else {
+		return this._contentType;
+	}
 }
 
 // Should be called after raw attributes has been changed, like for example text
