@@ -15,6 +15,9 @@ Templates.Raw.PropertiesImage = '
 				<div class="property-label">Bg</div>
 				<div class="property-input"><input type="text" value="{{=it.element.background}}" data-property="background" /></div>
 			</div>
+			<div class="property">
+				<div class="btn btn-delete">Remove</div>
+			</div>
 		</div>
 
 	</div>

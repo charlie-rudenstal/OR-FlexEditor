@@ -9,6 +9,13 @@ var ElementCollection = (function(me) {
 		$(me).trigger('change');
 	}
 
+	me.remove = function(element) {
+		elements[element.id] = null;
+		delete elements[element.id];
+		console.log(elements);
+		$(me).trigger('change');
+	}
+
 	me.select = function(elementToSelect) {
 		if(elementToSelect == selectedElement) return;
 		if(selectedElement) selectedElement.blur();

@@ -19,6 +19,9 @@ Templates.Raw.PropertiesText = '
 				<div class="property-label">Fg</div>
 				<div class="property-input"><input type="text" value="{{=it.element.foreground}}" data-property="foreground" /></div>
 			</div>
+			<div class="property">
+				<div class="btn btn-delete">Remove</div>
+			</div>
 		</div>
 
 	</div>

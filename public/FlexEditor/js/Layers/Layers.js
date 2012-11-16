@@ -56,7 +56,7 @@ function Layers(renderer) {
 	this.render = function(elements) {
 		loadedElements = cloneArrayShallow(elements);
 		loadedElements.reverse(); // reverse our copy to get latest layer at top
-		renderer.write(loadedElements, renderToElement, Templates.Layer, false, true);
+		renderer.write(loadedElements, renderToElement, Templates.Layer, true, true);
 	}
 
 }

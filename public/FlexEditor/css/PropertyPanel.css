@@ -17,7 +17,7 @@
 }
 
 .properties {
-	margin-bottom: 14px;
+	margin-bottom: 10px;
 }
 
 .property {
@@ -44,6 +44,28 @@
 	cursor: text;
 }
 
+.btn {
+	font-size: 14px;
+	border-top: 1px solid #585858;
+	border-bottom: 1px solid #313131;
+	background: -webkit-linear-gradient(#484848, #404040);
+	padding: 6px;
+	text-align: center;
+	display: inline-block;
+}
+
+.btn:hover {
+	background: -webkit-linear-gradient(#525252, #434343);
+}
+
+.btn:active {
+	background: -webkit-linear-gradient(#404040, #484848);
+}
+
+.btn.btn-delete {
+	margin-top: 4px;
+	width: 155px;
+}
 
 /*class="properties">
 			<div class="property">
