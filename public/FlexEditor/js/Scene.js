@@ -6,6 +6,7 @@ var Scene = function(renderer, renderToElement, cellSize) {
 
 		var mouseInput = new MouseInput(renderToElement, cellSize);
 		mouseInput.start();
+		registerKeyHandler();
 
 		$(mouseInput).on('mousemove', function(e) {
 			if(DragDrop.current) {
@@ -49,6 +50,27 @@ var Scene = function(renderer, renderToElement, cellSize) {
 				selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
 				selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
 				me.render(ElementCollection.getAsArray());
+			}
+		});
+	};
+
+	// Will move elements when using Alt + Arrow keys
+	function registerKeyHandler() {
+		$(window).keydown(function(e) {
+			var keyLeft = 	37;
+			var keyUp = 38;
+			var keyRight = 39;
+			var keyDown = 40;
+			if(e.altKey) {
+				// Find which element is selected and ignore if no selection
+				// Then move it!
+				var selectedElement = ElementCollection.getSelected();
+				if(!selectedElement) return;
+				if(e.keyCode == keyLeft)	selectedElement.x(selectedElement.x() - cellSize.width);
+				if(e.keyCode == keyUp) 		selectedElement.y(selectedElement.y() - cellSize.height);
+				if(e.keyCode == keyRight) 	selectedElement.x(selectedElement.x() + cellSize.width);
+				if(e.keyCode == keyDown) 	selectedElement.y(selectedElement.y() + cellSize.height);
+				selectedElement.invalidate();
 			}
 		});
 	}
