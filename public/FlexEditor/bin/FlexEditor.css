@@ -80,21 +80,44 @@ input:focus {
 .attribute {
 	width: 13px;
 	height: 13px;
-	background-color: #454444;
 	float: left;
-	margin: 3px 1px;
+	margin: 0px 3px;
 	text-align: center;
-	line-height: 13px;
+}
+
+.attribute i {
+	color: #FDC413;
+	color: #D1D1D1;
+	text-shadow: 0px 1px #000;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.layer-element-selected .attribute i {
+	color: #454444;	
+	text-shadow: none;
 }
 
 .attribute-bg {
-	background-color: #d7f3e4;
+	border: 1px solid #454444;
 }
 
-.attribute-position {
-	font-size: 10px;
-	text-shadow: none;
-}.propertyPanel {
+.layer-element-selected .attribute-bg { 
+	border: 1px solid #C1C1C1;
+}
+
+.attribute-locked .icon-unlock {
+	opacity: 0;
+}
+
+.layer-element:hover .icon-unlock {
+	opacity: 0.3;
+}
+
+.layer-element-selected .icon-unlock { 
+	opacity: 0.3;
+}
+.propertyPanel {
 	position: absolute;
 	z-index: 2;
 	width: 190px;

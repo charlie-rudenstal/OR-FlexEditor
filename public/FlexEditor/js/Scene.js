@@ -87,7 +87,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		$(mouseInput).on('mousedown', function(e) {
 			var domElement = $(e.target).closest('.component').get(0);
 			var element = getElementByDomElement(domElement);
-			console.log(element);
 			if(element) {
 				var relativeX = e.position.absolute.x - element.x();
 				var relativeY = e.position.absolute.y - element.y();
@@ -206,7 +205,10 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		if(!domElement) return;
 		var elements = ElementCollection.getAsArray(); 
 		for(var i in elements) {
-			if(domElement.id == 'element_' + elements[i].id) return elements[i];
+			if(domElement.id == 'element_' + elements[i].id) {
+				// Elements that are locked should not be selectable
+				if(!elements[i].locked) return elements[i];
+			}
 		}
 	}
 

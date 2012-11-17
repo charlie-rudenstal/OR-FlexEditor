@@ -21,9 +21,19 @@ function Layers(renderer) {
 
 	// Will select the element in the ElementCollection on click
 	function onItemDown(e) {
-		var elementId  = $(e.target).data('element-id');
+		
+		var $target = $(e.target);
+
+
+		var elementId  = $(e.target).closest('.layer-element').data('element-id');
 		var element = ElementCollection.getById(elementId);
-		ElementCollection.select(element);
+
+		if($target.is('.layer-element')) {
+			ElementCollection.select(element);
+		} else if($target.closest('.attribute-locked').length > 0) {
+			element.locked = !element.locked;
+			element.invalidate();
+		}
 	}
 
 	// Will switch selection between elements with Shift+Up and Shift+Down
