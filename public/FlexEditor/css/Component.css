@@ -12,13 +12,12 @@
 
 .component .content {
 	position: absolute;
-
 	width: 100%;
-	text-align: center;
-
-	top: 50%;
-	margin-top: -10px;
-
+	height: 100%;
+	/*
+	text-align: center;*/
+	/*top: 50%;
+	margin-top: -10px;*/
 
 	color: #ccc;
 	font-family: helvetica;

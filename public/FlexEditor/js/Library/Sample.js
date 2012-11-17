@@ -11,8 +11,11 @@ Library.elements = Library.elements || [];
         var elm = new Element(renderToElement);
         elm.template = Templates.Element;
         elm.contentType('Image');
-        elm.background = 'transparent';  
+        elm.background = 'transparent';        
+        elm.valign = 'top';
+        elm.halign = 'left'; 
         elm.image = 'http://upload.wikimedia.org/wikipedia/commons/3/3e/Tree-256x256.png';  
+        elm.stretch = 'width';
         return elm;
     }
 

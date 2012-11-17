@@ -4,9 +4,20 @@ Templates.Raw.ElementTypeImage = '
 
 	<div class="content">
 	 	{{?it.image && it.image != "null"}}
-			<div style="background: url({{=it.image}}) no-repeat left top; position: absolute;
-						background-size: {{=it.width(null, "absolute")}}px auto;
-						width: {{=it.width(null, "absolute")}}px;
+			<div style="position: absolute;
+                        background: url({{=it.image}}) no-repeat {{=it.halign}} {{=it.valign}}; 
+
+                        {{?it.stretch == "width"}}
+            			    background-size: {{=it.width(null, "absolute")}}px auto;
+						{{?}}
+                        {{?it.stretch == "height"}}
+                            background-size: auto {{=it.height(null, "absolute")}}px;
+                        {{?}}
+                        {{?it.stretch == "fill"}}
+                            background-size: {{=it.width(null, "absolute")}}px {{=it.height(null, "absolute")}}px;
+                        {{?}}
+
+                        width: {{=it.width(null, "absolute")}}px;
 	 	     			height: {{=it.height(null, "absolute")}}px;"></div>
 	 	{{?}}
 	</div>

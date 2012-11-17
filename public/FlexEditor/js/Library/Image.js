@@ -12,6 +12,9 @@ Library.elements = Library.elements || [];
         elm.template = Templates.Element;
         elm.contentType('Image');  
         elm.background = 'transparent';  
+        elm.valign = 'top';  
+        elm.halign = 'left';  
+        elm.stretch = 'width';
         return elm;
     }
 
