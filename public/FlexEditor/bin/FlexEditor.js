@@ -51,8 +51,9 @@
         elm.stretch = 'width';
         elm.text = "Background";
         elm.locked = true;
-        elm.width(size.width);
-        elm.height(size.height);
+        elm.positionType = 'relative';
+        elm.width(100, 'relative');
+        elm.height(100, 'relative');
         ElementCollection.add(elm);
 	};
  
