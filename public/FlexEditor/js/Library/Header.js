@@ -22,7 +22,6 @@ Library.elements = Library.elements || [];
         elm.x(0, 'relative');
         elm.y(0, 'relative');
         elm.width(100, 'relative');
-        
 
         return elm;
     }
@@ -31,7 +30,7 @@ Library.elements = Library.elements || [];
     me.title = 'Header';
     me.description = 'A predefined Titlebar';
     me.width = 20;
-    me.height = 4;
+    me.height = 3;
 
     Library.elements[me.key] = me;
 })();
