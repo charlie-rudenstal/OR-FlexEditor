@@ -22,9 +22,8 @@ function Library(renderer) {
 
 	function onItemDown(e) {
 		$ghostLibraryElement = $(e.target).closest('.library-element');
-		ghostLibraryElement = Library.elements[$ghostLibraryElement.data('title')];
+		ghostLibraryElement = Library.elements[$ghostLibraryElement.data('key')];
 		ghostStartPosition = $ghostLibraryElement.offset();
-
 		DragDrop.current = ghostLibraryElement;
 	}
 

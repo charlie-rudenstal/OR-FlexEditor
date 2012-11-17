@@ -1,4 +1,4 @@
-function Element(parent, options) {
+function Element(parent, option) {
 	if(parent == null) throw "Parent for Element cannot be null";
 	options = options || {};
 

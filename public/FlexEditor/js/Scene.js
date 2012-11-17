@@ -67,10 +67,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			
 			resizeDirection = 0;
 			if(DragDrop.current) {
-				if(isInsideScene) {
-					var elm = new Element(renderToElement);
-					elm.template = Templates.Element;
-					elm.contentType(DragDrop.current.title);
+				if(isInsideScene) {					
+					var elm = DragDrop.current.createElement(renderToElement);
 					elm.x(e.position.snapped.x - (cellSize.width * 3));
 					elm.y(e.position.snapped.y - (cellSize.height * 3));
 					elm.width(cellSize.width * 6);
