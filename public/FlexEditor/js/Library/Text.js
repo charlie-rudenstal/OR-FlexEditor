@@ -10,12 +10,15 @@ Library.elements = Library.elements || [];
         var elm = new Element(renderToElement);
         elm.template = Templates.Element;
         elm.contentType('Text');  
+        elm.padding = 0;
         return elm;
     }
     
     me.key = "Text";
 	me.title = 'Text';
 	me.description = 'Used for captions, notices of any other kind of message';
+    me.width = 6;
+    me.height = 2;
 
     Library.elements[me.key] = me;
 })();

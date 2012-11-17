@@ -11,10 +11,8 @@ Templates.Raw.ElementSelected = '
 	 	     	background-color: {{=it.background}}
 	 	     	">
 
-		<div class="content" style="color: {{=it.foreground}}">
-			{{=it.contentTemplate(it)}}
-		</div>
-
+		{{=it.contentTemplate(it)}}
+	
 	 	<div class="resizeBorder"></div>
 
 	 	<div class="resizeBox resizeBox-topleft"></div>

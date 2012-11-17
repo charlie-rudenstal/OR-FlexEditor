@@ -23,8 +23,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				elm.template = Templates.ElementGhost;
 				elm.x(e.position.snapped.x - (cellSize.width * 3));
 				elm.y(e.position.snapped.y - (cellSize.height * 3));
-				elm.width(cellSize.width * 6);
-				elm.height(cellSize.height * 6);
+				elm.width(DragDrop.current.width * cellSize.width);
+				elm.height(DragDrop.current.height * cellSize.height);
 				renderer.write(ElementCollection.getAsArray().concat(elm), renderToElement);
 			
 			} else {
@@ -71,8 +71,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					var elm = DragDrop.current.createElement(renderToElement);
 					elm.x(e.position.snapped.x - (cellSize.width * 3));
 					elm.y(e.position.snapped.y - (cellSize.height * 3));
-					elm.width(cellSize.width * 6);
-					elm.height(cellSize.height * 6);
+					elm.width(DragDrop.current.width * cellSize.width);
+					elm.height(DragDrop.current.height * cellSize.height);
 					ElementCollection.add(elm);
 					ElementCollection.select(elm);
 				} else {

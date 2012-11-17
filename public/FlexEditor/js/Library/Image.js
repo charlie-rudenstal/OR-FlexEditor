@@ -21,6 +21,8 @@ Library.elements = Library.elements || [];
     me.key = "Image";
 	me.title = 'Image';
 	me.description = 'Import an image you have already created from a URL';
+    me.width = 6;
+    me.height = 6;
 
     Library.elements[me.key] = me;    
 })();

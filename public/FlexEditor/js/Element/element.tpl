@@ -11,10 +11,8 @@ Templates.Raw.Element = '
 	 	     	background-color: {{=it.background}}
 	 	     	">
 
-		<div class="content" style="color: {{=it.foreground}}">
-			{{=it.contentTemplate(it)}}
-		</div>
-
+		{{=it.contentTemplate(it)}}
+		
 	</div>
 
 ';

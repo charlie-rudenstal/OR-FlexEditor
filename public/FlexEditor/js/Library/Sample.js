@@ -22,6 +22,8 @@ Library.elements = Library.elements || [];
     me.key = "Sample";
     me.title = 'Image (Tree)';
     me.description = 'An image with a preset sample URL';
+    me.width = 6;
+    me.height = 6;
 
     Library.elements[me.key] = me;
 })();
