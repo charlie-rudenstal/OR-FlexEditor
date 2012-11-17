@@ -21,8 +21,8 @@ files = 	$(src)/Main.js\
 			$(src)/Library/Library.js\
 			$(src)/Library/Text.js\
 			$(src)/Library/Image.js\
-			$(src)/Library/Header.js\
-			$(src)/Library/Sample.js
+			$(src)/Library/Sample.js\
+			$(src)/Library/Header.js
 			
 templates = $(src)/Element/element.tpl\
 			$(src)/Element/element.selected.tpl\
