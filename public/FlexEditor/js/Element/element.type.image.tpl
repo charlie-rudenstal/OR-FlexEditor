@@ -2,7 +2,7 @@
 var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; 
 Templates.Raw.ElementTypeImage = '
 
-	<div class="content">
+	<div>
 	 	{{?it.image && it.image != "null"}}
 			<div style="position: absolute;
                         background: url({{=it.image}}) no-repeat {{=it.halign}} {{=it.valign}}; 

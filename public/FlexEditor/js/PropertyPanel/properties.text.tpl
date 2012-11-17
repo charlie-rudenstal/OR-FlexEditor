@@ -20,6 +20,14 @@ Templates.Raw.PropertiesText = '
 				<div class="property-input"><input type="text" value="{{=it.element.foreground}}" data-property="foreground" /></div>
 			</div>
 			<div class="property">
+				<div class="property-label">Halign</div>
+				<div class="property-input"><input type="text" value="{{=it.element.halign}}" data-property="halign" /></div>
+			</div>
+			<div class="property">
+				<div class="property-label">Valign</div>
+				<div class="property-input"><input type="text" value="{{=it.element.valign}}" data-property="valign" /></div>
+			</div>
+			<div class="property">
 				<div class="property-label">Padding</div>
 				<div class="property-input"><input type="text" value="{{=it.element.padding}}" data-property="padding" /></div>
 			</div>

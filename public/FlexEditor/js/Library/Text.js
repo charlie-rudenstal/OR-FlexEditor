@@ -10,7 +10,9 @@ Library.elements = Library.elements || [];
         var elm = new Element(renderToElement);
         elm.template = Templates.Element;
         elm.contentType('Text');  
-        elm.padding = 0;
+        elm.padding = 0; 
+        elm.valign = 'top';  
+        elm.halign = 'left';  
         return elm;
     }
     

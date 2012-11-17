@@ -125,7 +125,7 @@ input:focus {
 	font-size: 14px;
 	color: #a5a2a2;
 	display: inline-block;
-	width: 50px;
+	width: 58px;
 }
 
 .property-input {
@@ -133,7 +133,7 @@ input:focus {
 }
 
 .property-input input {
-	width: 109px;
+	width: 100px;
 	padding: 8px 4px;
 	background-color: #3d3d3d;
 	border: none;
