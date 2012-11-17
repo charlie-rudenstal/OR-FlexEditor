@@ -18,6 +18,7 @@ Library.elements = Library.elements || [];
         elm.valign = 'middle';
         elm.halign = 'center'; 
         elm.positionType = 'relative';
+        elm.padding = 0;
 
         elm.x(0, 'relative');
         elm.y(0, 'relative');

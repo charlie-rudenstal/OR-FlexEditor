@@ -1477,7 +1477,8 @@ Library.elements = Library.elements || [];
         elm.valign = 'top';  
         elm.halign = 'left'; 
         elm.background = 'transparent;'
-        elm.padding = 6;
+        elm.foreground = 'white';
+        elm.padding = 0; //6;
         elm.text = '';
         return elm;
     }
@@ -1564,6 +1565,7 @@ Library.elements = Library.elements || [];
         elm.valign = 'middle';
         elm.halign = 'center'; 
         elm.positionType = 'relative';
+        elm.padding = 0;
 
         elm.x(0, 'relative');
         elm.y(0, 'relative');
