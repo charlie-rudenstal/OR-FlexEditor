@@ -1308,6 +1308,9 @@ function Layers(renderer) {
 		} else if($target.closest('.attribute-locked').length > 0) {
 			element.locked = !element.locked;
 			element.invalidate();
+		} else if($target.closest('.attribute-position').length > 0) {
+			element.positionType = (element.positionType == 'absolute') ? 'relative' : 'absolute';
+			element.invalidate();
 		}
 	}
 
