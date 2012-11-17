@@ -50,7 +50,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				}
 			}
 
-
 		});
 
 
@@ -141,7 +140,21 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			var keyUp = 38;
 			var keyRight = 39;
 			var keyDown = 40;
-			if(e.altKey) {
+
+			// alt + shift + arrows: Resize current Element
+			if(e.altKey && e.shiftKey) {
+				// Find which element is selected and ignore if no selection
+				// Then resize it!
+				var selectedElement = ElementCollection.getSelected();
+				if(!selectedElement) return;
+				if(e.keyCode == keyLeft)	selectedElement.width(selectedElement.width() - cellSize.width);
+				if(e.keyCode == keyUp) 		selectedElement.height(selectedElement.height() - cellSize.height);
+				if(e.keyCode == keyRight) 	selectedElement.width(selectedElement.width() + cellSize.width);
+				if(e.keyCode == keyDown) 	selectedElement.height(selectedElement.height() + cellSize.height);
+				selectedElement.invalidate();
+			
+			// alt + arrows: Move current Element
+			} else if(e.altKey) {
 				// Find which element is selected and ignore if no selection
 				// Then move it!
 				var selectedElement = ElementCollection.getSelected();
