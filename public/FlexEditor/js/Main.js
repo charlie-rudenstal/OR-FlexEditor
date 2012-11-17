@@ -36,8 +36,23 @@ function Main(options) {
 		}
 	});
 
+
 	me.load = function() {
 		scene.init();
+
+		// Add the default Background layer
+        var elm = new Element(elmEditor);
+        elm.template = Templates.Element;
+        elm.contentType('Image');
+        elm.background = 'transparent';        
+        elm.valign = 'top';
+        elm.halign = 'left';
+        elm.stretch = 'width';
+        elm.text = "Background";
+        elm.locked = true;
+        elm.width(size.width);
+        elm.height(size.height);
+        ElementCollection.add(elm);
 	};
  
 	me.render = function() {
