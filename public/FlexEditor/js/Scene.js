@@ -2,7 +2,9 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 	var me = {};
 	var selectedElementStartPosition;
 	var selectedElementStartSize;
-	var resizeDirection = null;
+	var resizeDirection = 0;
+	var resizeDirections = { left: 1, up: 2, right: 4, down: 8 };
+
 	var $renderToElement = $(renderToElement);
 
 	me.init = function() {
@@ -58,7 +60,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			var isInsideScene = e.position.absolute.x < size.width &&
 								e.position.absolute.y < size.height;
 			
-			resizeDirection = null;
+			resizeDirection = 0;
 			if(DragDrop.current) {
 				if(isInsideScene) {
 					var elm = new Element(renderToElement);
@@ -82,22 +84,27 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		$(mouseInput).on('mousedown', function(e) {
 			var domElement = $(e.target).closest('.component').get(0);
 			var element = getElementByDomElement(domElement);
+			console.log(element);
 			if(element) {
 				var relativeX = e.position.absolute.x - element.x();
 				var relativeY = e.position.absolute.y - element.y();
+				
 				var resizeLeft = relativeX < 8;
 				var resizeUp = relativeY < 8;
 				var resizeRight = relativeX >= element.width() - 8;
 				var resizeDown = relativeY >= element.height() - 8;
+				
 				selectedElementStartPosition = { x: element.x(), y: element.y() };
 				selectedElementStartSize = { width: element.width(), height: element.height() };
 
+				resizeDirection = 0;
 				if(element.selected) {
 					// Did the user click on a resize handle?
-					if(resizeLeft) resizeDirection = 'left';
-					else if(resizeUp) resizeDirection = 'up';
-					else if(resizeRight) resizeDirection = 'right';
-					else if(resizeDown) resizeDirection = 'down';
+					if(resizeLeft) resizeDirection |= resizeDirections.left;
+					if(resizeUp) resizeDirection |= resizeDirections.up;
+					if(resizeRight) resizeDirection |= resizeDirections.right;
+					if(resizeDown) resizeDirection |= resizeDirections.down;
+					console.log(resizeDirection);
 				} else {
 					ElementCollection.select(element);
 				}
@@ -112,18 +119,24 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			if(selectedElement) {
 
 				// No resize is in progress, move the element on drag
-				if(resizeDirection == null) {
+				if(resizeDirection == 0) {
 					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
 					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
-				} else if(resizeDirection == 'left') {
+				} 
+
+				// No else if:s to enable diagonal resize (when resizeDirection is up and left at the same time)
+				if(resizeDirection & resizeDirections.left) {
 					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
 					selectedElement.width(selectedElementStartSize.width - e.delta.snapped.x);
-				} else if(resizeDirection == 'up') {
+				}
+				if(resizeDirection & resizeDirections.up) {
 					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
 					selectedElement.height(selectedElementStartSize.height - e.delta.snapped.y);
-				} else if(resizeDirection == 'right') {
+				}
+				if(resizeDirection & resizeDirections.right) {
 					selectedElement.width(selectedElementStartSize.width + e.delta.snapped.x);
-				} else if(resizeDirection == 'down') {
+				}
+				if(resizeDirection & resizeDirections.down) {
 					selectedElement.height(selectedElementStartSize.height + e.delta.snapped.y);
 				}
 
