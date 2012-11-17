@@ -20,12 +20,14 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 			if(DragDrop.current) {
 
-				var elm = new Element(renderToElement);
+				var elm = DragDrop.current.createElement(renderToElement);
 				elm.template = Templates.ElementGhost;
-				elm.x(e.position.snapped.x - (cellSize.width * 3));
-				elm.y(e.position.snapped.y - (cellSize.height * 3));
-				elm.width(DragDrop.current.width * cellSize.width);
-				elm.height(DragDrop.current.height * cellSize.height);
+				// set a x, y, width and height using the item type default 
+				// if the width is not set explicitly by the item type
+				if(isNaN(elm.x())) elm.x(e.position.snapped.x - (cellSize.width * 3));
+				if(isNaN(elm.y())) elm.y(e.position.snapped.y - (cellSize.height * 3));					
+				if(isNaN(elm.width())) elm.width(DragDrop.current.width * cellSize.width);
+				if(isNaN(elm.height())) elm.height(DragDrop.current.height * cellSize.height);
 				renderer.write(ElementCollection.getAsArray().concat(elm), renderToElement);
 
 			} else {
