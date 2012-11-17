@@ -8,7 +8,7 @@ Templates.Raw.Element = '
 	 	     	top: {{=it.y(null, "absolute")}}px;
 	 	     	width: {{=it.width(null, "absolute")}}px;
 	 	     	height: {{=it.height(null, "absolute")}}px;
-	 	     	background-color: {{=it.background}}">
+	 	     	background: {{=it.background}}">
 
 		<div class="content">
 			{{=it.contentTemplate(it)}}
