@@ -12,7 +12,9 @@ Library.elements = Library.elements || [];
         elm.contentType('Text');  
         elm.padding = 0; 
         elm.valign = 'top';  
-        elm.halign = 'left';  
+        elm.halign = 'left'; 
+        elm.background = 'transparent;'
+        elm.padding = 6;
         return elm;
     }
     

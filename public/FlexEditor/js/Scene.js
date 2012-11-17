@@ -163,6 +163,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			var keyUp = 38;
 			var keyRight = 39;
 			var keyDown = 40;
+			var keyEscape = 27;
 
 			// alt + shift + arrows: Resize current Element
 			if(e.altKey && e.shiftKey) {
@@ -188,6 +189,11 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(e.keyCode == keyRight) 	selectedElement.x(selectedElement.x() + cellSize.width);
 				if(e.keyCode == keyDown) 	selectedElement.y(selectedElement.y() + cellSize.height);
 				selectedElement.invalidate();
+			}
+
+			// escape: Remove current selection
+			if(e.keyCode == keyEscape) {
+				ElementCollection.select(null);
 			}
 		});
 	}

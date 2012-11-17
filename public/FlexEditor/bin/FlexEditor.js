@@ -1073,6 +1073,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			var keyUp = 38;
 			var keyRight = 39;
 			var keyDown = 40;
+			var keyEscape = 27;
 
 			// alt + shift + arrows: Resize current Element
 			if(e.altKey && e.shiftKey) {
@@ -1098,6 +1099,11 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(e.keyCode == keyRight) 	selectedElement.x(selectedElement.x() + cellSize.width);
 				if(e.keyCode == keyDown) 	selectedElement.y(selectedElement.y() + cellSize.height);
 				selectedElement.invalidate();
+			}
+
+			// escape: Remove current selection
+			if(e.keyCode == keyEscape) {
+				ElementCollection.select(null);
 			}
 		});
 	}
@@ -1442,7 +1448,9 @@ Library.elements = Library.elements || [];
         elm.contentType('Text');  
         elm.padding = 0; 
         elm.valign = 'top';  
-        elm.halign = 'left';  
+        elm.halign = 'left'; 
+        elm.background = 'transparent;'
+        elm.padding = 6;
         return elm;
     }
     
