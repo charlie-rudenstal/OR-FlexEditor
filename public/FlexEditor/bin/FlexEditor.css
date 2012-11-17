@@ -52,25 +52,28 @@ input:focus {
 	width: 170px;
 	/*background-color: #2b2b2b;*/
 	background-color: rgba(43, 43, 43, 0.4);
+    cursor: -webkit-grabbing !important; 
+    cursor: -moz-grabbing !important;
 }
-.element {
+.layer-element {
 	color: #bebebe;
 	font-size: 14px;
 	padding: 12px 10px;
 	text-shadow: 0px 1px #000;
+	cursor: default;
 }
 
-.element:hover {
+.layer-element:hover {
 	background-color: #3b3b3b;
 }
 
-.element-selected, .element-selected:hover  {
+.layer-element-selected, .layer-element-selected:hover  {
 	background-color: #d1d1d1;
 	color: #090909;
 	text-shadow: none;
 }
 
-.element-attributes {
+.layer-element-attributes {
 	float: right;
 }
 
@@ -145,6 +148,7 @@ input:focus {
 	padding: 6px;
 	text-align: center;
 	display: inline-block;
+	cursor: default;
 }
 
 .btn:hover {
@@ -269,13 +273,13 @@ input:focus {
 .resizeBox.resizeBox-middleright {
 	right: -3px;
 	top: 50%;
-	margin-top: -3px;
+	margin-top: -3px;	
 }
 
 .resizeBox.resizeBox-middletop {
 	top: -3px;
 	left: 50%;
-	margin-left: -3px;
+	margin-left: -3px;	
 }
 
 .resizeBox.resizeBox-middlebottom {
@@ -283,8 +287,6 @@ input:focus {
 	left: 50%;
 	margin-left: -3px;
 }
-
-
 
 
 

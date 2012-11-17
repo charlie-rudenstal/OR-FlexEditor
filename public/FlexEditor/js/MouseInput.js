@@ -40,7 +40,10 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		}
 
 		this.mousemove = function(e, position) {
-			$me.trigger({ type: 'mousemove', position: position, originalEvent: e });
+			$me.trigger({ type: 'mousemove', 
+						  position: position, 
+					      originalEvent: e,
+					      target: e.target });
 		}
 
 		this.dblclick = function(e, position) {

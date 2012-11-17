@@ -41,6 +41,8 @@ function Library(renderer) {
 	}
 
 	function onItemUp(e) {
+
+		$ghostLibraryElement = $(e.target).closest('.library-element');
 		$('.library-ghost').remove();
 		
 		// set timeout to let listeners of mouseup retrieve the dragdrop data before it's cleared

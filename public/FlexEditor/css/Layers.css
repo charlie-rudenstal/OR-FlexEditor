@@ -1,22 +1,23 @@
 
-.element {
+.layer-element {
 	color: #bebebe;
 	font-size: 14px;
 	padding: 12px 10px;
 	text-shadow: 0px 1px #000;
+	cursor: default;
 }
 
-.element:hover {
+.layer-element:hover {
 	background-color: #3b3b3b;
 }
 
-.element-selected, .element-selected:hover  {
+.layer-element-selected, .layer-element-selected:hover  {
 	background-color: #d1d1d1;
 	color: #090909;
 	text-shadow: none;
 }
 
-.element-attributes {
+.layer-element-attributes {
 	float: right;
 }
 

@@ -101,13 +101,13 @@
 .resizeBox.resizeBox-middleright {
 	right: -3px;
 	top: 50%;
-	margin-top: -3px;
+	margin-top: -3px;	
 }
 
 .resizeBox.resizeBox-middletop {
 	top: -3px;
 	left: 50%;
-	margin-left: -3px;
+	margin-left: -3px;	
 }
 
 .resizeBox.resizeBox-middlebottom {
@@ -115,8 +115,6 @@
 	left: 50%;
 	margin-left: -3px;
 }
-
-
 
 
 

@@ -4,4 +4,6 @@
 	width: 170px;
 	/*background-color: #2b2b2b;*/
 	background-color: rgba(43, 43, 43, 0.4);
+    cursor: -webkit-grabbing !important; 
+    cursor: -moz-grabbing !important;
 }

@@ -52,6 +52,7 @@
 	padding: 6px;
 	text-align: center;
 	display: inline-block;
+	cursor: default;
 }
 
 .btn:hover {
