@@ -9,7 +9,7 @@ Templates.Raw.PropertiesImage = '
 		<div class="properties">
 			<div class="property">
 				<div class="property-label">Url</div>
-				<div class="property-input"><input type="text" value="{{=it.element.image}}" data-property="image" /></div>
+				<div class="property-input"><input type="text" value="{{?it.element.image}}{{=it.element.image}}{{?}}" data-property="image" /></div>
 			</div>
 			<div class="property">
 				<div class="property-label">Bg</div>
