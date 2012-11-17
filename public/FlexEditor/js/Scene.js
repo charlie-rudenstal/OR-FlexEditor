@@ -41,7 +41,12 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					var resizeDown = relativeY >= element.height() - 8;
 
 					if(element.selected) {
-						if(resizeLeft) $renderToElement.css('cursor', 'w-resize');
+						if(resizeUp && resizeLeft) $renderToElement.css('cursor', 'nw-resize');
+						else if(resizeUp && resizeRight) $renderToElement.css('cursor', 'ne-resize');
+						else if(resizeDown && resizeLeft) $renderToElement.css('cursor', 'sw-resize');
+						else if(resizeDown && resizeRight) $renderToElement.css('cursor', 'se-resize');
+					
+						else if(resizeLeft) $renderToElement.css('cursor', 'w-resize');
 						else if(resizeUp) $renderToElement.css('cursor', 'n-resize');
 						else if(resizeRight) $renderToElement.css('cursor', 'e-resize');
 						else if(resizeDown) $renderToElement.css('cursor', 's-resize');
