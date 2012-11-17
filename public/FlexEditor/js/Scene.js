@@ -116,6 +116,13 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			}
 		})
 
+		// Clicks outside of the scene in the gray area should remove selection
+		// (Unfortunately this area is currently also named 'scene', change this)
+		$(renderToElement).closest('.scene').on('mousedown', function(e) {
+			// Only catch clicks that specifically hits the area outside of the editor
+			if($(e.target).is('.scene')) ElementCollection.select(null);
+		});
+
 		// Move elements if dragged
 		$(mouseInput).on('drag', function(e) {
 			var selectedElement = ElementCollection.getSelected();
