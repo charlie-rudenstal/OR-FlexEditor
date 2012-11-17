@@ -31,7 +31,7 @@ function Layers(renderer) {
 		$(window).keydown(function(e) {
 			var keyDown = 40;
 			var keyUp = 38;
-			if(e.shiftKey) {
+			if(e.shiftKey && !e.altKey) {
 				// Find which element in the layer list is selected
 				var selectedElement = ElementCollection.getSelected();
 				var selectedLayerIndex = -1;

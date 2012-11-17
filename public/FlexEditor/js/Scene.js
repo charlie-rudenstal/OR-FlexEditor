@@ -152,9 +152,10 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(e.keyCode == keyRight) 	selectedElement.width(selectedElement.width() + cellSize.width);
 				if(e.keyCode == keyDown) 	selectedElement.height(selectedElement.height() + cellSize.height);
 				selectedElement.invalidate();
-			
+			}
+
 			// alt + arrows: Move current Element
-			} else if(e.altKey) {
+			if(e.altKey && !e.shiftKey) {
 				// Find which element is selected and ignore if no selection
 				// Then move it!
 				var selectedElement = ElementCollection.getSelected();

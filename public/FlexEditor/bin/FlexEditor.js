@@ -1062,9 +1062,10 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(e.keyCode == keyRight) 	selectedElement.width(selectedElement.width() + cellSize.width);
 				if(e.keyCode == keyDown) 	selectedElement.height(selectedElement.height() + cellSize.height);
 				selectedElement.invalidate();
-			
+			}
+
 			// alt + arrows: Move current Element
-			} else if(e.altKey) {
+			if(e.altKey && !e.shiftKey) {
 				// Find which element is selected and ignore if no selection
 				// Then move it!
 				var selectedElement = ElementCollection.getSelected();
@@ -1259,7 +1260,7 @@ function Layers(renderer) {
 		$(window).keydown(function(e) {
 			var keyDown = 40;
 			var keyUp = 38;
-			if(e.shiftKey) {
+			if(e.shiftKey && !e.altKey) {
 				// Find which element in the layer list is selected
 				var selectedElement = ElementCollection.getSelected();
 				var selectedLayerIndex = -1;
