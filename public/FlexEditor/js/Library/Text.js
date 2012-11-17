@@ -15,6 +15,7 @@ Library.elements = Library.elements || [];
         elm.halign = 'left'; 
         elm.background = 'transparent;'
         elm.padding = 6;
+        elm.text = '';
         return elm;
     }
     

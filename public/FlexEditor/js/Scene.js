@@ -19,6 +19,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			$renderToElement.css('cursor', 'default');
 
 			if(DragDrop.current) {
+
 				var elm = new Element(renderToElement);
 				elm.template = Templates.ElementGhost;
 				elm.x(e.position.snapped.x - (cellSize.width * 3));
@@ -26,7 +27,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				elm.width(DragDrop.current.width * cellSize.width);
 				elm.height(DragDrop.current.height * cellSize.height);
 				renderer.write(ElementCollection.getAsArray().concat(elm), renderToElement);
-			
+
 			} else {
 
 				// Check if mouse is over a resize handle and update the mouse pointer accordingly
@@ -106,7 +107,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					if(resizeUp) resizeDirection |= resizeDirections.up;
 					if(resizeRight) resizeDirection |= resizeDirections.right;
 					if(resizeDown) resizeDirection |= resizeDirections.down;
-					console.log(resizeDirection);
 				} else {
 					ElementCollection.select(element);
 				}

@@ -30,7 +30,7 @@ function Main(options) {
 	$(ElementCollection).on('selection', function(e) {
 		var element = e.element;	
 		if(element) {
-			PropertyPanel.show(element, renderer, document.body, 190, 100);
+			PropertyPanel.show(element, renderer, document.body, 190, 47);
 		} else {
 			PropertyPanel.closeAll();
 		}

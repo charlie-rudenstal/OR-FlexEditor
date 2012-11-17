@@ -11,7 +11,7 @@ Templates.Raw.ElementGhost = '
 	 	     	width: {{=it.width(null, "absolute")}}px;
 	 	     	height: {{=it.height(null, "absolute")}}px;
 	 	     	background: none;
-	 	     	border: 1px solid {{=it.background}};
+	 	     	border: 1px solid #3276a9;
 	 	     	">
 
 	 	{{?it.image}}

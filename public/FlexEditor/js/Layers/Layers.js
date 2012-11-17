@@ -44,6 +44,9 @@ function Layers(renderer) {
 		$(window).keydown(function(e) {
 			var keyDown = 40;
 			var keyUp = 38;
+			var keyD = 68;
+
+			// shift + up/down will move elemnt selection up and down 
 			if(e.shiftKey && !e.altKey) {
 				// Find which element in the layer list is selected
 				var selectedElement = ElementCollection.getSelected();
@@ -62,6 +65,14 @@ function Layers(renderer) {
 					if(selectLayerIndex < 0) selectLayerIndex = loadedElements.length - 1;
 					ElementCollection.select(loadedElements[selectLayerIndex]);
 				}
+			}
+
+			// alt + d will duplicate current element
+			if(e.altKey && !e.shiftKey && e.keyCode == 68) {
+				var selectedElementOptions = ElementCollection.getSelected().getOptions();
+				var duplicateElement = new Element(selectedElementOptions.parent, selectedElementOptions);
+				ElementCollection.add(duplicateElement);
+				ElementCollection.select(duplicateElement);
 			}
 		});
 	}
