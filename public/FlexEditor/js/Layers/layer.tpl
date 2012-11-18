@@ -22,7 +22,7 @@ Templates.Raw.Layer = '
 		{{?it.text}}
 			{{=it.text}}
 		{{??}}
-			{{=it.contentType()}} Element
+			{{=it.property("contentType")}} Element
 		{{?}}
 	</div>
 

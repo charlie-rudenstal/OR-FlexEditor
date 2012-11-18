@@ -10,7 +10,7 @@ var PropertyPanel = (function(me) {
 		
 		function render() {
 
-			var templateName = 'Properties' + element.contentType();
+			var templateName = 'Properties' + element.property('contentType');
 			var template = Templates[templateName];
 			if(!template) console.log("Warning: Property Template for Element type ", element.type, "not found");
 
@@ -23,7 +23,7 @@ var PropertyPanel = (function(me) {
 		$('.propertyPanel').on('keyup', 'input[data-property]', function(e) {
 			var input = $(e.currentTarget);
 			var property = input.data('property');			
-			element[property] = input.val();
+			element.property(property, input.val());
 			element.invalidate();
 		});
 

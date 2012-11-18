@@ -8,7 +8,7 @@ Templates.Raw.ElementSelected = '
 	 	     	top: {{=it.y(null, "absolute")}}px;
 	 	     	width: {{=it.width(null, "absolute")}}px;
 	 	     	height: {{=it.height(null, "absolute")}}px;
-	 	     	background: {{=it.background}}
+	 	     	background: {{=it.property("background")}}
 	 	     	">
 
 		<div class="content">

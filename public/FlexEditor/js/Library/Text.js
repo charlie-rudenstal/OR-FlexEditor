@@ -8,15 +8,14 @@ Library.elements = Library.elements || [];
 
     me.createElement = function(renderToElement) {
         var elm = new Element(renderToElement);
-        elm.template = Templates.Element;
-        elm.contentType('Text');  
-        elm.padding = 0; 
-        elm.valign = 'top';  
-        elm.halign = 'left'; 
-        elm.background = 'transparent;'
-        elm.foreground = 'white';
-        elm.padding = 0; //6;
-        elm.text = '';
+        elm.property('contentType', 'Text');  
+        elm.property('padding', 0); 
+        elm.property('valign', 'top');  
+        elm.property('halign', 'left');
+        elm.property('background', 'transparent');
+        elm.property('foreground', 'white');
+        elm.property('padding', 0);
+        elm.property('text', '');
         return elm;
     }
     

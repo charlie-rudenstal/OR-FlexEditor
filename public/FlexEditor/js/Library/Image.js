@@ -9,12 +9,11 @@ Library.elements = Library.elements || [];
 
     me.createElement = function(renderToElement) {
         var elm = new Element(renderToElement);
-        elm.template = Templates.Element;
-        elm.contentType('Image');  
-        elm.background = 'transparent';  
-        elm.valign = 'top';  
-        elm.halign = 'left';  
-        elm.stretch = 'width';
+        elm.property('contentType', 'Image');  
+        elm.property('background', 'transparent');  
+        elm.property('valign', 'top');  
+        elm.property('halign', 'left');  
+        elm.property('stretch', 'width');
         return elm;
     }
 

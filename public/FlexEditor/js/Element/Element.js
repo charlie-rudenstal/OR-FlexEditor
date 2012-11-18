@@ -1,30 +1,48 @@
 function Element(parent, options) {
+	
+
 	if(parent == null) throw "Parent for Element cannot be null";
 	options = options || {};
-	this.template = Templates.Element;
+	this.properties = {};
 
-	// Parent
-	this.parent = parent;
-	this.parentWidth = $(parent).width();
-	this.parentHeight = $(parent).height(); 
+	$(this).on('contentTypeChange', this.onContentTypeChanged);
 
-	// ID and text
-	this.id = Element.idCounter++;
-
-	// Type of Element (based on Text, Image etc)
-	this.contentType(options._contentType || 'Text');
+	this.property('id', options.id || Element.idCounter++);
+	this.property('positionType', options.positionType || 'absolute');
+	this.property('parent', parent);
 	
-	// Position
-	this.positionType = options.positionType || 'absolute';
-
+	this.parentWidth = $(parent).width();
+	this.parentHeight = $(parent).height();
+	this.template = Templates.Element;
 	this.selected = false;
 
-	for(var i in options) {
-		if(typeof this[i] == 'undefined') this[i] = options[i];
-	}
+	// for(var key in options) {
+	// 	if(this.hasProperty(key) == false) {
+	// 		this.property(key, options[key]);
+	// 	}
+	// }
+
+
 };
 
 Element.idCounter = 0;
+
+Element.prototype.properties = {};
+
+Element.prototype.property = function(key, value) {
+	if(value == null) {
+		return this.properties[key];
+	} else {
+		if(this.properties[key] != value) {
+			this.properties[key] = value;
+			$(this).trigger(key + 'Change'); // widthChange, paddingChange etc
+		}
+	}
+}
+
+Element.prototype.hasProperty = function(key) {
+	return this.propeties.hasOwnProperty(key);
+}
 
 Element.prototype.select = function() {
 	this.template = Templates.ElementSelected;
@@ -36,19 +54,18 @@ Element.prototype.blur = function() {
 	this.selected = false;
 }
 
-Element.prototype.contentType = function(value) {
-	if(value) {
-		this._contentType = value;
-		this.contentTemplate = Templates['ElementType' + value];
-		if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', value);
-	} else {
-		return this._contentType;
-	}
+Element.prototype.onContentTypeChanged = function() {
+	console.log("contentTypeChange");
+	var contentType = this.property('contentType');
+	this.contentTemplate = Templates['ElementType' + contentType];
+	if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', value);
+	console.log(this);
 }
 
 // Should be called after raw attributes has been changed, like for example text
 // to notify this object and other listener about the change
-Element.prototype.invalidate = function() {
+Element.prototype.invalidate = function(property) {
+	if(property) $(this).trigger('change' + property);
 	$(this).trigger('change');
 }
 
@@ -74,7 +91,7 @@ Element.prototype.x = function(value, positionType) {
 		if(value < 0) value = 0;
 		if(value != this._x) {
 			this._x = value;
-			this.invalidate();
+			this.invalidate('x');
 		}
 	}
 };
@@ -89,7 +106,7 @@ Element.prototype.y = function(value, positionType) {
 		if(value < 0) value = 0;
 		if(value != this._y) {
 			this._y = value;
-			this.invalidate();
+			this.invalidate('y');
 		}
 	}
 };
@@ -103,7 +120,7 @@ Element.prototype.width = function(value, positionType) {
 		if(positionType != "relative")	value = value / this.parentWidth * 100; 
 		if(value != this._width) {
 			this._width = value;
-			this.invalidate();	
+			this.invalidate('width');	
 		}
 	}
 };
@@ -117,7 +134,7 @@ Element.prototype.height = function(value, positionType) {
 		if(positionType != "relative") value = value / this.parentHeight * 100;
 		if(value != this._height) {
 			this._height = value;
-			this.invalidate();
+			this.invalidate('height');
 		}
 };
 

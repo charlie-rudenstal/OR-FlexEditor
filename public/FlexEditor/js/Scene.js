@@ -31,6 +31,9 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(isNaN(elm.y())) elm.y(e.position.snapped.y - (cellSize.height * 3));					
 				if(isNaN(elm.width())) elm.width(DragDrop.current.width * cellSize.width);
 				if(isNaN(elm.height())) elm.height(DragDrop.current.height * cellSize.height);
+
+				// TODO: Create a temporary real element instead so that rendering can be limited
+				// to only when the element properties has been changed
 				renderer.write(ElementCollection.getAsArray().concat(elm), renderToElement);
 
 			} else {

@@ -41,17 +41,16 @@ function Main(options) {
 
 		// Add the default Background layer
         var elm = new Element(elmEditor);
-        elm.template = Templates.Element;
-        elm.contentType('Image');
-        elm.background = 'transparent';        
-        elm.valign = 'top';
-        elm.halign = 'left';
-        elm.stretch = 'width';
-        elm.text = "Background";
-        elm.locked = true;
-        elm.positionType = 'relative';
-        elm.width(100, 'relative');
-        elm.height(100, 'relative');
+        elm.property('contentType', 'Image');
+        elm.property('background', 'transparent');        
+        elm.property('valign', 'top');
+        elm.property('halign', 'left');
+        elm.property('stretch', 'width');
+        elm.property('text', "Background");
+        elm.property('locked', true);
+        elm.property('positionType', 'relative');
+        elm.width('width', 100, 'relative');
+        elm.height('height', 100, 'relative');
         ElementCollection.add(elm);
 	};
  
