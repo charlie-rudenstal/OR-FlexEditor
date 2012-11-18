@@ -3,9 +3,9 @@ function Grid(renderer, options) {
 	this.gridTemplate = Templates.Grid;
 	
 	var options = options || {};
-	this.cellSize = options.cellSize || { width: 5, height: 5 };
-	this.width = options.width || 12;
-	this.height = options.height || 25;
+	this.cellSize = options.cellSize;
+	this.width = options.size.cols * this.cellSize.width;
+	this.height = options.size.rows * this.cellSize.height;
 };
 
 (function(me) {
@@ -20,8 +20,8 @@ function Grid(renderer, options) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
 
-		element.style.width = this.width * this.cellSize.width + 1 + 'px';
-		element.style.height = this.height * this.cellSize.height + 1 + 'px';
+		element.style.width = this.width + 1 + 'px';
+		element.style.height = this.height + 1 + 'px';
 
 		this.renderer.write({ 
 			cellSize: this.cellSize, 

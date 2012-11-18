@@ -29,9 +29,12 @@ var PropertyPanel = (function(me) {
 
 		// A click on an element with the class .btn-delete in the properties template is treated as a delete button 
 		$('.propertyPanel').on('click', '.btn-delete', removeElement);
+
+		// shift + delete or shift + backspace will delete the current element
 		$('body').on('keydown.propertyPanel', function(e) {
 			var keyDelete = 46;
-			if(e.shiftKey && e.keyCode == keyDelete) {
+			var keyBackspace = 8;
+			if(e.shiftKey && (e.keyCode == keyDelete || e.keyCode == keyBackspace)) {
 				removeElement();
 			}
 		});

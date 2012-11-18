@@ -11,17 +11,17 @@ function Main(options) {
 	var width = options.width || 12;
 	var height = options.height || 25;
 
-	var size = { width: width * cellSize.width, 
-				 height: height * cellSize.height }
+	var size = { cols: options.width || 12,
+				 rows: options.height || 25 };
 
 	// Resize the editor element to match the size specified in options
-	elmEditor.style.width = size.width + 'px';
-	elmEditor.style.height = size.height + 'px';
+	elmEditor.style.width = size.cols * cellSize.width + 'px';
+	elmEditor.style.height = size.rows * cellSize.height + 'px';
 
 	// Initialize modules 
 	var interactions = new Interactions();
 	var renderer = new Renderer();
-	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
+	var grid = new Grid(renderer, { cellSize: cellSize, size: size });
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
 	var scene = new Scene(renderer, elmEditor, size, cellSize);
@@ -35,7 +35,6 @@ function Main(options) {
 			PropertyPanel.closeAll();
 		}
 	});
-
 
 	me.load = function() {
 		scene.init();

@@ -5,6 +5,9 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 	var resizeDirection = 0;
 	var resizeDirections = { left: 1, up: 2, right: 4, down: 8 };
 
+	var width = size.cols * cellSize.width;
+	var height = size.rows * cellSize.height;
+
 	var $renderToElement = $(renderToElement);
 
 	me.init = function() {
@@ -65,8 +68,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 		// If a element from the library is dropped over the scene, then create it
 		$(mouseInput).on('mouseup', function(e) {
-			var isInsideScene = e.position.absolute.x < size.width &&
-								e.position.absolute.y < size.height;
+			var isInsideScene = e.position.absolute.x < width &&
+								e.position.absolute.y < height;
 			
 			resizeDirection = 0;
 			if(DragDrop.current) {
@@ -166,6 +169,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			var keyRight = 39;
 			var keyDown = 40;
 			var keyEscape = 27;
+			var keyE = 69;
 
 			// alt + shift + arrows: Resize current Element
 			if(e.altKey && e.shiftKey) {
@@ -191,6 +195,31 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(e.keyCode == keyRight) 	selectedElement.x(selectedElement.x() + cellSize.width);
 				if(e.keyCode == keyDown) 	selectedElement.y(selectedElement.y() + cellSize.height);
 				selectedElement.invalidate();
+			}
+
+			 // ctrl + number keys: Create an element with the corresponding index from the library
+			 if(e.ctrlKey && e.keyCode > 48 && e.keyCode < 58) {
+
+				// get the element from library by index
+				var libraryElementIndex = e.keyCode - 49;
+				var libraryElement = null;
+				var i = 0;
+				for(var key in Library.elements) {
+					if(i++ == libraryElementIndex) libraryElement = Library.elements[key];
+				}
+				if(!libraryElement) return;
+				var elm = libraryElement.createElement(renderToElement);
+				if(isNaN(elm.width())) elm.width(4 * cellSize.width);
+				if(isNaN(elm.height())) elm.height(4 * cellSize.height);
+				if(isNaN(elm.x())) elm.x((~~(size.cols / 2) - 2) * cellSize.width);
+				if(isNaN(elm.y())) elm.y((~~(size.rows / 2) - 2) * cellSize.height);					
+				ElementCollection.add(elm);
+				ElementCollection.select(elm);
+			}
+
+			// alt + e will print an array of the current Elements to the console
+			if(e.altKey && e.keyCode == keyE) {
+				console.log(ElementCollection.getAsArray());
 			}
 
 			// escape: Remove current selection

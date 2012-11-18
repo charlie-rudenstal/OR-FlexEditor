@@ -12,17 +12,17 @@
 	var width = options.width || 12;
 	var height = options.height || 25;
 
-	var size = { width: width * cellSize.width, 
-				 height: height * cellSize.height }
+	var size = { cols: options.width || 12,
+				 rows: options.height || 25 };
 
 	// Resize the editor element to match the size specified in options
-	elmEditor.style.width = size.width + 'px';
-	elmEditor.style.height = size.height + 'px';
+	elmEditor.style.width = size.cols * cellSize.width + 'px';
+	elmEditor.style.height = size.rows * cellSize.height + 'px';
 
 	// Initialize modules 
 	var interactions = new Interactions();
 	var renderer = new Renderer();
-	var grid = new Grid(renderer, { cellSize: cellSize, width: width, height: height });
+	var grid = new Grid(renderer, { cellSize: cellSize, size: size });
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
 	var scene = new Scene(renderer, elmEditor, size, cellSize);
@@ -36,7 +36,6 @@
 			PropertyPanel.closeAll();
 		}
 	});
-
 
 	me.load = function() {
 		scene.init();
@@ -848,9 +847,9 @@ function Grid(renderer, options) {
 	this.gridTemplate = Templates.Grid;
 	
 	var options = options || {};
-	this.cellSize = options.cellSize || { width: 5, height: 5 };
-	this.width = options.width || 12;
-	this.height = options.height || 25;
+	this.cellSize = options.cellSize;
+	this.width = options.size.cols * this.cellSize.width;
+	this.height = options.size.rows * this.cellSize.height;
 };
 
 (function(me) {
@@ -865,8 +864,8 @@ function Grid(renderer, options) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
 
-		element.style.width = this.width * this.cellSize.width + 1 + 'px';
-		element.style.height = this.height * this.cellSize.height + 1 + 'px';
+		element.style.width = this.width + 1 + 'px';
+		element.style.height = this.height + 1 + 'px';
 
 		this.renderer.write({ 
 			cellSize: this.cellSize, 
@@ -931,6 +930,9 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 	var resizeDirection = 0;
 	var resizeDirections = { left: 1, up: 2, right: 4, down: 8 };
 
+	var width = size.cols * cellSize.width;
+	var height = size.rows * cellSize.height;
+
 	var $renderToElement = $(renderToElement);
 
 	me.init = function() {
@@ -991,8 +993,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 		// If a element from the library is dropped over the scene, then create it
 		$(mouseInput).on('mouseup', function(e) {
-			var isInsideScene = e.position.absolute.x < size.width &&
-								e.position.absolute.y < size.height;
+			var isInsideScene = e.position.absolute.x < width &&
+								e.position.absolute.y < height;
 			
 			resizeDirection = 0;
 			if(DragDrop.current) {
@@ -1092,6 +1094,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			var keyRight = 39;
 			var keyDown = 40;
 			var keyEscape = 27;
+			var keyE = 69;
 
 			// alt + shift + arrows: Resize current Element
 			if(e.altKey && e.shiftKey) {
@@ -1117,6 +1120,31 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(e.keyCode == keyRight) 	selectedElement.x(selectedElement.x() + cellSize.width);
 				if(e.keyCode == keyDown) 	selectedElement.y(selectedElement.y() + cellSize.height);
 				selectedElement.invalidate();
+			}
+
+			 // ctrl + number keys: Create an element with the corresponding index from the library
+			 if(e.ctrlKey && e.keyCode > 48 && e.keyCode < 58) {
+
+				// get the element from library by index
+				var libraryElementIndex = e.keyCode - 49;
+				var libraryElement = null;
+				var i = 0;
+				for(var key in Library.elements) {
+					if(i++ == libraryElementIndex) libraryElement = Library.elements[key];
+				}
+				if(!libraryElement) return;
+				var elm = libraryElement.createElement(renderToElement);
+				if(isNaN(elm.width())) elm.width(4 * cellSize.width);
+				if(isNaN(elm.height())) elm.height(4 * cellSize.height);
+				if(isNaN(elm.x())) elm.x((~~(size.cols / 2) - 2) * cellSize.width);
+				if(isNaN(elm.y())) elm.y((~~(size.rows / 2) - 2) * cellSize.height);					
+				ElementCollection.add(elm);
+				ElementCollection.select(elm);
+			}
+
+			// alt + e will print an array of the current Elements to the console
+			if(e.altKey && e.keyCode == keyE) {
+				console.log(ElementCollection.getAsArray());
 			}
 
 			// escape: Remove current selection
@@ -1382,9 +1410,12 @@ function Layers(renderer) {
 
 		// A click on an element with the class .btn-delete in the properties template is treated as a delete button 
 		$('.propertyPanel').on('click', '.btn-delete', removeElement);
+
+		// shift + delete or shift + backspace will delete the current element
 		$('body').on('keydown.propertyPanel', function(e) {
 			var keyDelete = 46;
-			if(e.shiftKey && e.keyCode == keyDelete) {
+			var keyBackspace = 8;
+			if(e.shiftKey && (e.keyCode == keyDelete || e.keyCode == keyBackspace)) {
 				removeElement();
 			}
 		});
