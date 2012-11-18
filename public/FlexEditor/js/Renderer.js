@@ -17,8 +17,8 @@ function Renderer(options) {
 	 * 	 width: 30, height: 20 
 	 * }
 	 */
-
 	me.prototype.render = function(items, defaultTemplate, alwaysUseDefaultTemplate) {
+		
 		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array

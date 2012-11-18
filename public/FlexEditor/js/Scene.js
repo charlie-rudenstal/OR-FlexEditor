@@ -153,7 +153,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					selectedElement.height(selectedElementStartSize.height + e.delta.snapped.y);
 				}
 
-				me.render(ElementCollection.getAsArray());
 
 			}
 		});

@@ -741,8 +741,8 @@ function MouseInput(element, cellSize, relativeToScreen) {
 	 * 	 width: 30, height: 20 
 	 * }
 	 */
-
 	me.prototype.render = function(items, defaultTemplate, alwaysUseDefaultTemplate) {
+		
 		items = items || this.items || [{}];
 
 		// Allow a single element by turning it into an array
@@ -1079,7 +1079,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					selectedElement.height(selectedElementStartSize.height + e.delta.snapped.y);
 				}
 
-				me.render(ElementCollection.getAsArray());
 
 			}
 		});
@@ -1218,8 +1217,10 @@ Element.prototype.x = function(value, positionType) {
 	} else { 
 		if(positionType != "relative") value = value / this.parentWidth * 100;
 		if(value < 0) value = 0;
-		//if(value + this._width <= 100) 
-		this._x = value;
+		if(value != this._x) {
+			this._x = value;
+			this.invalidate();
+		}
 	}
 };
 
@@ -1231,8 +1232,10 @@ Element.prototype.y = function(value, positionType) {
 	} else { 
 		if(positionType != "relative") value = value / this.parentHeight * 100;
 		if(value < 0) value = 0;
-		//if(value + this._height <= 100) 
-		this._y = value;
+		if(value != this._y) {
+			this._y = value;
+			this.invalidate();
+		}
 	}
 };
 
@@ -1242,9 +1245,11 @@ Element.prototype.width = function(value, positionType) {
 			 return this._width;
 		else return this._width / 100 * this.parentWidth;
 	else {
-		if(positionType == "relative")		
-			 this._width = value;
-		else this._width = value / this.parentWidth * 100;	
+		if(positionType != "relative")	value = value / this.parentWidth * 100; 
+		if(value != this._width) {
+			this._width = value;
+			this.invalidate();	
+		}
 	}
 };
 
@@ -1254,9 +1259,11 @@ Element.prototype.height = function(value, positionType) {
 			 return this._height;
 		else return this._height / 100 * this.parentHeight;
 	else 
-		if(positionType == "relative") 
-			 this._height = value;
-		else this._height = value / this.parentHeight * 100;
+		if(positionType != "relative") value = value / this.parentHeight * 100;
+		if(value != this._height) {
+			this._height = value;
+			this.invalidate();
+		}
 };
 
 function Layers(renderer) {
