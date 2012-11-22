@@ -2,10 +2,8 @@
 var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; 
 Templates.Raw.ElementGhost = '
 
-	<div id="element_{{=it.id}}" 
-	 	 class="component button {{=it.resizeDir}} 
-	 		    {{?it.isMoving}}isMoving{{?}}
-	 	     	{{?it.image}}hasImage{{?}}"
+	<div id="element_{{=it.property("id")}}" 
+	 	 class="component button"
 	 	 style="left: {{=it.x(null, "absolute")}}px;
 	 	     	top: {{=it.y(null, "absolute")}}px;
 	 	     	width: {{=it.width(null, "absolute")}}px;

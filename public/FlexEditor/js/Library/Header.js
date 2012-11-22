@@ -8,7 +8,7 @@ Library.elements = Library.elements || [];
     }
 
     me.createElement = function(renderToElement) {
-        var elm = new Element(renderToElement);
+        var elm = ElementCollection.create(renderToElement);
         elm.property('contentType', 'Text');
         elm.property('background', '-webkit-linear-gradient(top, #333333 0%, #303030 50%, #292929 51%, #202020 100%);');
         elm.property('foreground', 'white');
@@ -21,15 +21,16 @@ Library.elements = Library.elements || [];
         elm.x(0, 'relative');
         elm.y(0, 'relative');
         elm.width(100, 'relative');
-
+        elm.height(3, 'cells');
         return elm;
     }
 
     me.key = "Header";
     me.title = 'Header';
     me.description = 'A predefined Titlebar';
-    me.width = 20;
-    me.height = 3;
+
+    me.lockedX = true;
+    me.lockedY = true;
 
     Library.elements[me.key] = me;
 })();

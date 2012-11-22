@@ -2,9 +2,27 @@ var ElementCollection = (function(me) {
 
 	var elements = {};
 	var selectedElement;
+	var ghostId = null;
+	var cellSize = null;
 
-	me.add = function(element) {
+	me.setCellSize = function(pCellSize) {
+		cellSize = pCellSize;
+	}
+
+	me.create = function(parent) {
+		return new Element(parent, {cellSize: cellSize});
+	}
+
+	// add an element to the collection. isGhost can be specified to keep
+	// track of which ID:s are drag&drop ghosts which will simplify removal of these 
+	// temporary elements. could be generalized later to some kind of 'delete by tag' 
+	// or 'modify by tag' when/if needed
+	me.add = function(element, isGhost) {
 		elements[element.property('id')] = element;
+		if(isGhost) {
+			ghostId = element.property('id');
+			element.template = Templates.ElementGhost;
+		}
 		$(element).on('change', function() { $(me).trigger('change'); });
 		$(me).trigger('change');
 	}
@@ -12,8 +30,30 @@ var ElementCollection = (function(me) {
 	me.remove = function(element) {
 		elements[element.id] = null;
 		delete elements[element.id];
-		console.log(elements);
 		$(me).trigger('change');
+
+		// we need to update the results of hasGhost if user removed 
+		// the ghost by other means than removeGhost
+		if(element.id == ghostId) ghostId = null;
+	}
+
+	me.removeGhost = function() {
+		me.remove({id: ghostId});
+		ghostId = null;
+	}
+
+	me.convertGhostToElement = function() {
+		var ghost = elements[ghostId];
+		ghostId = null;
+		ghost.property('contentType', ghost.property('contentType'));
+	}
+
+	me.getGhost = function() {
+		return elements[ghostId];
+	}
+
+	me.hasGhost = function() {
+		return ghostId != null;
 	}
 
 	me.select = function(elementToSelect) {

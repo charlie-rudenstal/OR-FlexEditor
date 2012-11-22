@@ -26,6 +26,7 @@ function Main(options) {
 	var layers = new Layers(renderer);
 	var scene = new Scene(renderer, elmEditor, size, cellSize);
 
+	ElementCollection.setCellSize(cellSize);
 	$(ElementCollection).on('change', function() { me.render(); });
 	$(ElementCollection).on('selection', function(e) {
 		var element = e.element;	
@@ -40,7 +41,7 @@ function Main(options) {
 		scene.init();
 
 		// Add the default Background layer
-        var elm = new Element(elmEditor);
+        var elm = ElementCollection.create(elmEditor);
         elm.property('contentType', 'Image');
         elm.property('background', 'transparent');        
         elm.property('valign', 'top');
@@ -49,8 +50,10 @@ function Main(options) {
         elm.property('text', "Background");
         elm.property('locked', true);
         elm.property('positionType', 'relative');
-        elm.width('width', 100, 'relative');
-        elm.height('height', 100, 'relative');
+        elm.x(0);
+        elm.y(0);
+        elm.width(100, 'relative');
+        elm.height(100, 'relative');
         ElementCollection.add(elm);
 	};
  

@@ -70,6 +70,7 @@ function Layers(renderer) {
 			if(e.altKey && !e.shiftKey && e.keyCode == 68) {
 				var selectedElementOptions = ElementCollection.getSelected().getOptions();
 				var duplicateElement = new Element(selectedElementOptions.parent, selectedElementOptions);
+				duplicateElement.generateNewId(); // Otherwise the new element will inherit the id from the old dupliate
 				ElementCollection.add(duplicateElement);
 				ElementCollection.select(duplicateElement);
 			}

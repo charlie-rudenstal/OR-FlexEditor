@@ -22,18 +22,16 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 			if(DragDrop.current) {
 
-				var elm = DragDrop.current.createElement(renderToElement);
-				elm.template = Templates.ElementGhost;
+				if(ElementCollection.hasGhost() == false) {
+					var elm = DragDrop.current.createElement(renderToElement);
+					ElementCollection.add(elm, 'ghost');
+				}
+
+				var ghost = ElementCollection.getGhost();
 				// set a x, y, width and height using the item type default 
 				// if the width is not set explicitly by the item type
-				if(isNaN(elm.x())) elm.x(e.position.snapped.x - (cellSize.width * 3));
-				if(isNaN(elm.y())) elm.y(e.position.snapped.y - (cellSize.height * 3));					
-				if(isNaN(elm.width())) elm.width(DragDrop.current.width * cellSize.width);
-				if(isNaN(elm.height())) elm.height(DragDrop.current.height * cellSize.height);
-
-				// TODO: Create a temporary real element instead so that rendering can be limited
-				// to only when the element properties has been changed
-				renderer.write(ElementCollection.getAsArray().concat(elm), renderToElement);
+				if(!DragDrop.current.lockedX) ghost.x(e.position.snapped.x - (cellSize.width * 3));
+				if(!DragDrop.current.lockedY) ghost.y(e.position.snapped.y - (cellSize.height * 3));					
 
 			} else {
 
@@ -76,14 +74,16 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			resizeDirection = 0;
 			if(DragDrop.current) {
 				if(isInsideScene) {					
-					var elm = DragDrop.current.createElement(renderToElement);
+					//var elm = DragDrop.current.createElement(renderToElement);
 					// set a x, y, width and height using the item type default 
 					// if the width is not set explicitly by the item type
-					if(isNaN(elm.x())) elm.x(e.position.snapped.x - (cellSize.width * 3));
-					if(isNaN(elm.y())) elm.y(e.position.snapped.y - (cellSize.height * 3));					
-					if(isNaN(elm.width())) elm.width(DragDrop.current.width * cellSize.width);
-					if(isNaN(elm.height())) elm.height(DragDrop.current.height * cellSize.height);
-					ElementCollection.add(elm);
+					
+					var elm = ElementCollection.getGhost();
+					ElementCollection.convertGhostToElement();
+					// if(!DragDrop.current.lockedX) elm.x(e.position.snapped.x - (cellSize.width * 3));
+					// if(!DragDrop.current.lockedY) elm.y(e.position.snapped.y - (cellSize.height * 3));					
+
+					// ElementCollection.add(elm);
 					ElementCollection.select(elm);
 				} else {
 					// Render just to get rid of the ghost element if the mouse was 
@@ -138,24 +138,24 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 				// No resize is in progress, move the element on drag
 				if(resizeDirection == 0) {
-					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
-					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
+					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x, 'absolute');
+					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y, 'absolute');
 				} 
 
 				// No else if:s to enable diagonal resize (when resizeDirection is up and left at the same time)
 				if(resizeDirection & resizeDirections.left) {
-					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x);
-					selectedElement.width(selectedElementStartSize.width - e.delta.snapped.x);
+					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x, 'absolute');
+					selectedElement.width(selectedElementStartSize.width - e.delta.snapped.x, 'absolute');
 				}
 				if(resizeDirection & resizeDirections.up) {
-					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y);
-					selectedElement.height(selectedElementStartSize.height - e.delta.snapped.y);
+					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y, 'absolute');
+					selectedElement.height(selectedElementStartSize.height - e.delta.snapped.y, 'absolute');
 				}
 				if(resizeDirection & resizeDirections.right) {
-					selectedElement.width(selectedElementStartSize.width + e.delta.snapped.x);
+					selectedElement.width(selectedElementStartSize.width + e.delta.snapped.x, 'absolute');
 				}
 				if(resizeDirection & resizeDirections.down) {
-					selectedElement.height(selectedElementStartSize.height + e.delta.snapped.y);
+					selectedElement.height(selectedElementStartSize.height + e.delta.snapped.y, 'absolute');
 				}
 
 
@@ -241,7 +241,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		for(var i in elements) {
 			if(domElement.id == 'element_' + elements[i].property("id")) {
 				// Elements that are locked should not be selectable
-				if(!elements[i].locked) return elements[i];
+				if(!elements[i].property('locked')) return elements[i];
 			}
 		}
 	}
