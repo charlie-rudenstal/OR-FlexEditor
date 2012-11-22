@@ -20,6 +20,10 @@ Templates.Raw.PropertiesImage = '
 				<div class="property-input"><input type="text" value="{{=it.element.property("stretch")}}" data-property="stretch" /></div>
 			</div>
 			<div class="property">
+				<div class="property-label">Autosize</div>
+				<div class="property-input"><input type="text" value="{{=it.element.property("autosize")}}" data-property="autosize" /></div>
+			</div>
+			<div class="property">
 				<div class="property-label">Valign</div>
 				<div class="property-input"><input type="text" value="{{=it.element.property("valign")}}" data-property="valign" /></div>
 			</div>

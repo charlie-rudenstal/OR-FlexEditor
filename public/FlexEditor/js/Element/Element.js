@@ -37,6 +37,8 @@ Element.prototype.property = function(key, value) {
 		return this.properties[key];
 	} else {
 		if(this.properties[key] != value) {
+			if(value == 'true') value = true;
+			if(value == 'false') value = false;
 			this.properties[key] = value;
 			$(this).trigger(key + 'Change'); // widthChange, paddingChange etc
 		}
@@ -74,7 +76,7 @@ Element.prototype.onContentTypeChanged = function() {
 // Should be called after raw attributes has been changed, like for example text
 // to notify this object and other listener about the change
 Element.prototype.invalidate = function(property) {
-	if(property) $(this).trigger('change' + property);
+	if(property) $(this).trigger(property + 'Change');
 	$(this).trigger('change');
 }
 
@@ -107,7 +109,7 @@ Element.prototype.x = function(value, positionType) {
 		}
 	} else { 
 		if(positionType != "relative") value = value / this.parentWidth * 100;
-		if(value < 0) value = 0;
+		//if(value < 0) value = 0;
 		if(value != this._x) {
 			this._x = value;
 			this.invalidate('x');
@@ -122,7 +124,7 @@ Element.prototype.y = function(value, positionType) {
 		else return this._y / 100 * this.parentHeight;			
 	} else { 
 		if(positionType != "relative") value = value / this.parentHeight * 100;
-		if(value < 0) value = 0;
+		//if(value < 0) value = 0;
 		if(value != this._y) {
 			this._y = value;
 			this.invalidate('y');

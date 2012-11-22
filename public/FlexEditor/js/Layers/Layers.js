@@ -67,7 +67,7 @@ function Layers(renderer) {
 			}
 
 			// alt + d will duplicate current element
-			if(e.altKey && !e.shiftKey && e.keyCode == 68) {
+			if(e.altKey && !e.shiftKey && e.keyCode == keyD) {
 				var selectedElementOptions = ElementCollection.getSelected().getOptions();
 				var duplicateElement = new Element(selectedElementOptions.parent, selectedElementOptions);
 				duplicateElement.generateNewId(); // Otherwise the new element will inherit the id from the old dupliate

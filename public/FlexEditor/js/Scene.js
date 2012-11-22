@@ -28,13 +28,13 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				}
 
 				var ghost = ElementCollection.getGhost();
+				
 				// set a x, y, width and height using the item type default 
 				// if the width is not set explicitly by the item type
 				if(!DragDrop.current.lockedX) ghost.x(e.position.snapped.x - (cellSize.width * 3));
 				if(!DragDrop.current.lockedY) ghost.y(e.position.snapped.y - (cellSize.height * 3));					
-
+	
 			} else {
-
 				// Check if mouse is over a resize handle and update the mouse pointer accordingly
 				var domElement = $(e.target).closest('.component').get(0);
 				var element = getElementByDomElement(domElement);
@@ -85,9 +85,11 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 					// ElementCollection.add(elm);
 					ElementCollection.select(elm);
-				} else {
+				
+				} else if (ElementCollection.hasGhost()) {
 					// Render just to get rid of the ghost element if the mouse was 
 					// slightly outside of the scene, but with a part of the element inside
+					ElementCollection.removeGhost();
 					me.render(ElementCollection.getAsArray());
 				}
 			}
@@ -135,7 +137,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		$(mouseInput).on('drag', function(e) {
 			var selectedElement = ElementCollection.getSelected();
 			if(selectedElement) {
-
 				// No resize is in progress, move the element on drag
 				if(resizeDirection == 0) {
 					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x, 'absolute');
@@ -157,8 +158,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(resizeDirection & resizeDirections.down) {
 					selectedElement.height(selectedElementStartSize.height + e.delta.snapped.y, 'absolute');
 				}
-
-
 			}
 		});
 	};

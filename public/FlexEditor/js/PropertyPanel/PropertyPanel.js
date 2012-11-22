@@ -9,7 +9,6 @@ var PropertyPanel = (function(me) {
 		render();
 		
 		function render() {
-
 			var templateName = 'Properties' + element.property('contentType');
 			var template = Templates[templateName];
 			if(!template) console.log("Warning: Property Template for Element type ", element.type, "not found");
@@ -43,7 +42,6 @@ var PropertyPanel = (function(me) {
 		function removeElement() {
 			
 			// TODO: Select next element in list before Delete
-
 			// Remove the element
 			ElementCollection.remove(element);		 
 			

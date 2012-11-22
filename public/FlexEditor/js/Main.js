@@ -41,7 +41,7 @@ function Main(options) {
 		scene.init();
 
 		// Add the default Background layer
-        var elm = ElementCollection.create(elmEditor);
+        var elm = Library.elements.Image.createElement(elmEditor);
         elm.property('contentType', 'Image');
         elm.property('background', 'transparent');        
         elm.property('valign', 'top');

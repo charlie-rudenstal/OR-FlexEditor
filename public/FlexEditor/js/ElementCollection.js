@@ -28,8 +28,8 @@ var ElementCollection = (function(me) {
 	}
 
 	me.remove = function(element) {
-		elements[element.id] = null;
-		delete elements[element.id];
+		elements[element.property('id')] = null;
+		delete elements[element.property('id')];
 		$(me).trigger('change');
 
 		// we need to update the results of hasGhost if user removed 
