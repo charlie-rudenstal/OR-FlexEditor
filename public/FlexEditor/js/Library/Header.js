@@ -9,16 +9,14 @@ Library.elements = Library.elements || [];
 
     me.createElement = function(renderToElement) {
         var elm = new Element(renderToElement);
-        elm.template = Templates.Element;
-        elm.contentType('Text');
-        // elm.background = '-webkit-linear-gradient(#595959, #2D2D2D)';        
-        elm.background = '-webkit-linear-gradient(top, #333333 0%, #303030 50%, #292929 51%, #202020 100%);';        
-        elm.foreground = 'white';
-        elm.text = 'Header';
-        elm.valign = 'middle';
-        elm.halign = 'center'; 
-        elm.positionType = 'relative';
-        elm.padding = 0;
+        elm.property('contentType', 'Text');
+        elm.property('background', '-webkit-linear-gradient(top, #333333 0%, #303030 50%, #292929 51%, #202020 100%);');
+        elm.property('foreground', 'white');
+        elm.property('text', 'Header');
+        elm.property('valign', 'middle');
+        elm.property('halign', 'center');
+        elm.property('positionType', 'relative');
+        elm.property('padding', '0');
 
         elm.x(0, 'relative');
         elm.y(0, 'relative');

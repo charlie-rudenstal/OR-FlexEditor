@@ -3,17 +3,17 @@ var Templates = Templates || {}; Templates.Raw = Templates.Raw || {};
 Templates.Raw.ElementTypeImage = '
 
 	<div>
-	 	{{?it.image && it.image != "null"}}
+	 	{{?it.hasProperty("image") && it.property("image") != "null"}}
 			<div style="position: absolute;
-                        background: url({{=it.image}}) no-repeat {{=it.halign}} {{=it.valign}}; 
+                        background: url({{=it.property("image")}}) no-repeat {{=it.property("halign")}} {{=it.property("valign")}}; 
 
-                        {{?it.stretch == "width"}}
+                        {{?it.property("stretch") == "width"}}
             			    background-size: {{=it.width(null, "absolute")}}px auto;
 						{{?}}
-                        {{?it.stretch == "height"}}
+                        {{?it.property("stretch") == "height"}}
                             background-size: auto {{=it.height(null, "absolute")}}px;
                         {{?}}
-                        {{?it.stretch == "fill"}}
+                        {{?it.property("stretch") == "fill"}}
                             background-size: {{=it.width(null, "absolute")}}px {{=it.height(null, "absolute")}}px;
                         {{?}}
 

@@ -41,7 +41,7 @@ Element.prototype.property = function(key, value) {
 }
 
 Element.prototype.hasProperty = function(key) {
-	return this.propeties.hasOwnProperty(key);
+	return this.properties.hasOwnProperty(key);
 }
 
 Element.prototype.select = function() {
@@ -58,7 +58,7 @@ Element.prototype.onContentTypeChanged = function() {
 	var contentType = this.property('contentType');
 	this.contentTemplate = Templates['ElementType' + contentType];
 	if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', value);
-}
+	}
 
 // Should be called after raw attributes has been changed, like for example text
 // to notify this object and other listener about the change

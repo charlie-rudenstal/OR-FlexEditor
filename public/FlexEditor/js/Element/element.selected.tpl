@@ -2,7 +2,7 @@
 var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; 
 Templates.Raw.ElementSelected = '
 
-	<div id="element_{{=it.id}}" 
+	<div id="element_{{=it.property("id")}}" 
 	 	 class="component button"
 	 	 style="left: {{=it.x(null, "absolute")}}px;
 	 	     	top: {{=it.y(null, "absolute")}}px;

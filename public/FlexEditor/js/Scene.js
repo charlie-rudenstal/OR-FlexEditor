@@ -18,7 +18,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 		// Render a ghost if user is dragging an element from the library
 		$(mouseInput).on('mousemove', function(e) {
-
 			$renderToElement.css('cursor', 'default');
 
 			if(DragDrop.current) {
@@ -240,7 +239,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		if(!domElement) return;
 		var elements = ElementCollection.getAsArray(); 
 		for(var i in elements) {
-			if(domElement.id == 'element_' + elements[i].id) {
+			if(domElement.id == 'element_' + elements[i].property("id")) {
 				// Elements that are locked should not be selectable
 				if(!elements[i].locked) return elements[i];
 			}

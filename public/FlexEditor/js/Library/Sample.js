@@ -9,13 +9,12 @@ Library.elements = Library.elements || [];
 
     me.createElement = function(renderToElement) {
         var elm = new Element(renderToElement);
-        elm.template = Templates.Element;
-        elm.contentType('Image');
-        elm.background = 'transparent';        
-        elm.valign = 'top';
-        elm.halign = 'left'; 
-        elm.image = 'http://upload.wikimedia.org/wikipedia/commons/3/3e/Tree-256x256.png';  
-        elm.stretch = 'width';
+        elm.property('contentType', 'Image');
+        elm.property('background', 'transparent');
+        elm.property('valign', 'top');
+        elm.property('halign', 'left');
+        elm.property('image', 'http://upload.wikimedia.org/wikipedia/commons/3/3e/Tree-256x256.png');  
+        elm.property('stretch', 'width');
         return elm;
     }
 
