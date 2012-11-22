@@ -44,6 +44,10 @@ Element.prototype.hasProperty = function(key) {
 	return this.properties.hasOwnProperty(key);
 }
 
+Element.prototype.toggleProperty = function(key) {
+	this.property(key, !this.properties[key]);
+}
+
 Element.prototype.select = function() {
 	this.template = Templates.ElementSelected;
 	this.selected = true;

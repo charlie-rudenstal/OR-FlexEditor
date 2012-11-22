@@ -1048,9 +1048,9 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 		// Clicks outside of the scene in the gray area should remove selection
 		// (Unfortunately this area is currently also named 'scene', change this)
-		$(renderToElement).closest('.scene').on('mousedown', function(e) {
+		$(renderToElement).closest('.sceneContainer').on('mousedown', function(e) {
 			// Only catch clicks that specifically hits the area outside of the editor
-			if($(e.target).is('.scene')) ElementCollection.select(null);
+			if($(e.target).is('.sceneContainer')) ElementCollection.select(null);
 		});
 
 		// Move elements if dragged
@@ -1216,6 +1216,10 @@ Element.prototype.hasProperty = function(key) {
 	return this.properties.hasOwnProperty(key);
 }
 
+Element.prototype.toggleProperty = function(key) {
+	this.property(key, !this.properties[key]);
+}
+
 Element.prototype.select = function() {
 	this.template = Templates.ElementSelected;
 	this.selected = true;
@@ -1331,7 +1335,6 @@ function Layers(renderer) {
 
 	// Will select the element in the ElementCollection on click
 	function onItemDown(e) {
-		
 		var $target = $(e.target);
 
 
@@ -1341,10 +1344,10 @@ function Layers(renderer) {
 		if($target.is('.layer-element')) {
 			ElementCollection.select(element);
 		} else if($target.closest('.attribute-locked').length > 0) {
-			element.locked = !element.locked;
+			element.toggleProperty('locked');
 			element.invalidate();
 		} else if($target.closest('.attribute-position').length > 0) {
-			element.positionType = (element.positionType == 'absolute') ? 'relative' : 'absolute';
+			element.property('positionType', (element.property('positionType') == 'absolute') ? 'relative' : 'absolute');
 			element.invalidate();
 		}
 	}

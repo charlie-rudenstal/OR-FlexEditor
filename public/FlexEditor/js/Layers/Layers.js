@@ -21,7 +21,6 @@ function Layers(renderer) {
 
 	// Will select the element in the ElementCollection on click
 	function onItemDown(e) {
-		
 		var $target = $(e.target);
 
 
@@ -31,10 +30,10 @@ function Layers(renderer) {
 		if($target.is('.layer-element')) {
 			ElementCollection.select(element);
 		} else if($target.closest('.attribute-locked').length > 0) {
-			element.locked = !element.locked;
+			element.toggleProperty('locked');
 			element.invalidate();
 		} else if($target.closest('.attribute-position').length > 0) {
-			element.positionType = (element.positionType == 'absolute') ? 'relative' : 'absolute';
+			element.property('positionType', (element.property('positionType') == 'absolute') ? 'relative' : 'absolute');
 			element.invalidate();
 		}
 	}
