@@ -102,9 +102,21 @@ body {
 	text-shadow: 0px 1px #000;
 }
 
-.scene {
-	width: 100%;
+.sceneContainer {
+	left: 191px;
+	right: 191px;
 	height: 100%;
-	padding-left: 191px;
-	padding-right: 191px;
+	position: absolute;
+}
+
+.scene {
+	margin-left: auto;
+	margin-right: auto;
+	width: 480px;
+	margin-top: 40px;
+}
+
+#editor, #grid {
+	position: absolute;
+	overflow: hidden;
 }

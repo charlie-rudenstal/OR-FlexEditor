@@ -55,11 +55,9 @@ Element.prototype.blur = function() {
 }
 
 Element.prototype.onContentTypeChanged = function() {
-	console.log("contentTypeChange");
 	var contentType = this.property('contentType');
 	this.contentTemplate = Templates['ElementType' + contentType];
 	if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', value);
-	console.log(this);
 }
 
 // Should be called after raw attributes has been changed, like for example text

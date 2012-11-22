@@ -89,7 +89,6 @@ function MouseInput(element, cellSize, relativeToScreen) {
 	// in this case the editor
 	function getMousePosition(e, relativeToElement) {
 		if(elementRect == null) elementRect = getElementRect(element);
-		
 		if(relativeToScreen) {
 			return {
 				x: e.pageX, 
@@ -100,14 +99,13 @@ function MouseInput(element, cellSize, relativeToScreen) {
 				x: e.pageX - elementRect.x,
 				y: e.pageY - elementRect.y
 			}	
-		}
-		
+		}		
 	}
 
 	// Helper method to get the position and size of an element
 	function getElementRect(element) {
 		var $element = $(element);
-		var position = $element.position();	
+		var position = $element.offset();	
 		var margin = {
 			top: parseInt($(element).css('marginTop')),	
 			right: parseInt($(element).css('marginRight')),	
