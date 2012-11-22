@@ -41,19 +41,7 @@ function Main(options) {
 		scene.init();
 
 		// Add the default Background layer
-        var elm = Library.elements.Image.createElement(elmEditor);
-        elm.property('contentType', 'Image');
-        elm.property('background', 'transparent');        
-        elm.property('valign', 'top');
-        elm.property('halign', 'left');
-        elm.property('stretch', 'width');
-        elm.property('text', "Background");
-        elm.property('locked', true);
-        elm.property('positionType', 'relative');
-        elm.x(0);
-        elm.y(0);
-        elm.width(100, 'relative');
-        elm.height(100, 'relative');
+        var elm = Library.elements.Background.createElement(elmEditor);
         ElementCollection.add(elm);
 	};
  

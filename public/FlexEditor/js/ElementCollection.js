@@ -9,8 +9,8 @@ var ElementCollection = (function(me) {
 		cellSize = pCellSize;
 	}
 
-	me.create = function(parent) {
-		return new Element(parent, {cellSize: cellSize});
+	me.create = function(parent, properties) {
+		return new Element(parent, cellSize, properties);
 	}
 
 	// add an element to the collection. isGhost can be specified to keep

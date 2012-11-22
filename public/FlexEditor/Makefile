@@ -19,17 +19,22 @@ files = 	$(src)/Main.js\
 			$(src)/Layers/Layers.js\
 			$(src)/PropertyPanel/PropertyPanel.js\
 			$(src)/Library/Library.js\
-			$(src)/Library/Text.js\
-			$(src)/Library/Image.js\
-			$(src)/Library/Sample.js\
-			$(src)/Library/Header.js
+			$(src)/Library/Button.js\
+			$(src)/Library/Background.js
+			#$(src)/Library/Text.js\
+			#$(src)/Library/Image.js\
+			#$(src)/Library/Sample.js\
+			#$(src)/Library/Header.js
+			
+			#$(src)/PropertyPanel/properties.text.tpl\
+			#$(src)/Element/element.type.text.tpl\
 			
 templates = $(src)/Element/element.tpl\
 			$(src)/Element/element.selected.tpl\
 			$(src)/Element/element.ghost.tpl\
-			$(src)/Element/element.type.text.tpl\
 			$(src)/Element/element.type.image.tpl\
-			$(src)/PropertyPanel/properties.text.tpl\
+			$(src)/Element/element.type.button.tpl\
+			$(src)/PropertyPanel/properties.button.tpl\
 			$(src)/PropertyPanel/properties.image.tpl\
  		    $(src)/Grid/grid.tpl\
  		    $(src)/Layers/layer.tpl\

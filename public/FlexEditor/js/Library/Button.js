@@ -3,7 +3,9 @@ Library.elements = Library.elements || [];
 
 (function() {
 
-    var autosizeChangeInProgress = false;
+    me.key = "Button";
+    me.title = 'Button';
+    me.description = 'Import an image you have already created from a URL';
 
 	function me() {
 		
@@ -11,13 +13,15 @@ Library.elements = Library.elements || [];
 
     me.createElement = function(renderToElement) {
         var elm = ElementCollection.create(renderToElement);
-        elm.property('contentType', 'Image');  
+        
+        elm.property('contentType', 'Button');  
         elm.property('background', 'transparent');  
-        elm.property('valign', 'top');  
-        elm.property('halign', 'left');  
-        elm.property('stretch', 'width');
-        elm.width(4, 'cells');
+        elm.property('text', '');  
+
+        elm.width(6, 'cells');
         elm.height(4, 'cells');
+        elm.property('valign', 'bottom');
+        elm.property('halign', 'center');
         elm.property('autosize', false);
 
         $(elm).on('imageChange', onImageChange);
@@ -27,11 +31,11 @@ Library.elements = Library.elements || [];
 
         return elm;
     }
-
-
-    // http://www.apicasystem.com/portals/0/Partners/Microsoft_Logo.png
-    // Autosize functionality
     
+    //////////////////
+    //// Autosize ////
+    //////////////////
+    var autosizeChangeInProgress = false;
     function onImageChange(e) {
         if(e.target.property('autosize')) onAutosizeChanged(e);
     }
@@ -51,16 +55,13 @@ Library.elements = Library.elements || [];
         }
     }    
 
-    // Turn off autosize if the user changes the width or height of the
-    // element manually. Check that the change is not triggered by autosize itself
     function onSizeChange(e) {
+        // Turn off autosize if the user changes the width or height of the
+        // element manually. Check that the change is not triggered by autosize itself
         if(autosizeChangeInProgress) return;
         e.target.property('autosize', false);
     }
 
-    me.key = "Image";
-	me.title = 'Image';
-	me.description = 'Import an image you have already created from a URL';
 
     Library.elements[me.key] = me;    
 })();

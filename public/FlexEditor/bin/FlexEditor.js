@@ -42,19 +42,7 @@
 		scene.init();
 
 		// Add the default Background layer
-        var elm = Library.elements.Image.createElement(elmEditor);
-        elm.property('contentType', 'Image');
-        elm.property('background', 'transparent');        
-        elm.property('valign', 'top');
-        elm.property('halign', 'left');
-        elm.property('stretch', 'width');
-        elm.property('text', "Background");
-        elm.property('locked', true);
-        elm.property('positionType', 'relative');
-        elm.x(0);
-        elm.y(0);
-        elm.width(100, 'relative');
-        elm.height(100, 'relative');
+        var elm = Library.elements.Background.createElement(elmEditor);
         ElementCollection.add(elm);
 	};
  
@@ -773,8 +761,8 @@ function Grid(renderer, options) {
 		cellSize = pCellSize;
 	}
 
-	me.create = function(parent) {
-		return new Element(parent, {cellSize: cellSize});
+	me.create = function(parent, properties) {
+		return new Element(parent, cellSize, properties);
 	}
 
 	// add an element to the collection. isGhost can be specified to keep
@@ -1096,34 +1084,24 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 	return me;
 }
-function Element(parent, options) {
+function Element(parent, cellSize, properties) {
 
-	if(parent == null) throw "Parent for Element cannot be null";
-	options = options || {};
 	this.properties = {};
-
-	this.cellSize = options.cellSize;
-
-	$(this).on('contentTypeChange', this.onContentTypeChanged);
-
-	if(options.id) this.property('id', options.id) 
-	else this.generateNewId();
-
-	this.property('positionType', options.positionType || 'absolute');
-	this.property('parent', parent);
-	
+	if(properties) this.setProperties(properties);
+	if(!this.properties.id) this.generateNewId();
+		
+	if(parent == null) throw "Parent for Element cannot be null";
+	this.parent = parent;
 	this.parentWidth = $(parent).width();
 	this.parentHeight = $(parent).height();
+
 	this.template = Templates.Element;
 	this.selected = false;
 
-	// for(var key in options) {
-	// 	if(this.hasProperty(key) == false) {
-	// 		this.property(key, options[key]);
-	// 	}
-	// }
-
-
+	this.cellSize = cellSize;
+	
+	if(this.hasProperty('contentType')) this.onContentTypeChanged();
+	$(this).on('contentTypeChange', this.onContentTypeChanged);
 };
 
 Element.idCounter = 0;
@@ -1168,8 +1146,8 @@ Element.prototype.blur = function() {
 Element.prototype.onContentTypeChanged = function() {
 	var contentType = this.property('contentType');
 	this.contentTemplate = Templates['ElementType' + contentType];
-	if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', value);
-	}
+	if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', contentType);
+}
 
 // Should be called after raw attributes has been changed, like for example text
 // to notify this object and other listener about the change
@@ -1178,14 +1156,16 @@ Element.prototype.invalidate = function(property) {
 	$(this).trigger('change');
 }
 
-Element.prototype.getOptions = function() {
-	var options = {};
-	for(var i in this) {
-		if(!this.hasOwnProperty(i)) continue;
-		if(typeof this[i] == 'function') continue;
-		options[i] = this[i];
-	}
-	return options;
+Element.prototype.getProperties = function() {
+	return clone(this.properties);
+}
+
+Element.prototype.setProperties = function(properties) {
+	this.properties = clone(properties);
+}
+
+Element.prototype.getParent = function() {
+	return this.parent;
 }
 
 function getStandardPositionFrom(value, positionType, parentWidthOrHeight, cellSize) {
@@ -1327,9 +1307,20 @@ function Layers(renderer) {
 
 			// alt + d will duplicate current element
 			if(e.altKey && !e.shiftKey && e.keyCode == keyD) {
-				var selectedElementOptions = ElementCollection.getSelected().getOptions();
-				var duplicateElement = new Element(selectedElementOptions.parent, selectedElementOptions);
-				duplicateElement.generateNewId(); // Otherwise the new element will inherit the id from the old dupliate
+				var selectedElement = ElementCollection.getSelected();
+				var duplicateElement = ElementCollection.create(selectedElement.getParent(), selectedElement.getProperties());
+				
+				duplicateElement.width(selectedElement.width(null, 'relative'), 'relative');
+				duplicateElement.height(selectedElement.height(null, 'relative'), 'relative');
+				duplicateElement.x(selectedElement.x(null, 'relative'), 'relative');
+				duplicateElement.y(selectedElement.y(null, 'relative'), 'relative');
+
+				// Otherwise the new element will inherit the id from the old dupliate
+				// This is not automatically done in ElementColletion.create
+				// because it might be useful to craete an element with a specific ID, 
+				// for example when importing an existing view
+				duplicateElement.generateNewId(); 
+				
 				ElementCollection.add(duplicateElement);
 				ElementCollection.select(duplicateElement);
 			}
@@ -1400,7 +1391,7 @@ function Layers(renderer) {
 	}
 
 	return me;
-})({});function Library(renderer) {
+})({});	function Library(renderer) {
 
 	var element;
 	var $ghostLibraryElement;
@@ -1464,36 +1455,10 @@ function Layers(renderer) {
 Library.elements = Library.elements || [];
 
 (function() {
-	function me() {
 
-    }
-
-    me.createElement = function(renderToElement) {
-        var elm = ElementCollection.create(renderToElement);
-        elm.property('contentType', 'Text');  
-        elm.property('padding', 0); 
-        elm.property('valign', 'top');  
-        elm.property('halign', 'left');
-        elm.property('background', 'transparent');
-        elm.property('foreground', 'white');
-        elm.property('padding', 0);
-        elm.property('text', '');
-        elm.width(6, 'cells');
-        elm.height(2, 'cells');
-        return elm;
-    }
-    
-    me.key = "Text";
-	me.title = 'Text';
-	me.description = 'Used for captions, notices of any other kind of message';
-
-    Library.elements[me.key] = me;
-})();var Library = Library || {}; 
-Library.elements = Library.elements || [];
-
-(function() {
-
-    var autosizeChangeInProgress = false;
+    me.key = "Button";
+    me.title = 'Button';
+    me.description = 'Import an image you have already created from a URL';
 
 	function me() {
 		
@@ -1501,13 +1466,15 @@ Library.elements = Library.elements || [];
 
     me.createElement = function(renderToElement) {
         var elm = ElementCollection.create(renderToElement);
-        elm.property('contentType', 'Image');  
+        
+        elm.property('contentType', 'Button');  
         elm.property('background', 'transparent');  
-        elm.property('valign', 'top');  
-        elm.property('halign', 'left');  
-        elm.property('stretch', 'width');
-        elm.width(4, 'cells');
+        elm.property('text', '');  
+
+        elm.width(6, 'cells');
         elm.height(4, 'cells');
+        elm.property('valign', 'bottom');
+        elm.property('halign', 'center');
         elm.property('autosize', false);
 
         $(elm).on('imageChange', onImageChange);
@@ -1517,18 +1484,88 @@ Library.elements = Library.elements || [];
 
         return elm;
     }
-
-
-    // http://www.apicasystem.com/portals/0/Partners/Microsoft_Logo.png
-
-    // Autosize functionality
     
+    //////////////////
+    //// Autosize ////
+    //////////////////
+    var autosizeChangeInProgress = false;
     function onImageChange(e) {
         if(e.target.property('autosize')) onAutosizeChanged(e);
     }
 
     function onAutosizeChanged(e) {
-        console.log("yeah");
+        var elm = e.target;
+        if(elm.property('autosize') == true && elm.property('image')) {        
+            // Update this element to get the width and height of the true image
+            var img = new Image();
+            img.onload = function() {
+                autosizeChangeInProgress = true;
+                elm.width(this.width, 'absolute');
+                elm.height(this.height, 'absolute');
+                autosizeChangeInProgress = false;
+            }
+            img.src = elm.property('image');
+        }
+    }    
+
+    function onSizeChange(e) {
+        // Turn off autosize if the user changes the width or height of the
+        // element manually. Check that the change is not triggered by autosize itself
+        if(autosizeChangeInProgress) return;
+        e.target.property('autosize', false);
+    }
+
+
+    Library.elements[me.key] = me;    
+})();var Library = Library || {}; 
+Library.elements = Library.elements || [];
+
+(function() {
+
+
+    me.key = "Background";
+    me.title = 'Background';
+    me.description = 'Import an image you have already created from a URL';
+    me.lockedX = true;
+    me.lockedY = true;
+
+	function me() {
+		
+	}
+
+    me.createElement = function(renderToElement) {
+        var elm = ElementCollection.create(renderToElement);
+        elm.property('contentType', 'Image');
+        elm.property('background', 'transparent');        
+        elm.property('valign', 'top');
+        elm.property('halign', 'left');
+        elm.property('stretch', 'width');
+        elm.property('text', "Background");
+        elm.property('locked', true);
+        elm.property('positionType', 'relative');
+        elm.x(0);
+        elm.y(0);
+        elm.width(100, 'relative');
+        elm.height(100, 'relative');
+
+        $(elm).on('imageChange', onImageChange);
+        $(elm).on('autosizeChange', onAutosizeChanged);
+        $(elm).on('widthChange heightChange', onSizeChange);
+        elm.property('autosize', true);
+
+        return elm;
+    }
+    
+
+    //////////////////
+    //// Autosize ////
+    //////////////////
+    var autosizeChangeInProgress = false;
+    function onImageChange(e) {
+        if(e.target.property('autosize')) onAutosizeChanged(e);
+    }
+
+    function onAutosizeChanged(e) {
         var elm = e.target;
         if(elm.property('autosize') == true && elm.property('image')) {        
             // Update this element to get the width and height of the true image
@@ -1550,103 +1587,9 @@ Library.elements = Library.elements || [];
         e.target.property('autosize', false);
     }
 
-    me.key = "Image";
-	me.title = 'Image';
-	me.description = 'Import an image you have already created from a URL';
 
     Library.elements[me.key] = me;    
-})();var Library = Library || {}; 
-Library.elements = Library.elements || [];
-
-(function() {
-
-    var autosizeChangeInProgress = false;
-
-    function me() {
-        
-    }
-
-    me.createElement = function(parent) {
-        var elm = ElementCollection.create(parent);
-        elm.property('contentType', 'Image');
-        elm.property('background', 'transparent');
-        elm.property('valign', 'top');
-        elm.property('halign', 'left');
-        elm.property('image', 'http://upload.wikimedia.org/wikipedia/commons/3/3e/Tree-256x256.png');  
-        elm.property('stretch', 'width');
-        elm.width(10, 'cells');
-        elm.height(10, 'cells');
-
-        $(elm).on('autosizeChange', onAutosizeChanged);
-        $(elm).on('widthChange heightChange', onSizeChange);
-        elm.property('autosize', true);
-
-        return elm;
-    }
-
-    function onAutosizeChanged(e) {
-        var elm = e.target;
-        if(elm.property('autosize') == true) {        
-            // Update this element to get the width and height of the true image
-            var img = new Image();
-            img.onload = function() {
-                autosizeChangeInProgress = true;
-                elm.width(this.width, 'absolute');
-                elm.height(this.height, 'absolute');
-                autosizeChangeInProgress = false;
-            }
-            img.src = elm.property('image');
-        }
-    }    
-
-    // Turn off autosize if the user changes the width or height of the
-    // element manually. Check that the change is not triggered by autosize itself
-    function onSizeChange(e) {
-        if(autosizeChangeInProgress) return;
-        e.target.property('autosize', false);
-    }
-
-    me.key = "Sample";
-    me.title = 'Image (Tree)';
-    me.description = 'An image with a preset sample URL';
-    
-    Library.elements[me.key] = me;
-})();var Library = Library || {}; 
-Library.elements = Library.elements || [];
-
-(function() {
-
-    function me() {
-        
-    }
-
-    me.createElement = function(renderToElement) {
-        var elm = ElementCollection.create(renderToElement);
-        elm.property('contentType', 'Text');
-        elm.property('background', '-webkit-linear-gradient(top, #333333 0%, #303030 50%, #292929 51%, #202020 100%);');
-        elm.property('foreground', 'white');
-        elm.property('text', 'Header');
-        elm.property('valign', 'middle');
-        elm.property('halign', 'center');
-        elm.property('positionType', 'relative');
-        elm.property('padding', '0');
-
-        elm.x(0, 'relative');
-        elm.y(0, 'relative');
-        elm.width(100, 'relative');
-        elm.height(3, 'cells');
-        return elm;
-    }
-
-    me.key = "Header";
-    me.title = 'Header';
-    me.description = 'A predefined Titlebar';
-
-    me.lockedX = true;
-    me.lockedY = true;
-
-    Library.elements[me.key] = me;
-})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	<div id="element_{{=it.property("id")}}" 	 	 class="component button"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: {{=it.property	("background")}}">		<div class="content">			{{=it.contentTemplate(it)}}		</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementSelected = '	<div id="element_{{=it.property("id")}}" 	 	 class="component button"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: {{=it.property("background")}}	 	     	">		<div class="content">			{{=it.contentTemplate(it)}}		</div>		 	<div class="resizeBorder"></div>	 	<div class="resizeBox resizeBox-topleft"></div>	 	<div class="resizeBox resizeBox-topright"></div>	 	<div class="resizeBox resizeBox-bottomleft"></div>	 	<div class="resizeBox resizeBox-bottomright"></div>	 		 	<div class="resizeBox resizeBox-middleleft"></div>	 	<div class="resizeBox resizeBox-middleright"></div>	 	<div class="resizeBox resizeBox-middletop"></div>	 	<div class="resizeBox resizeBox-middlebottom"></div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementGhost = '	<div id="element_{{=it.property("id")}}" 	 	 class="component button"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: none;	 	     	border: 1px solid #3276a9;	 	     	">		<div class="content">					</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementTypeText = '    <div style="display: table-cell;                vertical-align: {{=it.property("valign")}};                text-align: {{=it.property("halign")}};                width: {{=it.width(null, "absolute")}}px;                height: {{=it.height(null, "absolute")}}px;                font-family: helvetica;                font-size: 14px;                color: {{=it.property("foreground")}};                padding: {{=it.property("padding")}}px;">	  {{=it.property("text")}}        </div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementTypeImage = '	<div>	 	{{?it.hasProperty("image") && it.property("image") != "null"}}			<div style="position: absolute;                        background: url({{=it.property("image")}}) no-repeat {{=it.property("halign")}} {{=it.property("valign")}};                         {{?it.property("stretch") == "width"}}                            background-size: {{=it.width(null, "absolute")}}px auto;                        {{?}}                        {{?it.property("stretch") == "height"}}                            background-size: auto {{=it.height(null, "absolute")}}px;                        {{?}}                        {{?it.property("stretch") == "fill"}}                            background-size: {{=it.width(null, "absolute")}}px {{=it.height(null, "absolute")}}px;                        {{?}}                        width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;                        ">            </div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.PropertiesText = '	<div class="propertyPanel" style="left: {{=it.x}}px; top: {{=it.y}}px;">		<div class="propertyPanel-header">Text Properties</div>				<div class="properties">			<div class="property">				<div class="property-label">Text</div>				<div class="property-input"><input type="text" value="{{=it.element.property("text")}}" data-property="text" /></div>			</div>			<div class="property">				<div class="property-label">Bg</div>				<div class="property-input"><input type="text" value="{{=it.element.property("background")}}" data-property="background" /></div>			</div>			<div class="property">				<div class="property-label">Fg</div>				<div class="property-input"><input type="text" value="{{=it.element.property("foreground")}}" data-property="foreground" /></div>			</div>			<div class="property">				<div class="property-label">Halign</div>				<div class="property-input"><input type="text" value="{{=it.element.property("halign")}}" data-property="halign" /></div>			</div>			<div class="property">				<div class="property-label">Valign</div>				<div class="property-input"><input type="text" value="{{=it.element.property("valign")}}" data-property="valign" /></div>			</div>			<div class="property">				<div class="property-label">Padding</div>				<div class="property-input"><input type="text" value="{{=it.element.property("padding")}}" data-property="padding" /></div>			</div>			<div class="property">				<div class="btn btn-delete">Remove</div>			</div>		</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.PropertiesImage = '	<div class="propertyPanel" style="left: {{=it.x}}px; top: {{=it.y}}px;">		<div class="propertyPanel-header">Image Properties</div>				<div class="properties">			<div class="property">				<div class="property-label">Url</div>				<div class="property-input"><input type="text" value="{{?it.element.hasProperty("image")}}{{=it.element.property("image")}}{{?}}" data-property="image" /></div>			</div>			<div class="property">				<div class="property-label">Bg</div>				<div class="property-input"><input type="text" value="{{=it.element.property("background")}}" data-property="background" /></div>			</div>			<div class="property">				<div class="property-label">Stretch</div>				<div class="property-input"><input type="text" value="{{=it.element.property("stretch")}}" data-property="stretch" /></div>			</div>			<div class="property">				<div class="property-label">Autosize</div>				<div class="property-input"><input type="text" value="{{=it.element.property("autosize")}}" data-property="autosize" /></div>			</div>			<div class="property">				<div class="property-label">Valign</div>				<div class="property-input"><input type="text" value="{{=it.element.property("valign")}}" data-property="valign" /></div>			</div>			<div class="property">				<div class="property-label">Halign</div>				<div class="property-input"><input type="text" value="{{=it.element.property("halign")}}" data-property="halign" /></div>			</div>			<div class="property">				<div class="btn btn-delete">Remove</div>			</div>		</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < it.width + 1; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < it.height + 1; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Layer = '	<div class="layer-element {{?it.selected}}layer-element-selected{{?}}" data-element-id="{{=it.property("id")}}">		<div class="layer-element-attributes">			<div class="attribute attribute-locked">				{{?it.property("locked")}}					<i class="icon-lock"></i>				{{??}}					<i class="icon-unlock"></i>				{{?}}			</div>			<div class="attribute attribute-position">				{{?it.property("positionType") == "absolute"}}					<i class="icon-move"></i>				{{??}}					<i class="icon-asterisk"></i>				{{?}}</div>			<div class="attribute attribute-bg" style="background-color: {{=it.property("background")}}"></div>		</div>		{{?it.property("text")}}			{{=it.property("text")}}		{{??}}			{{=it.property("contentType")}} Element		{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryElement = '	<div class="library-element" data-key="{{=it.key}}">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryGhost = '	<div class="library-element library-ghost">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';
+})();/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Element = '	<div id="element_{{=it.property("id")}}" 	 	 class="component button"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: {{=it.property	("background")}}">		<div class="content">			{{=it.contentTemplate(it)}}		</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementSelected = '	<div id="element_{{=it.property("id")}}" 	 	 class="component button"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: {{=it.property("background")}}	 	     	">		<div class="content">			{{=it.contentTemplate(it)}}		</div>		 	<div class="resizeBorder"></div>	 	<div class="resizeBox resizeBox-topleft"></div>	 	<div class="resizeBox resizeBox-topright"></div>	 	<div class="resizeBox resizeBox-bottomleft"></div>	 	<div class="resizeBox resizeBox-bottomright"></div>	 		 	<div class="resizeBox resizeBox-middleleft"></div>	 	<div class="resizeBox resizeBox-middleright"></div>	 	<div class="resizeBox resizeBox-middletop"></div>	 	<div class="resizeBox resizeBox-middlebottom"></div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementGhost = '	<div id="element_{{=it.property("id")}}" 	 	 class="component button"	 	 style="left: {{=it.x(null, "absolute")}}px;	 	     	top: {{=it.y(null, "absolute")}}px;	 	     	width: {{=it.width(null, "absolute")}}px;	 	     	height: {{=it.height(null, "absolute")}}px;	 	     	background: none;	 	     	border: 1px solid #3276a9;	 	     	">		<div class="content">					</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementTypeImage = '	<div>	 	{{?it.hasProperty("image") && it.property("image") != "null"}}			<div style="position: absolute;                        background: url({{=it.property("image")}}) no-repeat {{=it.property("halign")}} {{=it.property("valign")}};                         {{?it.property("stretch") == "width"}}                            background-size: {{=it.width(null, "absolute")}}px auto;                        {{?}}                        {{?it.property("stretch") == "height"}}                            background-size: auto {{=it.height(null, "absolute")}}px;                        {{?}}                        {{?it.property("stretch") == "fill"}}                            background-size: {{=it.width(null, "absolute")}}px {{=it.height(null, "absolute")}}px;                        {{?}}                        width: {{=it.width(null, "absolute")}}px;	 	     			height: {{=it.height(null, "absolute")}}px;                        ">            </div>	 	{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.ElementTypeButton = '    <div style="display: table-cell;                vertical-align: {{=it.property("valign")}};                text-align: {{=it.property("halign")}};                width: {{=it.width(null, "absolute")}}px;                height: {{=it.height(null, "absolute")}}px;                font-family: helvetica;                font-size: 14px;                color: {{=it.property("foreground")}};                padding: {{=it.property("padding")}}px;">	  {{=it.property("text")}}        </div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.PropertiesButton = '	<div class="propertyPanel" style="left: {{=it.x}}px; top: {{=it.y}}px;">		<div class="propertyPanel-header">Text Properties</div>				<div class="properties">			<div class="property">				<div class="property-label">Text</div>				<div class="property-input"><input type="text" value="{{=it.element.property("text")}}" data-property="text" /></div>			</div>			<div class="property">				<div class="property-label">Bg</div>				<div class="property-input"><input type="text" value="{{=it.element.property("background")}}" data-property="background" /></div>			</div>			<div class="property">				<div class="property-label">Fg</div>				<div class="property-input"><input type="text" value="{{=it.element.property("foreground")}}" data-property="foreground" /></div>			</div>			<div class="property">				<div class="property-label">Halign</div>				<div class="property-input"><input type="text" value="{{=it.element.property("halign")}}" data-property="halign" /></div>			</div>			<div class="property">				<div class="btn btn-delete">Remove</div>			</div>		</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.PropertiesImage = '	<div class="propertyPanel" style="left: {{=it.x}}px; top: {{=it.y}}px;">		<div class="propertyPanel-header">Image Properties</div>				<div class="properties">			<div class="property">				<div class="property-label">Url</div>				<div class="property-input"><input type="text" value="{{?it.element.hasProperty("image")}}{{=it.element.property("image")}}{{?}}" data-property="image" /></div>			</div>			<div class="property">				<div class="property-label">Bg</div>				<div class="property-input"><input type="text" value="{{=it.element.property("background")}}" data-property="background" /></div>			</div>			<div class="property">				<div class="property-label">Stretch</div>				<div class="property-input"><input type="text" value="{{=it.element.property("stretch")}}" data-property="stretch" /></div>			</div>			<div class="property">				<div class="property-label">Autosize</div>				<div class="property-input"><input type="text" value="{{=it.element.property("autosize")}}" data-property="autosize" /></div>			</div>			<div class="property">				<div class="property-label">Valign</div>				<div class="property-input"><input type="text" value="{{=it.element.property("valign")}}" data-property="valign" /></div>			</div>			<div class="property">				<div class="property-label">Halign</div>				<div class="property-input"><input type="text" value="{{=it.element.property("halign")}}" data-property="halign" /></div>			</div>			<div class="property">				<div class="btn btn-delete">Remove</div>			</div>		</div>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Grid = '	<div class="grid-root">	{{ for(var x = 0; x < it.width + 1; x++ ) { }}		<div class="grid-line" style="				left: {{=x * it.cellSize.width}}px; 				top: 0px;				width: 1px; 				height: 800px;"></div>	{{ } }}	{{ for(var y = 0; y < it.height + 1; y++ ) { }}		<div class="grid-line" style="				left: 0px; 				top: {{=y * it.cellSize.height}}px;				width: 800px; 				height: 1px;"></div>			{{ } }}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.Layer = '	<div class="layer-element {{?it.selected}}layer-element-selected{{?}}" data-element-id="{{=it.property("id")}}">		<div class="layer-element-attributes">			<div class="attribute attribute-locked">				{{?it.property("locked")}}					<i class="icon-lock"></i>				{{??}}					<i class="icon-unlock"></i>				{{?}}			</div>			<div class="attribute attribute-position">				{{?it.property("positionType") == "absolute"}}					<i class="icon-move"></i>				{{??}}					<i class="icon-asterisk"></i>				{{?}}</div>			<div class="attribute attribute-bg" style="background-color: {{=it.property("background")}}"></div>		</div>		{{?it.property("text")}}			{{=it.property("text")}}		{{??}}			{{=it.property("contentType")}} Element		{{?}}	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryElement = '	<div class="library-element" data-key="{{=it.key}}">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';/* Will be compressed into one line by Makefile */var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; Templates.Raw.LibraryGhost = '	<div class="library-element library-ghost">		<h1 class="library-header">{{=it.title}}</h1>		<p class="library-description">{{=it.description}}</p>	</div>';
 	// Auto-Compile templates from the tpl folder (and store in the Templates namespace)
 	Templates.compile();
 

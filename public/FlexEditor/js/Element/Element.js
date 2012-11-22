@@ -1,31 +1,21 @@
-function Element(parent, options) {
+function Element(parent, cellSize, properties) {
 
-	if(parent == null) throw "Parent for Element cannot be null";
-	options = options || {};
 	this.properties = {};
-
-	this.cellSize = options.cellSize;
-
-	$(this).on('contentTypeChange', this.onContentTypeChanged);
-
-	if(options.id) this.property('id', options.id) 
-	else this.generateNewId();
-
-	this.property('positionType', options.positionType || 'absolute');
-	this.property('parent', parent);
-	
+	if(properties) this.setProperties(properties);
+	if(!this.properties.id) this.generateNewId();
+		
+	if(parent == null) throw "Parent for Element cannot be null";
+	this.parent = parent;
 	this.parentWidth = $(parent).width();
 	this.parentHeight = $(parent).height();
+
 	this.template = Templates.Element;
 	this.selected = false;
 
-	// for(var key in options) {
-	// 	if(this.hasProperty(key) == false) {
-	// 		this.property(key, options[key]);
-	// 	}
-	// }
-
-
+	this.cellSize = cellSize;
+	
+	if(this.hasProperty('contentType')) this.onContentTypeChanged();
+	$(this).on('contentTypeChange', this.onContentTypeChanged);
 };
 
 Element.idCounter = 0;
@@ -70,8 +60,8 @@ Element.prototype.blur = function() {
 Element.prototype.onContentTypeChanged = function() {
 	var contentType = this.property('contentType');
 	this.contentTemplate = Templates['ElementType' + contentType];
-	if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', value);
-	}
+	if(!this.contentTemplate) console.log('Warning: Could not find Content Template for Element type', contentType);
+}
 
 // Should be called after raw attributes has been changed, like for example text
 // to notify this object and other listener about the change
@@ -80,14 +70,16 @@ Element.prototype.invalidate = function(property) {
 	$(this).trigger('change');
 }
 
-Element.prototype.getOptions = function() {
-	var options = {};
-	for(var i in this) {
-		if(!this.hasOwnProperty(i)) continue;
-		if(typeof this[i] == 'function') continue;
-		options[i] = this[i];
-	}
-	return options;
+Element.prototype.getProperties = function() {
+	return clone(this.properties);
+}
+
+Element.prototype.setProperties = function(properties) {
+	this.properties = clone(properties);
+}
+
+Element.prototype.getParent = function() {
+	return this.parent;
 }
 
 function getStandardPositionFrom(value, positionType, parentWidthOrHeight, cellSize) {

@@ -68,9 +68,20 @@ function Layers(renderer) {
 
 			// alt + d will duplicate current element
 			if(e.altKey && !e.shiftKey && e.keyCode == keyD) {
-				var selectedElementOptions = ElementCollection.getSelected().getOptions();
-				var duplicateElement = new Element(selectedElementOptions.parent, selectedElementOptions);
-				duplicateElement.generateNewId(); // Otherwise the new element will inherit the id from the old dupliate
+				var selectedElement = ElementCollection.getSelected();
+				var duplicateElement = ElementCollection.create(selectedElement.getParent(), selectedElement.getProperties());
+				
+				duplicateElement.width(selectedElement.width(null, 'relative'), 'relative');
+				duplicateElement.height(selectedElement.height(null, 'relative'), 'relative');
+				duplicateElement.x(selectedElement.x(null, 'relative'), 'relative');
+				duplicateElement.y(selectedElement.y(null, 'relative'), 'relative');
+
+				// Otherwise the new element will inherit the id from the old dupliate
+				// This is not automatically done in ElementColletion.create
+				// because it might be useful to craete an element with a specific ID, 
+				// for example when importing an existing view
+				duplicateElement.generateNewId(); 
+				
 				ElementCollection.add(duplicateElement);
 				ElementCollection.select(duplicateElement);
 			}

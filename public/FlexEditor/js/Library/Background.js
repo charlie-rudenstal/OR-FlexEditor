@@ -3,7 +3,12 @@ Library.elements = Library.elements || [];
 
 (function() {
 
-    var autosizeChangeInProgress = false;
+
+    me.key = "Background";
+    me.title = 'Background';
+    me.description = 'Import an image you have already created from a URL';
+    me.lockedX = true;
+    me.lockedY = true;
 
 	function me() {
 		
@@ -11,14 +16,18 @@ Library.elements = Library.elements || [];
 
     me.createElement = function(renderToElement) {
         var elm = ElementCollection.create(renderToElement);
-        elm.property('contentType', 'Image');  
-        elm.property('background', 'transparent');  
-        elm.property('valign', 'top');  
-        elm.property('halign', 'left');  
+        elm.property('contentType', 'Image');
+        elm.property('background', 'transparent');        
+        elm.property('valign', 'top');
+        elm.property('halign', 'left');
         elm.property('stretch', 'width');
-        elm.width(4, 'cells');
-        elm.height(4, 'cells');
-        elm.property('autosize', false);
+        elm.property('text', "Background");
+        elm.property('locked', true);
+        elm.property('positionType', 'relative');
+        elm.x(0);
+        elm.y(0);
+        elm.width(100, 'relative');
+        elm.height(100, 'relative');
 
         $(elm).on('imageChange', onImageChange);
         $(elm).on('autosizeChange', onAutosizeChanged);
@@ -27,11 +36,12 @@ Library.elements = Library.elements || [];
 
         return elm;
     }
-
-
-    // http://www.apicasystem.com/portals/0/Partners/Microsoft_Logo.png
-    // Autosize functionality
     
+
+    //////////////////
+    //// Autosize ////
+    //////////////////
+    var autosizeChangeInProgress = false;
     function onImageChange(e) {
         if(e.target.property('autosize')) onAutosizeChanged(e);
     }
@@ -58,9 +68,6 @@ Library.elements = Library.elements || [];
         e.target.property('autosize', false);
     }
 
-    me.key = "Image";
-	me.title = 'Image';
-	me.description = 'Import an image you have already created from a URL';
 
     Library.elements[me.key] = me;    
 })();

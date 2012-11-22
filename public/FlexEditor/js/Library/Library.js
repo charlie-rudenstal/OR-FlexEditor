@@ -1,4 +1,4 @@
-function Library(renderer) {
+	function Library(renderer) {
 
 	var element;
 	var $ghostLibraryElement;
