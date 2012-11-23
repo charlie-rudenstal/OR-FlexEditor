@@ -18,6 +18,7 @@ Library.elements = Library.elements || [];
         elm.property('background', 'transparent');  
         elm.property('text', '');  
 
+
         elm.width(6, 'cells');
         elm.height(4, 'cells');
         elm.property('valign', 'bottom');
@@ -28,6 +29,9 @@ Library.elements = Library.elements || [];
         $(elm).on('autosizeChange', onAutosizeChanged);
         $(elm).on('widthChange heightChange', onSizeChange);
         elm.property('autosize', true);
+
+        elm.property('relativeToBackground', false);
+        $(elm).on('relativeToBackgroundChange', onRelativeToBackgroundChange);
 
         return elm;
     }
@@ -60,6 +64,15 @@ Library.elements = Library.elements || [];
         // element manually. Check that the change is not triggered by autosize itself
         if(autosizeChangeInProgress) return;
         e.target.property('autosize', false);
+    }
+
+    function onRelativeToBackgroundChange(e) {
+        if(e.target.property('relativeToBackground')) {
+            e.target.parentElement = ElementCollection.getById(0);
+        } else {
+            e.target.parentElement = $("#editor").get(0);  
+        }
+        e.target.invalidate('parentElement');
     }
 
 

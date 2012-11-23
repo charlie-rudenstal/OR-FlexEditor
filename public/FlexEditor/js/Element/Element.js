@@ -1,10 +1,12 @@
 function Element(parent, cellSize, properties) {
 
 	this.properties = {};
+	this.parentElement = null;
 	if(properties) this.setProperties(properties);
 	if(!this.properties.id) this.generateNewId();
 		
 	if(parent == null) throw "Parent for Element cannot be null";
+
 	this.parent = parent;
 	this.parentWidth = $(parent).width();
 	this.parentHeight = $(parent).height();
@@ -16,6 +18,8 @@ function Element(parent, cellSize, properties) {
 	
 	if(this.hasProperty('contentType')) this.onContentTypeChanged();
 	$(this).on('contentTypeChange', this.onContentTypeChanged);
+
+	$(this).on('parentElementChange', this.onParentElementChange);
 };
 
 Element.idCounter = 0;
@@ -34,6 +38,26 @@ Element.prototype.property = function(key, value) {
 		}
 	}
 }
+
+Element.prototype.onParentElementChange = function() {
+	if(this.parentElement) {
+		this.parent = $('#element_' + this.parentElement.property('id')).get(0);
+	}	
+	// this.parentWidth = $(this.parent).width();
+	// this.parentHeight = $(this.parent).height();
+
+	// Listen for movements on the parent and move this element to reflect that
+	// if(this.parentElement) {
+	// 	$(this.parentElement).off('xChange yChange', this.onParentMoved);
+	// 	$(this.parentElement).on('xChange yChange', this.onParentMoved);
+	// 	console.log("setup event handlers for", this.parentElement, this.parent);
+	// }
+}
+
+// Element.prototype.onParentMoved = function() {
+// 	this.x(this.x(null, 'relative'), 'relative');
+// 	this.y(this.y(null, 'relative'), 'relative');
+// }
 
 Element.prototype.hasProperty = function(key) {
 	return this.properties.hasOwnProperty(key);
@@ -97,11 +121,12 @@ Element.prototype.x = function(value, positionType) {
 		if(positionType == "relative")
 			return this._x;
 		else {
-			return this._x / 100 * this.parentWidth;
+			var absolute = this._x / 100 * this.parentWidth;
+			if(this.parentElement) absolute += this.parentElement.x(null, 'absolute');
+			return absolute;
 		}
 	} else { 
 		if(positionType != "relative") value = value / this.parentWidth * 100;
-		//if(value < 0) value = 0;
 		if(value != this._x) {
 			this._x = value;
 			this.invalidate('x');
@@ -113,10 +138,13 @@ Element.prototype.y = function(value, positionType) {
 	if(value == null) {
 		if(positionType == "relative") 
 			 return this._y;
-		else return this._y / 100 * this.parentHeight;			
+		else {			
+			var absolute = this._y / 100 * this.parentHeight;			
+			if(this.parentElement) absolute += this.parentElement.y(null, 'absolute');
+			return absolute;
+		}
 	} else { 
 		if(positionType != "relative") value = value / this.parentHeight * 100;
-		//if(value < 0) value = 0;
 		if(value != this._y) {
 			this._y = value;
 			this.invalidate('y');

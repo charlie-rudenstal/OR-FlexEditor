@@ -139,17 +139,25 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			if(selectedElement) {
 				// No resize is in progress, move the element on drag
 				if(resizeDirection == 0) {
-					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x, 'absolute');
-					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y, 'absolute');
+					var toX = selectedElementStartPosition.x + e.delta.snapped.x;
+					var toY = selectedElementStartPosition.y + e.delta.snapped.y;
+					if(selectedElement.parentElement) toX -= selectedElement.parentElement.x(null, 'absolute');
+					if(selectedElement.parentElement) toY -= selectedElement.parentElement.y(null, 'absolute');
+					selectedElement.x(toX, 'absolute');
+					selectedElement.y(toY, 'absolute');
 				} 
 
 				// No else if:s to enable diagonal resize (when resizeDirection is up and left at the same time)
 				if(resizeDirection & resizeDirections.left) {
-					selectedElement.x(selectedElementStartPosition.x + e.delta.snapped.x, 'absolute');
+					var toX = selectedElementStartPosition.x + e.delta.snapped.x;
+					if(selectedElement.parentElement) toX -= selectedElement.parentElement.x(null, 'absolute');
+					selectedElement.x(toX, 'absolute');
 					selectedElement.width(selectedElementStartSize.width - e.delta.snapped.x, 'absolute');
 				}
 				if(resizeDirection & resizeDirections.up) {
-					selectedElement.y(selectedElementStartPosition.y + e.delta.snapped.y, 'absolute');
+					var toY = selectedElementStartPosition.y + e.delta.snapped.y;
+					if(selectedElement.parentElement) toY -= selectedElement.parentElement.y(null, 'absolute');
+					selectedElement.y(toY, 'absolute');
 					selectedElement.height(selectedElementStartSize.height - e.delta.snapped.y, 'absolute');
 				}
 				if(resizeDirection & resizeDirections.right) {

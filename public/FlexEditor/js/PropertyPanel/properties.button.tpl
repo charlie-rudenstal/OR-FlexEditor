@@ -10,6 +10,10 @@ Templates.Raw.PropertiesButton = '
 			<div class="property">
 				<div class="property-label">Text</div>
 				<div class="property-input"><input type="text" value="{{=it.element.property("text")}}" data-property="text" /></div>
+			</div>			
+			<div class="property">
+				<div class="property-label">Rel2Bg</div>
+				<div class="property-input"><input type="text" value="{{=it.element.property("relativeToBackground")}}" data-property="relativeToBackground" /></div>
 			</div>
 			<div class="property">
 				<div class="property-label">Bg</div>
@@ -18,10 +22,6 @@ Templates.Raw.PropertiesButton = '
 			<div class="property">
 				<div class="property-label">Fg</div>
 				<div class="property-input"><input type="text" value="{{=it.element.property("foreground")}}" data-property="foreground" /></div>
-			</div>
-			<div class="property">
-				<div class="property-label">Halign</div>
-				<div class="property-input"><input type="text" value="{{=it.element.property("halign")}}" data-property="halign" /></div>
 			</div>
 			<div class="property">
 				<div class="btn btn-delete">Remove</div>
