@@ -23,6 +23,7 @@ var PropertyPanel = (function(me) {
 			var input = $(e.currentTarget);
 			var property = input.data('property');			
 			element.property(property, input.val());
+			element.invalidateLayout();
 		});
 
 		// A click on an element with the class .btn-delete in the properties template is treated as a delete button 
@@ -39,7 +40,6 @@ var PropertyPanel = (function(me) {
 
 		// Remove the element for this PropertyPanel when the remove/delete button is clicked and close this panel
 		function removeElement() {
-			
 			// TODO: Select next element in list before Delete
 			// Remove the element
 			ElementCollection.remove(element);		 

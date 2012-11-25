@@ -1550,6 +1550,7 @@ function Layers(renderer) {
 			var input = $(e.currentTarget);
 			var property = input.data('property');			
 			element.property(property, input.val());
+			element.invalidateLayout();
 		});
 
 		// A click on an element with the class .btn-delete in the properties template is treated as a delete button 
@@ -1566,7 +1567,6 @@ function Layers(renderer) {
 
 		// Remove the element for this PropertyPanel when the remove/delete button is clicked and close this panel
 		function removeElement() {
-			
 			// TODO: Select next element in list before Delete
 			// Remove the element
 			ElementCollection.remove(element);		 
@@ -1741,7 +1741,7 @@ Library.elements = Library.elements || [];
     me.createElement = function() {
         var elm = ElementCollection.create();
         elm.property('contentType', 'Image');
-        elm.property('background', 'green');        
+        elm.property('background', 'transparent');        
         elm.property('valign', 'top');
         elm.property('halign', 'left');
         elm.property('stretch', 'width');
@@ -1751,8 +1751,8 @@ Library.elements = Library.elements || [];
         elm.property('x', 0);
         elm.property('y', 0);
         elm.property('positionType', 'relative');
-        elm.property('width', 50);
-        elm.property('height', 50);
+        elm.property('width', 100);
+        elm.property('height', 100);
 
         $(elm).on('imageChange', onImageChange);
         $(elm).on('autosizeChange', onAutosizeChanged);
@@ -1778,8 +1778,9 @@ Library.elements = Library.elements || [];
             var img = new Image();
             img.onload = function() {
                 autosizeChangeInProgress = true;
-                elm.width(this.width, 'absolute');
-                elm.height(this.height, 'absolute');
+                elm.property('positionType', 'absolute');
+                elm.property('width', this.width);
+                elm.property('height', this.height);
                 autosizeChangeInProgress = false;
             }
             img.src = elm.property('image');
