@@ -487,7 +487,7 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		var position = {};
 		position.absolute = getMousePosition(e, element);
 		position.snapped = getSnappedRect(position.absolute, cellSize);
-
+		
 		var action = state[e.type];
 		if(action) action(e, position);
 
@@ -760,10 +760,19 @@ var Grid = (function(me) {
 		return clone(cellSize);
 	}
 
-	me.getRelativeCellSize = function() {
+	me.getRelativeCellSize = function(parentElement) {
+		var c = cols;
+		var r = rows;
+		// use cols and rows of parentElement 
+		// instead of for all of the editor if specified
+		if(parentElement != null) {
+			var cell = parentElement.getCell();
+			c = cell.width;
+			r = cell.height;
+		}
 		return {
-			width: 1 / cols * 100,
-			height: 1 / rows * 100	
+			width: 1 / c * 100,
+			height: 1 / r * 100	
 		};
 	}
 
@@ -936,17 +945,19 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(!DragDrop.current.lockedY) ghost.setY(e.position.snapped.y - 3);					
 
 			} else {
-				return;
-				// Check if mouse is over a resize handle and update the mouse pointer accordingly
 				
+				// Check if mouse is over a resize handle and update the mouse pointer accordingly
 				var element = ElementCollection.getFromDom(e.target);
 				if(element && element.selected) {
-					var relativeX = e.position.absolute.x - element.x();
-					var relativeY = e.position.absolute.y - element.y();
+					var absElement = element.getAbsolute();
+					
+					var relativeX = e.position.absolute.x - absElement.x;
+					var relativeY = e.position.absolute.y - absElement.y;
+
 					var resizeLeft = relativeX < 8;
 					var resizeUp = relativeY < 8;
-					var resizeRight = relativeX >= element.property('width') - 8;
-					var resizeDown = relativeY >= element.property('height') - 8;
+					var resizeRight = relativeX >= absElement.width - 8;
+					var resizeDown = relativeY >= absElement.height - 8;
 
 					if(element.selected) {
 						if(resizeUp && resizeLeft) $renderToElement.css('cursor', 'nw-resize');
@@ -1013,6 +1024,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				selectedElementStartPosition = element.getCell();
 				
 				if(element.selected) {
+					
 					var elmAbsolute = element.getAbsolute();
 					
 					// Did the user click on a resize handle?
@@ -1295,7 +1307,7 @@ Element.prototype.setHeight = function(y) {
 Element.prototype.getCurrentCellSize = function() {
 	return this.property('positionType') == 'absolute' 
 			? Grid.getCellSize() 
-			: Grid.getRelativeCellSize();
+			: Grid.getRelativeCellSize(this.parentElement);
 }
 
 Element.prototype.resize = function(width, height) {
@@ -1306,7 +1318,18 @@ Element.prototype.resize = function(width, height) {
 	this.property('height', this.property('height') + absoluteHeight);
 }
 
+
 Element.prototype.getAbsolute = function() {
+	var domElement = this.getDomElement();
+	var position = domElement.offset();
+	var rootPosition = $('#editor').offset();
+	return { x: position.left - rootPosition.left,
+			 y: position.top - rootPosition.top, 
+			 width: domElement.width(), 
+			 height: domElement.height() };
+}
+
+Element.prototype.getAbsoluteInParent = function() {
 	var domElement = this.getDomElement();
 	var position = domElement.position();
 	return { x: position.left, y: position.top, 
@@ -1314,7 +1337,7 @@ Element.prototype.getAbsolute = function() {
 }
 
 Element.prototype.getCell = function() {
-	var abs = this.getAbsolute();
+	var abs = this.getAbsoluteInParent();
 	var cellSize = Grid.getCellSize();
 	return {
 		x: ~~(abs.x / cellSize.width),
@@ -1364,7 +1387,19 @@ function Layers(renderer) {
 		} else if($target.closest('.attribute-locked').length > 0) {
 			element.toggleProperty('locked');
 		} else if($target.closest('.attribute-position').length > 0) {
-			element.property('positionType', (element.property('positionType') == 'absolute') ? 'relative' : 'absolute');
+				
+			var cell = element.getCell();
+
+			console.log(cell);
+
+			element.property('positionType', (element.property('positionType') == 'absolute') 
+				? 'relative' 
+				: 'absolute');
+
+			element.setX(cell.x);
+			element.setY(cell.y);
+			element.setWidth(cell.width);
+			element.setHeight(cell.height);
 		}
 	}
 
@@ -1595,12 +1630,13 @@ Library.elements = Library.elements || [];
         elm.property('background', 'blue');  
         elm.property('text', 'Test');  
 
-        elm.property('width', 20);
-        elm.property('height', 20);
         elm.property('valign', 'bottom');
         elm.property('halign', 'center');
         elm.property('autosize', false);
+
         elm.property('positionType', 'absolute');
+        elm.setWidth(6);
+        elm.setHeight(6);
 
         //$(elm).on('imageChange', onImageChange);
         //$(elm).on('autosizeChange', onAutosizeChanged);
@@ -1679,10 +1715,10 @@ Library.elements = Library.elements || [];
         elm.property('stretch', 'width');
         elm.property('text', "Background");
         elm.property('locked', false);
-        elm.property('positionType', 'relative');
         elm.property('children', []);
         elm.property('x', 0);
         elm.property('y', 0);
+        elm.property('positionType', 'relative');
         elm.property('width', 50);
         elm.property('height', 50);
 

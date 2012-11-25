@@ -23,10 +23,10 @@ Library.elements = Library.elements || [];
         elm.property('stretch', 'width');
         elm.property('text', "Background");
         elm.property('locked', false);
-        elm.property('positionType', 'relative');
         elm.property('children', []);
         elm.property('x', 0);
         elm.property('y', 0);
+        elm.property('positionType', 'relative');
         elm.property('width', 50);
         elm.property('height', 50);
 

@@ -128,7 +128,7 @@ Element.prototype.setHeight = function(y) {
 Element.prototype.getCurrentCellSize = function() {
 	return this.property('positionType') == 'absolute' 
 			? Grid.getCellSize() 
-			: Grid.getRelativeCellSize();
+			: Grid.getRelativeCellSize(this.parentElement);
 }
 
 Element.prototype.resize = function(width, height) {
@@ -139,7 +139,18 @@ Element.prototype.resize = function(width, height) {
 	this.property('height', this.property('height') + absoluteHeight);
 }
 
+
 Element.prototype.getAbsolute = function() {
+	var domElement = this.getDomElement();
+	var position = domElement.offset();
+	var rootPosition = $('#editor').offset();
+	return { x: position.left - rootPosition.left,
+			 y: position.top - rootPosition.top, 
+			 width: domElement.width(), 
+			 height: domElement.height() };
+}
+
+Element.prototype.getAbsoluteInParent = function() {
 	var domElement = this.getDomElement();
 	var position = domElement.position();
 	return { x: position.left, y: position.top, 
@@ -147,7 +158,7 @@ Element.prototype.getAbsolute = function() {
 }
 
 Element.prototype.getCell = function() {
-	var abs = this.getAbsolute();
+	var abs = this.getAbsoluteInParent();
 	var cellSize = Grid.getCellSize();
 	return {
 		x: ~~(abs.x / cellSize.width),

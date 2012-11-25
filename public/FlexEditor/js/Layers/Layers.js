@@ -29,7 +29,19 @@ function Layers(renderer) {
 		} else if($target.closest('.attribute-locked').length > 0) {
 			element.toggleProperty('locked');
 		} else if($target.closest('.attribute-position').length > 0) {
-			element.property('positionType', (element.property('positionType') == 'absolute') ? 'relative' : 'absolute');
+				
+			var cell = element.getCell();
+
+			console.log(cell);
+
+			element.property('positionType', (element.property('positionType') == 'absolute') 
+				? 'relative' 
+				: 'absolute');
+
+			element.setX(cell.x);
+			element.setY(cell.y);
+			element.setWidth(cell.width);
+			element.setHeight(cell.height);
 		}
 	}
 

@@ -35,17 +35,19 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				if(!DragDrop.current.lockedY) ghost.setY(e.position.snapped.y - 3);					
 
 			} else {
-				return;
-				// Check if mouse is over a resize handle and update the mouse pointer accordingly
 				
+				// Check if mouse is over a resize handle and update the mouse pointer accordingly
 				var element = ElementCollection.getFromDom(e.target);
 				if(element && element.selected) {
-					var relativeX = e.position.absolute.x - element.x();
-					var relativeY = e.position.absolute.y - element.y();
+					var absElement = element.getAbsolute();
+					
+					var relativeX = e.position.absolute.x - absElement.x;
+					var relativeY = e.position.absolute.y - absElement.y;
+
 					var resizeLeft = relativeX < 8;
 					var resizeUp = relativeY < 8;
-					var resizeRight = relativeX >= element.property('width') - 8;
-					var resizeDown = relativeY >= element.property('height') - 8;
+					var resizeRight = relativeX >= absElement.width - 8;
+					var resizeDown = relativeY >= absElement.height - 8;
 
 					if(element.selected) {
 						if(resizeUp && resizeLeft) $renderToElement.css('cursor', 'nw-resize');
@@ -112,6 +114,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				selectedElementStartPosition = element.getCell();
 				
 				if(element.selected) {
+					
 					var elmAbsolute = element.getAbsolute();
 					
 					// Did the user click on a resize handle?

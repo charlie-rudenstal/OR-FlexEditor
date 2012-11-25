@@ -20,7 +20,7 @@ function MouseInput(element, cellSize, relativeToScreen) {
 		var position = {};
 		position.absolute = getMousePosition(e, element);
 		position.snapped = getSnappedRect(position.absolute, cellSize);
-
+		
 		var action = state[e.type];
 		if(action) action(e, position);
 

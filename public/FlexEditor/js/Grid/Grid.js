@@ -23,10 +23,19 @@ var Grid = (function(me) {
 		return clone(cellSize);
 	}
 
-	me.getRelativeCellSize = function() {
+	me.getRelativeCellSize = function(parentElement) {
+		var c = cols;
+		var r = rows;
+		// use cols and rows of parentElement 
+		// instead of for all of the editor if specified
+		if(parentElement != null) {
+			var cell = parentElement.getCell();
+			c = cell.width;
+			r = cell.height;
+		}
 		return {
-			width: 1 / cols * 100,
-			height: 1 / rows * 100	
+			width: 1 / c * 100,
+			height: 1 / r * 100	
 		};
 	}
 

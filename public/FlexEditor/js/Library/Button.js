@@ -18,12 +18,13 @@ Library.elements = Library.elements || [];
         elm.property('background', 'blue');  
         elm.property('text', 'Test');  
 
-        elm.property('width', 20);
-        elm.property('height', 20);
         elm.property('valign', 'bottom');
         elm.property('halign', 'center');
         elm.property('autosize', false);
+
         elm.property('positionType', 'absolute');
+        elm.setWidth(6);
+        elm.setHeight(6);
 
         //$(elm).on('imageChange', onImageChange);
         //$(elm).on('autosizeChange', onAutosizeChanged);
