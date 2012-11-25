@@ -9,8 +9,8 @@ var ElementCollection = (function(me) {
 		cellSize = pCellSize;
 	}
 
-	me.create = function(parent, properties) {
-		return new Element(parent, cellSize, properties);
+	me.create = function(properties) {
+		return new Element(properties);
 	}
 
 	// add an element to the collection. isGhost can be specified to keep
@@ -23,14 +23,19 @@ var ElementCollection = (function(me) {
 			ghostId = element.property('id');
 			element.template = Templates.ElementGhost;
 		}
-		$(element).on('change', function() { $(me).trigger('change'); });
-		$(me).trigger('change');
+		$(element).on('layoutInvalidated', function() { me.invalidateLayout() });
+		me.invalidateLayout();
+	}
+
+	me.invalidateLayout = function() {
+		$(me).trigger('layoutInvalidated');
 	}
 
 	me.remove = function(element) {
 		elements[element.property('id')] = null;
 		delete elements[element.property('id')];
-		$(me).trigger('change');
+
+		invalidateLayout();
 
 		// we need to update the results of hasGhost if user removed 
 		// the ghost by other means than removeGhost
@@ -61,7 +66,7 @@ var ElementCollection = (function(me) {
 		if(selectedElement) selectedElement.blur();
 		selectedElement = elementToSelect;
 		if(elementToSelect) elementToSelect.select();
-		$(me).trigger('change');
+		$(me).trigger('invalidateLayout');
 		$(me).trigger({type: 'selection', element: elementToSelect});
 	}
 
@@ -87,6 +92,13 @@ var ElementCollection = (function(me) {
 
 	me.getSelected = function() {
 		return selectedElement;
+	}
+
+	me.getFromDom = function(domElement) {
+		var closest = $(domElement).closest('*[data-element-id]');
+		if(closest.size() == 0) return null;
+		var elementId = closest.data('element-id');
+		return me.getById(elementId);
 	}
 
 	return me;

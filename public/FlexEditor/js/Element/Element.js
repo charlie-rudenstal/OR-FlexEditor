@@ -1,73 +1,24 @@
-function Element(parent, cellSize, properties) {
-
+function Element(properties) {
 	this.properties = {};
 	this.parentElement = null;
 	if(properties) this.setProperties(properties);
 	if(!this.properties.id) this.generateNewId();
-		
-	if(parent == null) throw "Parent for Element cannot be null";
-
-	this.parent = parent;
-	this.parentWidth = $(parent).width();
-	this.parentHeight = $(parent).height();
-
+	
 	this.template = Templates.Element;
 	this.layerTemplate = Templates.Layer;
 	this.selected = false;
 
-	this.cellSize = cellSize;
-	
 	if(this.hasProperty('contentType')) this.onContentTypeChanged();
 	$(this).on('contentTypeChange', this.onContentTypeChanged);
 
-	//$(this).on('parentElementChange', this.onParentElementChange);
+	$(this).on('xChange yChange widthChange heightChange positionTypeChange', this.onLayoutChanged);
 };
 
+Element.prototype.onLayoutChanged = function() {
+	this.invalidateLayout();
+}
+
 Element.idCounter = 0;
-
-Element.prototype.properties = {};
-
-Element.prototype.property = function(key, value) {
-	if(value == null) {
-		return this.properties[key];
-	} else {
-		if(this.properties[key] != value) {
-			if(value == 'true') value = true;
-			if(value == 'false') value = false;
-			this.properties[key] = value;
-			$(this).trigger(key + 'Change'); // widthChange, paddingChange etc
-		}
-	}
-}
-
-Element.prototype.onParentElementChange = function() {
-	//if(this.parentElement) {
-	//	this.parent = $('#element_' + this.parentElement.property('id')).get(0);
-	//}	
-	// this.parentWidth = $(this.parent).width();
-	// this.parentHeight = $(this.parent).height();
-
-	// Listen for movements on the parent and move this element to reflect that
-	// if(this.parentElement) {
-	// 	$(this.parentElement).off('xChange yChange', this.onParentMoved);
-	// 	$(this.parentElement).on('xChange yChange', this.onParentMoved);
-	// 	console.log("setup event handlers for", this.parentElement, this.parent);
-	// }
-}
-
-// Element.prototype.onParentMoved = function() {
-// 	this.x(this.x(null, 'relative'), 'relative');
-// 	this.y(this.y(null, 'relative'), 'relative');
-// }
-
-Element.prototype.hasProperty = function(key) {
-	return this.properties.hasOwnProperty(key);
-}
-
-Element.prototype.toggleProperty = function(key) {
-	this.property(key, !this.properties[key]);
-}
-
 Element.prototype.generateNewId = function() {
 	this.property('id', Element.idCounter++);
 }
@@ -90,9 +41,33 @@ Element.prototype.onContentTypeChanged = function() {
 
 // Should be called after raw attributes has been changed, like for example text
 // to notify this object and other listener about the change
-Element.prototype.invalidate = function(property) {
-	if(property) $(this).trigger(property + 'Change');
-	$(this).trigger('change');
+Element.prototype.invalidateLayout = function() {
+	$(this).trigger('layoutInvalidated');
+}
+
+/********************/
+/* Handle Propeties */
+/********************/
+Element.prototype.properties = {};
+Element.prototype.property = function(key, value) {
+	if(value == null) {
+		return this.properties[key];
+	} else {
+		if(this.properties[key] != value) {
+			if(value == 'true') value = true;
+			if(value == 'false') value = false;
+			this.properties[key] = value;
+			$(this).trigger(key + 'Change'); // widthChange, paddingChange etc
+		}
+	}
+}
+
+Element.prototype.hasProperty = function(key) {
+	return this.properties.hasOwnProperty(key);
+}
+
+Element.prototype.toggleProperty = function(key) {
+	this.property(key, !this.properties[key]);
 }
 
 Element.prototype.getProperties = function() {
@@ -103,71 +78,52 @@ Element.prototype.setProperties = function(properties) {
 	this.properties = clone(properties);
 }
 
-Element.prototype.getParent = function() {
-	var parent = this.getDomElement().parent().closest('.component');
-	if(parent.size() == 0) parent = $("#editor");
-	return parent;
-	//return this.parent;
-}
-
-Element.prototype.getDomElement = function() {
-	return $('#element_' + this.property('id'));
-}
-
+/********************************/
+/* Shortcuts for positioning    */
+/********************************/
 Element.prototype.getUnit = function() {
 	return this.property('positionType') == 'absolute' ? 'px' : '%';
 }
 
 Element.prototype.xUnit = function() {
-	return this.x() + this.getUnit();
+	return this.property('x') + this.getUnit();
 }
 
 Element.prototype.yUnit = function() {
-	return this.y() + this.getUnit();
+	return this.property('y') + this.getUnit();
 }
 
 Element.prototype.widthUnit = function() {
-	return this.width() + this.getUnit();
+	return this.property('width') + this.getUnit();
 }
 
 Element.prototype.heightUnit = function() {
-	return this.height() + this.getUnit();
+	return this.property('height') + this.getUnit();
 }
 
-Element.prototype.x = function(value) {
-	if(value == null) {
-		return this._x;
-	} else {
-		this._x = value;
-		this.invalidate('x');
-	}
-};
+Element.prototype.move = function(x, y) {
+	this.property('x', this.property('x') + x);
+	this.property('y', this.property('y') + y);
+}
 
-Element.prototype.y = function(value) {
-	if(value == null) {
-		return this._y;
-	} else {
-		this._y = value;
-		this.invalidate('y');
-	}
-};
+Element.prototype.resize = function(width, height) {
+	this.property('width', this.property('width') + width);
+	this.property('height', this.property('height') + height);
+}
 
-Element.prototype.width = function(value) {
-	if(value == null) {
-		return this._width;
-	} else {
-		this._width = value;
-		this.invalidate('width');
-	}
-};
+Element.prototype.getAbsolute = function() {
+	var domElement = this.getDomElement();
+	var position = domElement.position();
+	return { x: position.left, y: position.top, 
+			 width: domElement.width(), height: domElement.height() };
+}
 
-Element.prototype.height = function(value) {
-	
-	if(value == null) {
-		return this._height;
-	} else {
-		this._height = value;
-		this.invalidate('height');
-	}
-};
+// Element.prototype.getParent = function() {
+// 	var parent = this.getDomElement().parent().closest('.component');
+// 	if(parent.size() == 0) parent = $("#editor");
+// 	return parent;
+// }
 
+Element.prototype.getDomElement = function() {
+	return $('#element_' + this.property('id'));
+}

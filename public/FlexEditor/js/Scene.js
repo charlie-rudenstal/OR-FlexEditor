@@ -31,10 +31,14 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				
 				// set a x, y, width and height using the item type default 
 				// if the width is not set explicitly by the item type
-				if(!DragDrop.current.lockedX) ghost.x(e.position.snapped.x - (cellSize.width * 3));
-				if(!DragDrop.current.lockedY) ghost.y(e.position.snapped.y - (cellSize.height * 3));					
-	
+				if(!DragDrop.current.lockedX) {
+					var x = e.position.snapped.x - (cellSize.width * 3);
+					ghost.property('x', x);
+				}
+				if(!DragDrop.current.lockedY) ghost.property('y', (e.position.snapped.y - (cellSize.height * 3)));					
+
 			} else {
+				return;
 				// Check if mouse is over a resize handle and update the mouse pointer accordingly
 				var domElement = $(e.target).closest('.component').get(0);
 				var element = getElementByDomElement(domElement);
@@ -43,8 +47,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					var relativeY = e.position.absolute.y - element.y();
 					var resizeLeft = relativeX < 8;
 					var resizeUp = relativeY < 8;
-					var resizeRight = relativeX >= element.width() - 8;
-					var resizeDown = relativeY >= element.height() - 8;
+					var resizeRight = relativeX >= element.property('width') - 8;
+					var resizeDown = relativeY >= element.property('height') - 8;
 
 					if(element.selected) {
 						if(resizeUp && resizeLeft) $renderToElement.css('cursor', 'nw-resize');
@@ -64,7 +68,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			}
 
 		});
-	
+
 		// If a element from the library is dropped over the scene, then create it
 		$(mouseInput).on('mouseup', function(e) {
 			var isInsideScene = e.position.absolute.x < width &&
@@ -73,15 +77,11 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			resizeDirection = 0;
 			if(DragDrop.current) {
 				if(isInsideScene) {					
-					//var elm = DragDrop.current.createElement(renderToElement);
 					// set a x, y, width and height using the item type default 
 					// if the width is not set explicitly by the item type
-					
 					var elm = ElementCollection.getGhost();
 					ElementCollection.convertGhostToElement();
-					// if(!DragDrop.current.lockedX) elm.x(e.position.snapped.x - (cellSize.width * 3));
-					// if(!DragDrop.current.lockedY) elm.y(e.position.snapped.y - (cellSize.height * 3));					
-
+					
 					// If an element was selected when this element
 					// is created, it should be added as a child to this element
 					var parentElement = ElementCollection.getSelected();
@@ -94,8 +94,6 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					}
 					// ElementCollection.add(elm);
 					ElementCollection.select(elm);
-
-				
 				
 				} else if (ElementCollection.hasGhost()) {
 					// Render just to get rid of the ghost element if the mouse was 
@@ -108,22 +106,22 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 		// Select the element if the user clicks on it
 		$(mouseInput).on('mousedown', function(e) {
-			var domElement = $(e.target).closest('.component').get(0);
-			var element = getElementByDomElement(domElement);
+			var element = ElementCollection.getFromDom($(e.target));
 			if(element) {
-				var relativeX = e.position.absolute.x - element.x();
-				var relativeY = e.position.absolute.y - element.y();
-				
-				var resizeLeft = relativeX < 8;
-				var resizeUp = relativeY < 8;
-				var resizeRight = relativeX >= element.width() - 8;
-				var resizeDown = relativeY >= element.height() - 8;
-				
-				selectedElementStartPosition = { x: element.x(), y: element.y() };
-				selectedElementStartSize = { width: element.width(), height: element.height() };
-
-				resizeDirection = 0;
 				if(element.selected) {
+					var elmAbsolute = element.getAbsolute();
+					var relativeX = e.position.absolute.x - elmAbsolute.x;
+					var relativeY = e.position.absolute.y - elmAbsolute.y;
+					
+					var resizeLeft = relativeX < 8;
+					var resizeUp = relativeY < 8;
+					var resizeRight = relativeX >= elmAbsolute.width - 8;
+					var resizeDown = relativeY >= elmAbsolute.height - 8;
+					
+					selectedElementStartPosition = { x: elmAbsolute.x, y: elmAbsolute.y };
+					selectedElementStartSize = { width: elmAbsolute.width, height: elmAbsolute.height };
+
+					resizeDirection = 0;
 					// Did the user click on a resize handle?
 					if(resizeLeft) resizeDirection |= resizeDirections.left;
 					if(resizeUp) resizeDirection |= resizeDirections.up;
@@ -133,7 +131,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					ElementCollection.select(element);
 				}
 			} else {
-				ElementCollection.select(null); // Deselect elements if clicked outside
+				// Deselect elements if user clicked on something else than an element
+				ElementCollection.select(null); 
 			}
 		})
 
@@ -193,28 +192,24 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 
 			// alt + shift + arrows: Resize current Element
 			if(e.altKey && e.shiftKey) {
-				// Find which element is selected and ignore if no selection
-				// Then resize it!
+				// Find which element is selected and ignore if no selection, then resize it!
 				var selectedElement = ElementCollection.getSelected();
 				if(!selectedElement) return;
-				if(e.keyCode == keyLeft)	selectedElement.width(selectedElement.width() - cellSize.width);
-				if(e.keyCode == keyUp) 		selectedElement.height(selectedElement.height() - cellSize.height);
-				if(e.keyCode == keyRight) 	selectedElement.width(selectedElement.width() + cellSize.width);
-				if(e.keyCode == keyDown) 	selectedElement.height(selectedElement.height() + cellSize.height);
-				selectedElement.invalidate();
+				if(e.keyCode == keyLeft)	selectedElement.resize(-cellSize.width, 0);
+				if(e.keyCode == keyUp) 		selectedElement.resize(0, -cellSize.height);
+				if(e.keyCode == keyRight) 	selectedElement.resize(cellSize.width, 0);
+				if(e.keyCode == keyDown) 	selectedElement.resize(0, cellSize.height);
 			}
 
 			// alt + arrows: Move current Element
 			if(e.altKey && !e.shiftKey) {
-				// Find which element is selected and ignore if no selection
-				// Then move it!
+				// Find which element is selected and ignore if no selection, then move it!
 				var selectedElement = ElementCollection.getSelected();
 				if(!selectedElement) return;
-				if(e.keyCode == keyLeft)	selectedElement.x(selectedElement.x() - cellSize.width);
-				if(e.keyCode == keyUp) 		selectedElement.y(selectedElement.y() - cellSize.height);
-				if(e.keyCode == keyRight) 	selectedElement.x(selectedElement.x() + cellSize.width);
-				if(e.keyCode == keyDown) 	selectedElement.y(selectedElement.y() + cellSize.height);
-				selectedElement.invalidate();
+				if(e.keyCode == keyLeft)	selectedElement.move(-cellSize.width, 0);
+				if(e.keyCode == keyUp) 		selectedElement.move(0, -cellSize.height);
+				if(e.keyCode == keyRight) 	selectedElement.move(cellSize.width, 0);
+				if(e.keyCode == keyDown) 	selectedElement.move(0, cellSize.height);
 			}
 
 			 // ctrl + number keys: Create an element with the corresponding index from the library

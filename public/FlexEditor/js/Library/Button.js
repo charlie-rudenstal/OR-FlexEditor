@@ -11,19 +11,19 @@ Library.elements = Library.elements || [];
 		
 	}
 
-    me.createElement = function(renderToElement) {
-        var elm = ElementCollection.create(renderToElement);
+    me.createElement = function() {
+        var elm = ElementCollection.create();
         
         elm.property('contentType', 'Button');  
         elm.property('background', 'blue');  
         elm.property('text', '');  
 
-        elm.width(50);
-        elm.height(50);
+        elm.property('width', 20);
+        elm.property('height', 20);
         elm.property('valign', 'bottom');
         elm.property('halign', 'center');
         elm.property('autosize', false);
-        elm.property('positionType', 'relative');
+        elm.property('positionType', 'absolute');
 
         //$(elm).on('imageChange', onImageChange);
         //$(elm).on('autosizeChange', onAutosizeChanged);

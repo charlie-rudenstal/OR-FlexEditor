@@ -27,7 +27,7 @@ function Main(options) {
 	var scene = new Scene(renderer, elmEditor, size, cellSize);
 
 	ElementCollection.setCellSize(cellSize);
-	$(ElementCollection).on('change', function() { me.render(); });
+	$(ElementCollection).on('layoutInvalidated', function() { me.invalidateLayout() });
 	$(ElementCollection).on('selection', function(e) {
 		var element = e.element;	
 		if(element) {
@@ -44,6 +44,10 @@ function Main(options) {
         var elm = Library.elements.Background.createElement(elmEditor);
         ElementCollection.add(elm);
 	};
+
+	me.invalidateLayout = function() {
+		me.render();
+	}
  
 	me.render = function() {
 		var elements = ElementCollection.getAsArray();

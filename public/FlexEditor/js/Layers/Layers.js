@@ -22,19 +22,14 @@ function Layers(renderer) {
 	// Will select the element in the ElementCollection on click
 	function onItemDown(e) {
 		var $target = $(e.target);
-
-
-		var elementId  = $(e.target).closest('.layer-element').data('element-id');
-		var element = ElementCollection.getById(elementId);
+		var element = ElementCollection.getFromDom(e.target);
 
 		if($target.is('.layer-element')) {
 			ElementCollection.select(element);
 		} else if($target.closest('.attribute-locked').length > 0) {
 			element.toggleProperty('locked');
-			element.invalidate();
 		} else if($target.closest('.attribute-position').length > 0) {
 			element.property('positionType', (element.property('positionType') == 'absolute') ? 'relative' : 'absolute');
-			element.invalidate();
 		}
 	}
 

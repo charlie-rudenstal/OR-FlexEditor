@@ -23,7 +23,6 @@ var PropertyPanel = (function(me) {
 			var input = $(e.currentTarget);
 			var property = input.data('property');			
 			element.property(property, input.val());
-			element.invalidate();
 		});
 
 		// A click on an element with the class .btn-delete in the properties template is treated as a delete button 

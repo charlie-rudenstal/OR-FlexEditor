@@ -14,8 +14,8 @@ Library.elements = Library.elements || [];
 		
 	}
 
-    me.createElement = function(renderToElement) {
-        var elm = ElementCollection.create(renderToElement);
+    me.createElement = function() {
+        var elm = ElementCollection.create();
         elm.property('contentType', 'Image');
         elm.property('background', 'green');        
         elm.property('valign', 'top');
@@ -25,10 +25,10 @@ Library.elements = Library.elements || [];
         elm.property('locked', false);
         elm.property('positionType', 'relative');
         elm.property('children', []);
-        elm.x(0);
-        elm.y(0);
-        elm.width(50);
-        elm.height(50);
+        elm.property('x', 0);
+        elm.property('y', 0);
+        elm.property('width', 50);
+        elm.property('height', 50);
 
         $(elm).on('imageChange', onImageChange);
         $(elm).on('autosizeChange', onAutosizeChanged);
