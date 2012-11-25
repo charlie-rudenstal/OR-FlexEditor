@@ -12,8 +12,8 @@ Templates.Raw.PropertiesButton = '
 				<div class="property-input"><input type="text" value="{{=it.element.property("text")}}" data-property="text" /></div>
 			</div>			
 			<div class="property">
-				<div class="property-label">Rel2Bg</div>
-				<div class="property-input"><input type="text" value="{{=it.element.property("relativeToBackground")}}" data-property="relativeToBackground" /></div>
+				<div class="property-label">Action</div>
+				<div class="property-input"><input type="text" value="{{=it.element.property("actionUrl")}}" data-property="actionUrl" /></div>
 			</div>
 			<div class="property">
 				<div class="property-label">Bg</div>

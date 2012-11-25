@@ -21,6 +21,7 @@ Library.elements = Library.elements || [];
         elm.property('valign', 'bottom');
         elm.property('halign', 'center');
         elm.property('autosize', false);
+        elm.property('actionUrl', '');
 
         elm.property('positionType', 'absolute');
         elm.setWidth(6);
