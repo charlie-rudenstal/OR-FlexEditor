@@ -108,25 +108,27 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		$(mouseInput).on('mousedown', function(e) {
 			var element = ElementCollection.getFromDom($(e.target));
 			if(element) {
+				// Save the position of the element
+				var elmAbsolute = element.getAbsolute();
+				selectedElementStartPosition = { x: elmAbsolute.x, y: elmAbsolute.y };
+				selectedElementStartSize = { width: elmAbsolute.width, height: elmAbsolute.height };
+
 				if(element.selected) {
-					var elmAbsolute = element.getAbsolute();
+					// Did the user click on a resize handle?
 					var relativeX = e.position.absolute.x - elmAbsolute.x;
 					var relativeY = e.position.absolute.y - elmAbsolute.y;
-					
+
 					var resizeLeft = relativeX < 8;
 					var resizeUp = relativeY < 8;
 					var resizeRight = relativeX >= elmAbsolute.width - 8;
 					var resizeDown = relativeY >= elmAbsolute.height - 8;
 					
-					selectedElementStartPosition = { x: elmAbsolute.x, y: elmAbsolute.y };
-					selectedElementStartSize = { width: elmAbsolute.width, height: elmAbsolute.height };
-
 					resizeDirection = 0;
-					// Did the user click on a resize handle?
 					if(resizeLeft) resizeDirection |= resizeDirections.left;
 					if(resizeUp) resizeDirection |= resizeDirections.up;
 					if(resizeRight) resizeDirection |= resizeDirections.right;
 					if(resizeDown) resizeDirection |= resizeDirections.down;
+
 				} else {
 					ElementCollection.select(element);
 				}
@@ -147,34 +149,33 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		$(mouseInput).on('drag', function(e) {
 			var selectedElement = ElementCollection.getSelected();
 			if(selectedElement) {
-				// No resize is in progress, move the element on drag
-				if(resizeDirection == 0) {
-					var toX = selectedElementStartPosition.x + e.delta.snapped.x;
-					var toY = selectedElementStartPosition.y + e.delta.snapped.y;
-					if(selectedElement.parentElement) toX -= selectedElement.parentElement.x(null, 'absolute');
-					if(selectedElement.parentElement) toY -= selectedElement.parentElement.y(null, 'absolute');
-					selectedElement.x(toX, 'absolute');
-					selectedElement.y(toY, 'absolute');
-				} 
+				var isResizing = resizeDirection > 0;
+				if(isResizing) {	
+					// No else if:s to enable diagonal resize (when resizeDirection is up and left at the same time)
+					if(resizeDirection & resizeDirections.left) {
+						var toX = selectedElementStartPosition.x + e.delta.snapped.x;
+						selectedElement.property('x', toX);
+						selectedElement.property('width', selectedElementStartSize.width - e.delta.snapped.x, 'absolute');
+					}
+					if(resizeDirection & resizeDirections.up) {
+						var toY = selectedElementStartPosition.y + e.delta.snapped.y;
+						selectedElement.property('y', toY);
+						selectedElement.property('height', selectedElementStartSize.height - e.delta.snapped.y, 'absolute');
+					}
+					if(resizeDirection & resizeDirections.right) {
+						selectedElement.property('width', selectedElementStartSize.width + e.delta.snapped.x, 'absolute');
+					}
+					if(resizeDirection & resizeDirections.down) {
+						selectedElement.property('height', selectedElementStartSize.height + e.delta.snapped.y, 'absolute');
+					}
+				} else {
 
-				// No else if:s to enable diagonal resize (when resizeDirection is up and left at the same time)
-				if(resizeDirection & resizeDirections.left) {
+					// No resize is in progress, move the element on drag
 					var toX = selectedElementStartPosition.x + e.delta.snapped.x;
-					if(selectedElement.parentElement) toX -= selectedElement.parentElement.x(null, 'absolute');
-					selectedElement.x(toX, 'absolute');
-					selectedElement.width(selectedElementStartSize.width - e.delta.snapped.x, 'absolute');
-				}
-				if(resizeDirection & resizeDirections.up) {
 					var toY = selectedElementStartPosition.y + e.delta.snapped.y;
-					if(selectedElement.parentElement) toY -= selectedElement.parentElement.y(null, 'absolute');
-					selectedElement.y(toY, 'absolute');
-					selectedElement.height(selectedElementStartSize.height - e.delta.snapped.y, 'absolute');
-				}
-				if(resizeDirection & resizeDirections.right) {
-					selectedElement.width(selectedElementStartSize.width + e.delta.snapped.x, 'absolute');
-				}
-				if(resizeDirection & resizeDirections.down) {
-					selectedElement.height(selectedElementStartSize.height + e.delta.snapped.y, 'absolute');
+					selectedElement.property('x', toX);
+					selectedElement.property('y', toY);
+
 				}
 			}
 		});
