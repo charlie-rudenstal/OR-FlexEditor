@@ -33,6 +33,33 @@ Element.prototype.blur = function() {
 	this.selected = false;
 }
 
+Element.prototype.removeChild = function(element) {
+	var children = this.property('children');
+	if(children) {
+		for(var i in children) {
+			if(children[i] == element) {
+				children.splice(i, 1);
+			}
+		}
+	}
+}
+
+Element.prototype.destroy = function() {
+	// Remove from Parent
+	if(this.parentElement) {
+		this.parentElement.removeChild(this);
+		this.parentElement = null;
+	}
+
+	// Remove Children
+	var children = this.property('children');
+	if(children) {
+		for(var i in children) {
+			ElementCollection.remove(children[i]);
+		}	
+	}
+}
+
 Element.prototype.onContentTypeChanged = function() {
 	var contentType = this.property('contentType');
 	this.contentTemplate = Templates['ElementType' + contentType];

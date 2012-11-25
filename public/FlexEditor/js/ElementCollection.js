@@ -27,14 +27,19 @@ var ElementCollection = (function(me) {
 	}
 
 	me.remove = function(element) {
+
+		// Let the element clear up itself and any references
+		element.destroy();
+		
+		// Remove from ElementCollection
 		elements[element.property('id')] = null;
 		delete elements[element.property('id')];
 
-		invalidateLayout();
-
-		// we need to update the results of hasGhost if user removed 
+		// We need to update the results of hasGhost if user removed 
 		// the ghost by other means than removeGhost
 		if(element.id == ghostId) ghostId = null;
+			
+		me.invalidateLayout();
 	}
 
 	me.removeGhost = function() {

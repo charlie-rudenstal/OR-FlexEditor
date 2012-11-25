@@ -837,14 +837,19 @@ var Grid = (function(me) {
 	}
 
 	me.remove = function(element) {
+
+		// Let the element clear up itself and any references
+		element.destroy();
+		
+		// Remove from ElementCollection
 		elements[element.property('id')] = null;
 		delete elements[element.property('id')];
 
-		invalidateLayout();
-
-		// we need to update the results of hasGhost if user removed 
+		// We need to update the results of hasGhost if user removed 
 		// the ghost by other means than removeGhost
 		if(element.id == ghostId) ghostId = null;
+			
+		me.invalidateLayout();
 	}
 
 	me.removeGhost = function() {
@@ -1210,6 +1215,33 @@ Element.prototype.select = function() {
 Element.prototype.blur = function() {
 	this.template = Templates.Element;
 	this.selected = false;
+}
+
+Element.prototype.removeChild = function(element) {
+	var children = this.property('children');
+	if(children) {
+		for(var i in children) {
+			if(children[i] == element) {
+				children.splice(i, 1);
+			}
+		}
+	}
+}
+
+Element.prototype.destroy = function() {
+	// Remove from Parent
+	if(this.parentElement) {
+		this.parentElement.removeChild(this);
+		this.parentElement = null;
+	}
+
+	// Remove Children
+	var children = this.property('children');
+	if(children) {
+		for(var i in children) {
+			ElementCollection.remove(children[i]);
+		}	
+	}
 }
 
 Element.prototype.onContentTypeChanged = function() {
