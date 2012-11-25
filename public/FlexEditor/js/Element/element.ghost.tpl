@@ -13,7 +13,7 @@ Templates.Raw.ElementGhost = '
 	 	     	">
 
 		<div class="content">
-			{{=it.property("tja")}}
+			
 		</div>
 
 	</div>

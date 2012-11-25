@@ -128,12 +128,23 @@ function MouseInput(element, cellSize, relativeToScreen) {
 	function getSnappedRect(point, cellSize) {
 		var rect = {
 			// 					      ~~ is a fast way to trim decimals
-			x:      cellSize.width  * ~~(point.x / cellSize.width),
-			y:      cellSize.height * ~~(point.y / cellSize.height),
+			x:      ~~(point.x / cellSize.width),
+			y:      ~~(point.y / cellSize.height),
 			width:  cellSize.width,
 			height: cellSize.height
 		};
 		return rect;
 	}
+
+	// function getSnappedRect(point, cellSize) {
+	// 	var rect = {
+	// 		// 					      ~~ is a fast way to trim decimals
+	// 		x:      cellSize.width  * ~~(point.x / cellSize.width),
+	// 		y:      cellSize.height * ~~(point.y / cellSize.height),
+	// 		width:  cellSize.width,
+	// 		height: cellSize.height
+	// 	};
+	// 	return rect;
+	// }
 
 };

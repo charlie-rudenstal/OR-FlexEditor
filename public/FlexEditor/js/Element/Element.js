@@ -102,19 +102,37 @@ Element.prototype.heightUnit = function() {
 }
 
 Element.prototype.move = function(x, y) {
-	var cellSize = this.property('positionType') == 'absolute' 
-					? Grid.getCellSize() 
-					: Grid.getRelativeCellSize();
+	var cellSize = this.getCurrentCellSize();
 	var absoluteX = x * cellSize.width;
 	var absoluteY = y * cellSize.height;
 	this.property('x', this.property('x') + absoluteX);
 	this.property('y', this.property('y') + absoluteY);
 }
 
+Element.prototype.setX = function(x) {
+	this.property('x', this.getCurrentCellSize().width * x);
+}
+
+Element.prototype.setY = function(y) {
+	this.property('y', this.getCurrentCellSize().height * y);
+}
+
+Element.prototype.setWidth = function(x) {
+	this.property('width', this.getCurrentCellSize().width * x);
+}
+
+Element.prototype.setHeight = function(y) {
+	this.property('height', this.getCurrentCellSize().height * y);
+}
+
+Element.prototype.getCurrentCellSize = function() {
+	return this.property('positionType') == 'absolute' 
+			? Grid.getCellSize() 
+			: Grid.getRelativeCellSize();
+}
+
 Element.prototype.resize = function(width, height) {
-	var cellSize = this.property('positionType') == 'absolute' 
-				? Grid.getCellSize() 
-				: Grid.getRelativeCellSize();
+	var cellSize = this.getCurrentCellSize();
 	var absoluteWidth = width * cellSize.width;
 	var absoluteHeight = height * cellSize.height;
 	this.property('width', this.property('width') + absoluteWidth);
@@ -126,6 +144,17 @@ Element.prototype.getAbsolute = function() {
 	var position = domElement.position();
 	return { x: position.left, y: position.top, 
 			 width: domElement.width(), height: domElement.height() };
+}
+
+Element.prototype.getCell = function() {
+	var abs = this.getAbsolute();
+	var cellSize = Grid.getCellSize();
+	return {
+		x: ~~(abs.x / cellSize.width),
+		y: ~~(abs.y / cellSize.height),
+		width: ~~(abs.width / cellSize.width),
+		height: ~~(abs.height / cellSize.height)
+	};
 }
 
 // Element.prototype.getParent = function() {

@@ -31,17 +31,14 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				
 				// set a x, y, width and height using the item type default 
 				// if the width is not set explicitly by the item type
-				if(!DragDrop.current.lockedX) {
-					var x = e.position.snapped.x - (cellSize.width * 3);
-					ghost.property('x', x);
-				}
-				if(!DragDrop.current.lockedY) ghost.property('y', (e.position.snapped.y - (cellSize.height * 3)));					
+				if(!DragDrop.current.lockedX) ghost.setX(e.position.snapped.x - 2);
+				if(!DragDrop.current.lockedY) ghost.setY(e.position.snapped.y - 3);					
 
 			} else {
 				return;
 				// Check if mouse is over a resize handle and update the mouse pointer accordingly
-				var domElement = $(e.target).closest('.component').get(0);
-				var element = getElementByDomElement(domElement);
+				
+				var element = ElementCollection.getFromDom(e.target);
 				if(element && element.selected) {
 					var relativeX = e.position.absolute.x - element.x();
 					var relativeY = e.position.absolute.y - element.y();
@@ -109,11 +106,14 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			var element = ElementCollection.getFromDom($(e.target));
 			if(element) {
 				// Save the position of the element
-				var elmAbsolute = element.getAbsolute();
-				selectedElementStartPosition = { x: elmAbsolute.x, y: elmAbsolute.y };
-				selectedElementStartSize = { width: elmAbsolute.width, height: elmAbsolute.height };
-
+				// selectedElementStartPosition = { x: elmAbsolute.x, y: elmAbsolute.y };
+				// selectedElementStartSize = { width: elmAbsolute.width, height: elmAbsolute.height };
+				
+				selectedElementStartPosition = element.getCell();
+				
 				if(element.selected) {
+					var elmAbsolute = element.getAbsolute();
+					
 					// Did the user click on a resize handle?
 					var relativeX = e.position.absolute.x - elmAbsolute.x;
 					var relativeY = e.position.absolute.y - elmAbsolute.y;
@@ -154,26 +154,30 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					// No else if:s to enable diagonal resize (when resizeDirection is up and left at the same time)
 					if(resizeDirection & resizeDirections.left) {
 						var toX = selectedElementStartPosition.x + e.delta.snapped.x;
-						selectedElement.property('x', toX);
-						selectedElement.property('width', selectedElementStartSize.width - e.delta.snapped.x, 'absolute');
+						var toWidth = selectedElementStartPosition.width - e.delta.snapped.x;
+						selectedElement.setX(toX);
+						selectedElement.setWidth(toWidth);
 					}
 					if(resizeDirection & resizeDirections.up) {
 						var toY = selectedElementStartPosition.y + e.delta.snapped.y;
-						selectedElement.property('y', toY);
-						selectedElement.property('height', selectedElementStartSize.height - e.delta.snapped.y, 'absolute');
+						var toHeight = selectedElementStartPosition.height - e.delta.snapped.y;
+						selectedElement.setY(toY);
+						selectedElement.setHeight(toHeight);
 					}
 					if(resizeDirection & resizeDirections.right) {
-						selectedElement.property('width', selectedElementStartSize.width + e.delta.snapped.x, 'absolute');
+						var toWidth = selectedElementStartPosition.width + e.delta.snapped.x;
+						selectedElement.setWidth(toWidth);
 					}
 					if(resizeDirection & resizeDirections.down) {
-						selectedElement.property('height', selectedElementStartSize.height + e.delta.snapped.y, 'absolute');
+						var toHeight = selectedElementStartPosition.height + e.delta.snapped.y;
+						selectedElement.setHeight(toHeight);
 					}
 				} else {
 					// No resize is in progress, move the element on drag
 					var toX = selectedElementStartPosition.x + e.delta.snapped.x;
 					var toY = selectedElementStartPosition.y + e.delta.snapped.y;
-					selectedElement.property('x', toX);
-					selectedElement.property('y', toY);
+					selectedElement.setX(toX);
+					selectedElement.setY(toY);
 				}
 			}
 		});

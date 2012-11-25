@@ -16,7 +16,7 @@ Library.elements = Library.elements || [];
         
         elm.property('contentType', 'Button');  
         elm.property('background', 'blue');  
-        elm.property('text', '');  
+        elm.property('text', 'Test');  
 
         elm.property('width', 20);
         elm.property('height', 20);
