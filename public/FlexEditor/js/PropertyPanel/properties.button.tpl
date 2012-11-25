@@ -12,16 +12,22 @@ Templates.Raw.PropertiesButton = '
 				<div class="property-input"><input type="text" value="{{=it.element.property("text")}}" data-property="text" /></div>
 			</div>			
 			<div class="property">
-				<div class="property-label">Action</div>
-				<div class="property-input"><input type="text" value="{{=it.element.property("actionUrl")}}" data-property="actionUrl" /></div>
-			</div>
-			<div class="property">
 				<div class="property-label">Bg</div>
 				<div class="property-input"><input type="text" value="{{=it.element.property("background")}}" data-property="background" /></div>
 			</div>
 			<div class="property">
 				<div class="property-label">Fg</div>
 				<div class="property-input"><input type="text" value="{{=it.element.property("foreground")}}" data-property="foreground" /></div>
+			</div>
+			<div class="property">
+				<div class="property-label">Action</div>
+				<div class="property-input"><input type="text" value="{{=it.element.property("actionUrl")}}" data-property="actionUrl" /></div>
+			</div>		
+			<div class="property">
+				<div class="property-label">Module</div>
+				<div class="property-input">
+					<select id="selectModules" value="{{=it.element.property("actionUrl")}}" data-property="actionUrl"></select>
+				</div>
 			</div>
 			<div class="property">
 				<div class="btn btn-delete">Remove</div>
