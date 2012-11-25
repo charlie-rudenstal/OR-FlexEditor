@@ -3,11 +3,6 @@ var ElementCollection = (function(me) {
 	var elements = {};
 	var selectedElement;
 	var ghostId = null;
-	var cellSize = null;
-
-	me.setCellSize = function(pCellSize) {
-		cellSize = pCellSize;
-	}
 
 	me.create = function(properties) {
 		return new Element(properties);
@@ -96,7 +91,6 @@ var ElementCollection = (function(me) {
 
 	me.getFromDom = function(domElement) {
 		var closest = $(domElement).closest('*[data-element-id]');
-		console.log($(domElement).parent().get(0));
 		if(closest.size() == 0) return null;
 		var elementId = closest.data('element-id');
 		return me.getById(elementId);

@@ -169,13 +169,11 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 						selectedElement.property('height', selectedElementStartSize.height + e.delta.snapped.y, 'absolute');
 					}
 				} else {
-
 					// No resize is in progress, move the element on drag
 					var toX = selectedElementStartPosition.x + e.delta.snapped.x;
 					var toY = selectedElementStartPosition.y + e.delta.snapped.y;
 					selectedElement.property('x', toX);
 					selectedElement.property('y', toY);
-
 				}
 			}
 		});
@@ -196,10 +194,10 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				// Find which element is selected and ignore if no selection, then resize it!
 				var selectedElement = ElementCollection.getSelected();
 				if(!selectedElement) return;
-				if(e.keyCode == keyLeft)	selectedElement.resize(-cellSize.width, 0);
-				if(e.keyCode == keyUp) 		selectedElement.resize(0, -cellSize.height);
-				if(e.keyCode == keyRight) 	selectedElement.resize(cellSize.width, 0);
-				if(e.keyCode == keyDown) 	selectedElement.resize(0, cellSize.height);
+				if(e.keyCode == keyLeft)	selectedElement.resize(-1, 0);
+				if(e.keyCode == keyUp) 		selectedElement.resize(0, -1);
+				if(e.keyCode == keyRight) 	selectedElement.resize(1, 0);
+				if(e.keyCode == keyDown) 	selectedElement.resize(0, 1);
 			}
 
 			// alt + arrows: Move current Element
@@ -207,10 +205,10 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				// Find which element is selected and ignore if no selection, then move it!
 				var selectedElement = ElementCollection.getSelected();
 				if(!selectedElement) return;
-				if(e.keyCode == keyLeft)	selectedElement.move(-cellSize.width, 0);
-				if(e.keyCode == keyUp) 		selectedElement.move(0, -cellSize.height);
-				if(e.keyCode == keyRight) 	selectedElement.move(cellSize.width, 0);
-				if(e.keyCode == keyDown) 	selectedElement.move(0, cellSize.height);
+				if(e.keyCode == keyLeft)	selectedElement.move(-1, 0);
+				if(e.keyCode == keyUp) 		selectedElement.move(0, -1);
+				if(e.keyCode == keyRight) 	selectedElement.move(1, 0);
+				if(e.keyCode == keyDown) 	selectedElement.move(0, 1);
 			}
 
 			 // ctrl + number keys: Create an element with the corresponding index from the library

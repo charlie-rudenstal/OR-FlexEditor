@@ -102,13 +102,23 @@ Element.prototype.heightUnit = function() {
 }
 
 Element.prototype.move = function(x, y) {
-	this.property('x', this.property('x') + x);
-	this.property('y', this.property('y') + y);
+	var cellSize = this.property('positionType') == 'absolute' 
+					? Grid.getCellSize() 
+					: Grid.getRelativeCellSize();
+	var absoluteX = x * cellSize.width;
+	var absoluteY = y * cellSize.height;
+	this.property('x', this.property('x') + absoluteX);
+	this.property('y', this.property('y') + absoluteY);
 }
 
 Element.prototype.resize = function(width, height) {
-	this.property('width', this.property('width') + width);
-	this.property('height', this.property('height') + height);
+	var cellSize = this.property('positionType') == 'absolute' 
+				? Grid.getCellSize() 
+				: Grid.getRelativeCellSize();
+	var absoluteWidth = width * cellSize.width;
+	var absoluteHeight = height * cellSize.height;
+	this.property('width', this.property('width') + absoluteWidth);
+	this.property('height', this.property('height') + absoluteHeight);
 }
 
 Element.prototype.getAbsolute = function() {
@@ -119,9 +129,9 @@ Element.prototype.getAbsolute = function() {
 }
 
 // Element.prototype.getParent = function() {
-// 	var parent = this.getDomElement().parent().closest('.component');
-// 	if(parent.size() == 0) parent = $("#editor");
-// 	return parent;
+//  	var parent = this.getDomElement().parent().closest('.component');
+//  	if(parent.size() == 0) parent = $("#editor");
+//  	return parent;
 // }
 
 Element.prototype.getDomElement = function() {

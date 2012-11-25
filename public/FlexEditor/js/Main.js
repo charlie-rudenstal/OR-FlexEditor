@@ -8,25 +8,30 @@ function Main(options) {
 	options = options || {};
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
-	var width = options.width || 12;
-	var height = options.height || 25;
+	
+	//var width = options.width || 12;
+	//var height = options.height || 25;
 
 	var size = { cols: options.width || 12,
 				 rows: options.height || 25 };
 
+	var absoluteWidth = size.cols * cellSize.width;
+	var absoluteHeight = size.rows * cellSize.height;
+
 	// Resize the editor element to match the size specified in options
-	elmEditor.style.width = size.cols * cellSize.width + 'px';
-	elmEditor.style.height = size.rows * cellSize.height + 'px';
+	elmEditor.style.width = absoluteWidth + 'px';
+	elmEditor.style.height = absoluteHeight + 'px';
 
 	// Initialize modules 
-	var interactions = new Interactions();
+	//var interactions = new Interactions();
 	var renderer = new Renderer();
-	var grid = new Grid(renderer, { cellSize: cellSize, size: size });
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
 	var scene = new Scene(renderer, elmEditor, size, cellSize);
 
-	ElementCollection.setCellSize(cellSize);
+	// Initialize grid
+	Grid.init(renderer, size.cols, size.rows, cellSize);
+
 	$(ElementCollection).on('layoutInvalidated', function() { me.invalidateLayout() });
 	$(ElementCollection).on('selection', function(e) {
 		var element = e.element;	
@@ -58,7 +63,7 @@ function Main(options) {
 
 	// Render the grid
 	me.grid = function(element) {
-		grid.render(element);
+		Grid.render(element);
 	}
 
 	me.library = function(element) {

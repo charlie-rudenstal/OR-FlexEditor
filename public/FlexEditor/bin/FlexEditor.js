@@ -9,25 +9,30 @@
 	options = options || {};
 	var elmEditor = $(options.element).get(0);
 	var cellSize = options.cellSize || { width: 5, height: 5 };
-	var width = options.width || 12;
-	var height = options.height || 25;
+	
+	//var width = options.width || 12;
+	//var height = options.height || 25;
 
 	var size = { cols: options.width || 12,
 				 rows: options.height || 25 };
 
+	var absoluteWidth = size.cols * cellSize.width;
+	var absoluteHeight = size.rows * cellSize.height;
+
 	// Resize the editor element to match the size specified in options
-	elmEditor.style.width = size.cols * cellSize.width + 'px';
-	elmEditor.style.height = size.rows * cellSize.height + 'px';
+	elmEditor.style.width = absoluteWidth + 'px';
+	elmEditor.style.height = absoluteHeight + 'px';
 
 	// Initialize modules 
-	var interactions = new Interactions();
+	//var interactions = new Interactions();
 	var renderer = new Renderer();
-	var grid = new Grid(renderer, { cellSize: cellSize, size: size });
 	var library = new Library(renderer);
 	var layers = new Layers(renderer);
 	var scene = new Scene(renderer, elmEditor, size, cellSize);
 
-	ElementCollection.setCellSize(cellSize);
+	// Initialize grid
+	Grid.init(renderer, size.cols, size.rows, cellSize);
+
 	$(ElementCollection).on('layoutInvalidated', function() { me.invalidateLayout() });
 	$(ElementCollection).on('selection', function(e) {
 		var element = e.element;	
@@ -59,7 +64,7 @@
 
 	// Render the grid
 	me.grid = function(element) {
-		grid.render(element);
+		Grid.render(element);
 	}
 
 	me.library = function(element) {
@@ -719,17 +724,44 @@ function MouseInput(element, cellSize, relativeToScreen) {
 	}
 
 })();
-function Grid(renderer, options) {
-	this.renderer = renderer;
-	this.gridTemplate = Templates.Grid;
-	
-	var options = options || {};
-	this.cellSize = options.cellSize;
-	this.width = options.size.cols * this.cellSize.width;
-	this.height = options.size.rows * this.cellSize.height;
-};
+var Grid = (function(me) { 
 
-(function(me) {
+	var renderer = null;
+	var gridTemplate = null;
+
+	var cellSize = null;
+	var cols = null;
+	var rows = 0;
+	var absoluteWidth = null;
+	var absoluteHeight = null;
+		
+	me.init = function(pRenderer, pCols, pRows, pCellSize) {
+		renderer = pRenderer;
+		cellSize = pCellSize;
+		cols = pCols;
+		rows = pRows;
+		absoluteWidth = pCols * cellSize.width;
+		absoluteHeight = pRows * cellSize.height;
+		gridTemplate = Templates.Grid;
+	}
+
+	me.getCellSize = function() {
+		return clone(cellSize);
+	}
+
+	me.getRelativeCellSize = function() {
+		return {
+			width: 1 / cols * 100,
+			height: 1 / rows * 100	
+		};
+	}
+
+	me.getSize = function() {
+		return {
+			cols: cols,
+			rows: rows
+		};
+	}
 
 	/**
 	 * Renders a grid in the specified element 
@@ -737,20 +769,21 @@ function Grid(renderer, options) {
 	 * @param  {[type]} element [description]
 	 * @return {[type]}         [description]
 	 */
-	me.prototype.render = function(element) {
+	me.render = function(element) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(element instanceof jQuery) element = element.get(0);
 
-		element.style.width = this.width + 1 + 'px';
-		element.style.height = this.height + 1 + 'px';
+		element.style.width = absoluteWidth + 1 + 'px';
+		element.style.height = absoluteHeight + 1 + 'px';
 
-		this.renderer.write({ 
-			cellSize: this.cellSize, 
-			width: this.width, 
-			height: this.height }, element, Templates.Grid, true);
+		renderer.write({ cellSize: cellSize, 
+						 width: absoluteWidth, 
+						 height: absoluteWidth }, 
+						 element, gridTemplate, true);
 	}
 
-})(Grid);var DragDrop = (function(me) {
+	return me;
+})({});var DragDrop = (function(me) {
 
 	me.current = null;
 
@@ -760,11 +793,6 @@ function Grid(renderer, options) {
 	var elements = {};
 	var selectedElement;
 	var ghostId = null;
-	var cellSize = null;
-
-	me.setCellSize = function(pCellSize) {
-		cellSize = pCellSize;
-	}
 
 	me.create = function(properties) {
 		return new Element(properties);
@@ -853,7 +881,6 @@ function Grid(renderer, options) {
 
 	me.getFromDom = function(domElement) {
 		var closest = $(domElement).closest('*[data-element-id]');
-		console.log($(domElement).parent().get(0));
 		if(closest.size() == 0) return null;
 		var elementId = closest.data('element-id');
 		return me.getById(elementId);
@@ -1032,13 +1059,11 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 						selectedElement.property('height', selectedElementStartSize.height + e.delta.snapped.y, 'absolute');
 					}
 				} else {
-
 					// No resize is in progress, move the element on drag
 					var toX = selectedElementStartPosition.x + e.delta.snapped.x;
 					var toY = selectedElementStartPosition.y + e.delta.snapped.y;
 					selectedElement.property('x', toX);
 					selectedElement.property('y', toY);
-
 				}
 			}
 		});
@@ -1059,10 +1084,10 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				// Find which element is selected and ignore if no selection, then resize it!
 				var selectedElement = ElementCollection.getSelected();
 				if(!selectedElement) return;
-				if(e.keyCode == keyLeft)	selectedElement.resize(-cellSize.width, 0);
-				if(e.keyCode == keyUp) 		selectedElement.resize(0, -cellSize.height);
-				if(e.keyCode == keyRight) 	selectedElement.resize(cellSize.width, 0);
-				if(e.keyCode == keyDown) 	selectedElement.resize(0, cellSize.height);
+				if(e.keyCode == keyLeft)	selectedElement.resize(-1, 0);
+				if(e.keyCode == keyUp) 		selectedElement.resize(0, -1);
+				if(e.keyCode == keyRight) 	selectedElement.resize(1, 0);
+				if(e.keyCode == keyDown) 	selectedElement.resize(0, 1);
 			}
 
 			// alt + arrows: Move current Element
@@ -1070,10 +1095,10 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 				// Find which element is selected and ignore if no selection, then move it!
 				var selectedElement = ElementCollection.getSelected();
 				if(!selectedElement) return;
-				if(e.keyCode == keyLeft)	selectedElement.move(-cellSize.width, 0);
-				if(e.keyCode == keyUp) 		selectedElement.move(0, -cellSize.height);
-				if(e.keyCode == keyRight) 	selectedElement.move(cellSize.width, 0);
-				if(e.keyCode == keyDown) 	selectedElement.move(0, cellSize.height);
+				if(e.keyCode == keyLeft)	selectedElement.move(-1, 0);
+				if(e.keyCode == keyUp) 		selectedElement.move(0, -1);
+				if(e.keyCode == keyRight) 	selectedElement.move(1, 0);
+				if(e.keyCode == keyDown) 	selectedElement.move(0, 1);
 			}
 
 			 // ctrl + number keys: Create an element with the corresponding index from the library
@@ -1229,13 +1254,23 @@ Element.prototype.heightUnit = function() {
 }
 
 Element.prototype.move = function(x, y) {
-	this.property('x', this.property('x') + x);
-	this.property('y', this.property('y') + y);
+	var cellSize = this.property('positionType') == 'absolute' 
+					? Grid.getCellSize() 
+					: Grid.getRelativeCellSize();
+	var absoluteX = x * cellSize.width;
+	var absoluteY = y * cellSize.height;
+	this.property('x', this.property('x') + absoluteX);
+	this.property('y', this.property('y') + absoluteY);
 }
 
 Element.prototype.resize = function(width, height) {
-	this.property('width', this.property('width') + width);
-	this.property('height', this.property('height') + height);
+	var cellSize = this.property('positionType') == 'absolute' 
+				? Grid.getCellSize() 
+				: Grid.getRelativeCellSize();
+	var absoluteWidth = width * cellSize.width;
+	var absoluteHeight = height * cellSize.height;
+	this.property('width', this.property('width') + absoluteWidth);
+	this.property('height', this.property('height') + absoluteHeight);
 }
 
 Element.prototype.getAbsolute = function() {
@@ -1246,9 +1281,9 @@ Element.prototype.getAbsolute = function() {
 }
 
 // Element.prototype.getParent = function() {
-// 	var parent = this.getDomElement().parent().closest('.component');
-// 	if(parent.size() == 0) parent = $("#editor");
-// 	return parent;
+//  	var parent = this.getDomElement().parent().closest('.component');
+//  	if(parent.size() == 0) parent = $("#editor");
+//  	return parent;
 // }
 
 Element.prototype.getDomElement = function() {
