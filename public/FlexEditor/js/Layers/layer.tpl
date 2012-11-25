@@ -2,7 +2,12 @@
 var Templates = Templates || {}; Templates.Raw = Templates.Raw || {}; 
 Templates.Raw.Layer = '
 
-	<div class="layer-element {{?it.selected}}layer-element-selected{{?}}" data-element-id="{{=it.property("id")}}">
+	<div class="layer-element 
+				{{?it.selected}}layer-element-selected{{?}}"
+		 data-element-id="{{=it.property("id")}}"
+ 	  	 style="border-left: {{=it.layerIndent * 10}}px solid #303030"
+		>
+
 		<div class="layer-element-attributes">
 			<div class="attribute attribute-locked">
 				{{?it.property("locked")}}
@@ -25,5 +30,7 @@ Templates.Raw.Layer = '
 			{{=it.property("contentType")}} Element
 		{{?}}
 	</div>
+
+
 
 ';

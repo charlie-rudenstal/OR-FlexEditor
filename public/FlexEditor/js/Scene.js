@@ -64,8 +64,7 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 			}
 
 		});
-
-
+	
 		// If a element from the library is dropped over the scene, then create it
 		$(mouseInput).on('mouseup', function(e) {
 			var isInsideScene = e.position.absolute.x < width &&
@@ -83,14 +82,26 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					// if(!DragDrop.current.lockedX) elm.x(e.position.snapped.x - (cellSize.width * 3));
 					// if(!DragDrop.current.lockedY) elm.y(e.position.snapped.y - (cellSize.height * 3));					
 
+					// If an element was selected when this element
+					// is created, it should be added as a child to this element
+					var parentElement = ElementCollection.getSelected();
+					if(parentElement) {
+						var children = parentElement.property('children');
+						if(children) {
+							children.push(elm);
+							elm.parentElement = parentElement;
+						}
+					}
 					// ElementCollection.add(elm);
 					ElementCollection.select(elm);
+
+				
 				
 				} else if (ElementCollection.hasGhost()) {
 					// Render just to get rid of the ghost element if the mouse was 
 					// slightly outside of the scene, but with a part of the element inside
 					ElementCollection.removeGhost();
-					me.render(ElementCollection.getAsArray());
+					me.render(ElementCollection.getRootChildrenAsArray());
 				}
 			}
 		});

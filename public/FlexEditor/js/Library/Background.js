@@ -17,17 +17,18 @@ Library.elements = Library.elements || [];
     me.createElement = function(renderToElement) {
         var elm = ElementCollection.create(renderToElement);
         elm.property('contentType', 'Image');
-        elm.property('background', 'transparent');        
+        elm.property('background', 'green');        
         elm.property('valign', 'top');
         elm.property('halign', 'left');
         elm.property('stretch', 'width');
         elm.property('text', "Background");
-        elm.property('locked', true);
+        elm.property('locked', false);
         elm.property('positionType', 'relative');
+        elm.property('children', []);
         elm.x(0);
         elm.y(0);
-        elm.width(100, 'relative');
-        elm.height(100, 'relative');
+        elm.width(50);
+        elm.height(50);
 
         $(elm).on('imageChange', onImageChange);
         $(elm).on('autosizeChange', onAutosizeChanged);

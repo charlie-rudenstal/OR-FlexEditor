@@ -4,10 +4,10 @@ Templates.Raw.ElementSelected = '
 
 	<div id="element_{{=it.property("id")}}" 
 	 	 class="component button"
-	 	 style="left: {{=it.x(null, "absolute")}}px;
-	 	     	top: {{=it.y(null, "absolute")}}px;
-	 	     	width: {{=it.width(null, "absolute")}}px;
-	 	     	height: {{=it.height(null, "absolute")}}px;
+	 	 style="left: {{=it.xUnit()}};
+	 	     	top: {{=it.yUnit()}};
+	 	     	width: {{=it.widthUnit()}};
+	 	     	height: {{=it.heightUnit()}};
 	 	     	background: {{=it.property("background")}}
 	 	     	">
 

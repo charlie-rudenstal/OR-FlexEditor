@@ -15,23 +15,23 @@ Library.elements = Library.elements || [];
         var elm = ElementCollection.create(renderToElement);
         
         elm.property('contentType', 'Button');  
-        elm.property('background', 'transparent');  
+        elm.property('background', 'blue');  
         elm.property('text', '');  
 
-
-        elm.width(6, 'cells');
-        elm.height(4, 'cells');
+        elm.width(50);
+        elm.height(50);
         elm.property('valign', 'bottom');
         elm.property('halign', 'center');
         elm.property('autosize', false);
+        elm.property('positionType', 'relative');
 
-        $(elm).on('imageChange', onImageChange);
-        $(elm).on('autosizeChange', onAutosizeChanged);
-        $(elm).on('widthChange heightChange', onSizeChange);
-        elm.property('autosize', true);
+        //$(elm).on('imageChange', onImageChange);
+        //$(elm).on('autosizeChange', onAutosizeChanged);
+        //$(elm).on('widthChange heightChange', onSizeChange);
+        elm.property('autosize', false);
 
-        elm.property('relativeToBackground', false);
-        $(elm).on('relativeToBackgroundChange', onRelativeToBackgroundChange);
+        // elm.property('relativeToBackground', false);
+        // $(elm).on('relativeToBackgroundChange', onRelativeToBackgroundChange);
 
         return elm;
     }
@@ -66,14 +66,14 @@ Library.elements = Library.elements || [];
         e.target.property('autosize', false);
     }
 
-    function onRelativeToBackgroundChange(e) {
-        if(e.target.property('relativeToBackground')) {
-            e.target.parentElement = ElementCollection.getById(0);
-        } else {
-            e.target.parentElement = $("#editor").get(0);  
-        }
-        e.target.invalidate('parentElement');
-    }
+    // function onRelativeToBackgroundChange(e) {
+    //     if(e.target.property('relativeToBackground')) {
+    //         //e.target.parentElement = ElementCollection.getById(0);
+    //     } else {
+    //         //e.target.parentElement = $("#editor").get(0);  
+    //     }
+    //     //e.target.invalidate('parentElement');
+    // }
 
 
     Library.elements[me.key] = me;    

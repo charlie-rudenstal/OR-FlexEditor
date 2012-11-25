@@ -77,6 +77,14 @@ var ElementCollection = (function(me) {
 		return elmArray;
 	}
 
+	me.getRootChildrenAsArray = function() {
+		var elmArray = [];
+		for(var i in elements) {
+			if(elements[i].parentElement == null) elmArray.push(elements[i]);
+		}
+		return elmArray;	
+	}
+
 	me.getSelected = function() {
 		return selectedElement;
 	}

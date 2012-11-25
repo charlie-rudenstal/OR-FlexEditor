@@ -47,7 +47,8 @@ function Main(options) {
  
 	me.render = function() {
 		var elements = ElementCollection.getAsArray();
-		scene.render(elements);
+		var rootElements = ElementCollection.getRootChildrenAsArray();
+		scene.render(rootElements);
 		layers.render(elements);
 	}
 

@@ -12,6 +12,7 @@ function Element(parent, cellSize, properties) {
 	this.parentHeight = $(parent).height();
 
 	this.template = Templates.Element;
+	this.layerTemplate = Templates.Layer;
 	this.selected = false;
 
 	this.cellSize = cellSize;
@@ -19,7 +20,7 @@ function Element(parent, cellSize, properties) {
 	if(this.hasProperty('contentType')) this.onContentTypeChanged();
 	$(this).on('contentTypeChange', this.onContentTypeChanged);
 
-	$(this).on('parentElementChange', this.onParentElementChange);
+	//$(this).on('parentElementChange', this.onParentElementChange);
 };
 
 Element.idCounter = 0;
@@ -40,9 +41,9 @@ Element.prototype.property = function(key, value) {
 }
 
 Element.prototype.onParentElementChange = function() {
-	if(this.parentElement) {
-		this.parent = $('#element_' + this.parentElement.property('id')).get(0);
-	}	
+	//if(this.parentElement) {
+	//	this.parent = $('#element_' + this.parentElement.property('id')).get(0);
+	//}	
 	// this.parentWidth = $(this.parent).width();
 	// this.parentHeight = $(this.parent).height();
 
@@ -103,79 +104,70 @@ Element.prototype.setProperties = function(properties) {
 }
 
 Element.prototype.getParent = function() {
-	return this.parent;
+	var parent = this.getDomElement().parent().closest('.component');
+	if(parent.size() == 0) parent = $("#editor");
+	return parent;
+	//return this.parent;
 }
 
-function getStandardPositionFrom(value, positionType, parentWidthOrHeight, cellSize) {
-	if(positionType == 'relative') return value;
-	if(positionType == 'absolute') return value / parentWidthOrHeight * 100;
-	if(positionType == 'cells') {
-		var absolute = value * cellSize;
-		var relative = absolute / parentWidthOrHeight * 100;
-		return relative;
-	}
+Element.prototype.getDomElement = function() {
+	return $('#element_' + this.property('id'));
 }
 
-Element.prototype.x = function(value, positionType) {
-	if (value == null) {
-		if(positionType == "relative")
-			return this._x;
-		else {
-			var absolute = this._x / 100 * this.parentWidth;
-			if(this.parentElement) absolute += this.parentElement.x(null, 'absolute');
-			return absolute;
-		}
-	} else { 
-		if(positionType != "relative") value = value / this.parentWidth * 100;
-		if(value != this._x) {
-			this._x = value;
-			this.invalidate('x');
-		}
-	}
-};
+Element.prototype.getUnit = function() {
+	return this.property('positionType') == 'absolute' ? 'px' : '%';
+}
 
-Element.prototype.y = function(value, positionType) {
+Element.prototype.xUnit = function() {
+	return this.x() + this.getUnit();
+}
+
+Element.prototype.yUnit = function() {
+	return this.y() + this.getUnit();
+}
+
+Element.prototype.widthUnit = function() {
+	return this.width() + this.getUnit();
+}
+
+Element.prototype.heightUnit = function() {
+	return this.height() + this.getUnit();
+}
+
+Element.prototype.x = function(value) {
 	if(value == null) {
-		if(positionType == "relative") 
-			 return this._y;
-		else {			
-			var absolute = this._y / 100 * this.parentHeight;			
-			if(this.parentElement) absolute += this.parentElement.y(null, 'absolute');
-			return absolute;
-		}
-	} else { 
-		if(positionType != "relative") value = value / this.parentHeight * 100;
-		if(value != this._y) {
-			this._y = value;
-			this.invalidate('y');
-		}
+		return this._x;
+	} else {
+		this._x = value;
+		this.invalidate('x');
 	}
 };
 
-Element.prototype.width = function(value, positionType) {
-	if(value == null)
-		if(positionType == "relative")
-			 return this._width;
-		else return this._width / 100 * this.parentWidth;
-	  else {
-	  	value = getStandardPositionFrom(value, positionType, this.parentWidth, this.cellSize.width);
-	  	if(value != this._width) {
-	  		this._width = value;
-			this.invalidate('width');	
-		}
+Element.prototype.y = function(value) {
+	if(value == null) {
+		return this._y;
+	} else {
+		this._y = value;
+		this.invalidate('y');
 	}
 };
 
-Element.prototype.height = function(value, positionType) {
-	if(value == null) 
-		if(positionType == "relative") 
-			 return this._height;
-		else return this._height / 100 * this.parentHeight;
-	else 
-	  	value = getStandardPositionFrom(value, positionType, this.parentHeight, this.cellSize.height);
-	  	if(value != this._height) {
-	  		this._height = value;
-			this.invalidate('height');	
-		}
+Element.prototype.width = function(value) {
+	if(value == null) {
+		return this._width;
+	} else {
+		this._width = value;
+		this.invalidate('width');
+	}
+};
+
+Element.prototype.height = function(value) {
+	
+	if(value == null) {
+		return this._height;
+	} else {
+		this._height = value;
+		this.invalidate('height');
+	}
 };
 

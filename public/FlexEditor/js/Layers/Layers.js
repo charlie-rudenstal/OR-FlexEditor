@@ -90,8 +90,42 @@ function Layers(renderer) {
 
 	this.render = function(elements) {
 		loadedElements = cloneArrayShallow(elements);
-		loadedElements.reverse(); // reverse our copy to get latest layer at top
-		renderer.write(loadedElements, renderToElement, Templates.Layer, true, true);
+		//loadedElements.reverse(); // reverse our copy to get latest layer at top
+		//loadedElements.reverse();
+
+		var renderElements = getLayerLevel(loadedElements, null, 0);
+		
+		renderer.write(renderElements, renderToElement, Templates.Layer, true, true);
+		
+		loadedElements = renderElements;
+	}
+
+	function getLayerLevel(elements, parent, layerIndent) {
+		var renderElements = [];
+
+		// loop through all root elements reversed to get latest layer at top
+		for(var i = elements.length - 1; i > -1; i--) {
+			var elm = elements[i];
+
+			// don't show ghosts in the list
+			if(elm == ElementCollection.getGhost()) continue;
+
+			// only render children with current parent
+			if(elm.parentElement != parent) continue;
+
+			// give element a layerLevel for indentation
+			elm.layerIndent = layerIndent;
+
+			renderElements.push(elm);
+
+			// find children of this element and render if any
+			var children = elm.property('children');
+			if(children) { 
+				var rendererdChildren = getLayerLevel(children, elm, layerIndent + 1);
+				renderElements = renderElements.concat(rendererdChildren);
+			}
+		}
+		return renderElements;
 	}
 
 }
