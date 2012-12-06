@@ -27,6 +27,8 @@ Library.elements = Library.elements || [];
         elm.property('x', 0);
         elm.property('y', 0);
         elm.property('positionType', 'relative');
+        elm.property('centerx', true);
+        elm.property('centery', false);
         elm.property('width', 100);
         elm.property('height', 100);
 

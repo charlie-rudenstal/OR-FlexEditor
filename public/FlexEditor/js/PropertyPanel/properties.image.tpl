@@ -24,6 +24,14 @@ Templates.Raw.PropertiesImage = '
 				<div class="property-input"><input type="text" value="{{=it.element.property("autosize")}}" data-property="autosize" /></div>
 			</div>
 			<div class="property">
+				<div class="property-label">CenterX</div>
+				<div class="property-input"><input type="text" value="{{=it.element.property("centerx")}}" data-property="centerx" /></div>
+			</div>
+			<div class="property">
+				<div class="property-label">CenterY</div>
+				<div class="property-input"><input type="text" value="{{=it.element.property("centery")}}" data-property="centery" /></div>
+			</div>
+			<div class="property">
 				<div class="property-label">Valign</div>
 				<div class="property-input"><input type="text" value="{{=it.element.property("valign")}}" data-property="valign" /></div>
 			</div>

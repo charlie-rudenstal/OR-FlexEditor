@@ -9,7 +9,17 @@ Templates.Raw.ElementSelected = '
 	 	     	top: {{=it.yUnit()}};
 	 	     	width: {{=it.widthUnit()}};
 	 	     	height: {{=it.heightUnit()}};
-	 	     	background: {{=it.property("background")}}
+	 	     	background: {{=it.property("background")}};
+				{{?it.property("centerx")}}
+                	position: absolute;
+                	left: 50%;
+                	margin-left: -{{=it.property("width") / 2 + it.getUnit()}};
+				{{?}}
+				{{?it.property("centery")}}
+                	position: absolute;
+                	top: 50%;
+                	margin-top: -{{=it.property("height") / 2 + it.getUnit()}};
+				{{?}}
 	 	     	">
 
 		<div class="content">

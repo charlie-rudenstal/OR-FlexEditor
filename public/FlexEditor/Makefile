@@ -20,9 +20,9 @@ files = 	$(src)/Main.js\
 			$(src)/PropertyPanel/PropertyPanel.js\
 			$(src)/Library/Library.js\
 			$(src)/Library/Button.js\
-			$(src)/Library/Background.js
+			$(src)/Library/Background.js\
+			$(src)/Library/Image.js
 			#$(src)/Library/Text.js\
-			#$(src)/Library/Image.js\
 			#$(src)/Library/Sample.js\
 			#$(src)/Library/Header.js
 			

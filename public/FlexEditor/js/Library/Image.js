@@ -3,22 +3,45 @@ Library.elements = Library.elements || [];
 
 (function() {
 
-    var autosizeChangeInProgress = false;
+    me.key = "Image";
+    me.title = 'Image';
+    me.description = 'Import an image you have already created from a URL';
 
 	function me() {
 		
 	}
 
-    me.createElement = function(renderToElement) {
-        var elm = ElementCollection.create(renderToElement);
-        elm.property('contentType', 'Image');  
-        elm.property('background', 'transparent');  
-        elm.property('valign', 'top');  
-        elm.property('halign', 'left');  
+    me.createElement = function() {
+        // var elm = ElementCollection.create(renderToElement);
+        // elm.property('contentType', 'Image');  
+        // elm.property('background', 'transparent');  
+        // elm.property('valign', 'top');  
+        // elm.property('halign', 'left');  
+        // elm.property('stretch', 'width');
+        // elm.width(4, 'cells');
+        // elm.height(4, 'cells');
+        // elm.property('autosize', false);
+
+        // $(elm).on('imageChange', onImageChange);
+        // $(elm).on('autosizeChange', onAutosizeChanged);
+        // $(elm).on('widthChange heightChange', onSizeChange);
+        // elm.property('autosize', true);
+
+        var elm = ElementCollection.create();
+        elm.property('contentType', 'Image');
+        elm.property('background', 'transparent');        
+        elm.property('valign', 'top');
+        elm.property('halign', 'left');
         elm.property('stretch', 'width');
-        elm.width(4, 'cells');
-        elm.height(4, 'cells');
-        elm.property('autosize', false);
+        elm.property('text', "Image");
+        elm.property('locked', false);
+        elm.property('x', 0);
+        elm.property('y', 0);
+        elm.property('positionType', 'relative');
+        elm.property('centerx', false);
+        elm.property('centery', false);
+        elm.property('width', 40);
+        elm.property('height', 40);
 
         $(elm).on('imageChange', onImageChange);
         $(elm).on('autosizeChange', onAutosizeChanged);
@@ -29,9 +52,10 @@ Library.elements = Library.elements || [];
     }
 
 
-    // http://www.apicasystem.com/portals/0/Partners/Microsoft_Logo.png
-    // Autosize functionality
-    
+    //////////////////
+    //// Autosize ////
+    //////////////////
+    var autosizeChangeInProgress = false;
     function onImageChange(e) {
         if(e.target.property('autosize')) onAutosizeChanged(e);
     }
@@ -43,8 +67,9 @@ Library.elements = Library.elements || [];
             var img = new Image();
             img.onload = function() {
                 autosizeChangeInProgress = true;
-                elm.width(this.width, 'absolute');
-                elm.height(this.height, 'absolute');
+                elm.property('positionType', 'absolute');
+                elm.property('width', this.width);
+                elm.property('height', this.height);
                 autosizeChangeInProgress = false;
             }
             img.src = elm.property('image');
@@ -57,10 +82,6 @@ Library.elements = Library.elements || [];
         if(autosizeChangeInProgress) return;
         e.target.property('autosize', false);
     }
-
-    me.key = "Image";
-	me.title = 'Image';
-	me.description = 'Import an image you have already created from a URL';
 
     Library.elements[me.key] = me;    
 })();
