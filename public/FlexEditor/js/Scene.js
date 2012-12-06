@@ -99,6 +99,8 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 					// slightly outside of the scene, but with a part of the element inside
 					ElementCollection.removeGhost();
 					me.render(ElementCollection.getRootChildrenAsArray());
+				} else {
+					ElementCollection.removeGhost();
 				}
 			}
 		});
@@ -106,7 +108,9 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		// Select the element if the user clicks on it
 		$(mouseInput).on('mousedown', function(e) {
 			var element = ElementCollection.getFromDom($(e.target));
-			if(element) {
+
+
+			if(element && element.property('locked') != true) {
 				// Save the position of the element
 				// selectedElementStartPosition = { x: elmAbsolute.x, y: elmAbsolute.y };
 				// selectedElementStartSize = { width: elmAbsolute.width, height: elmAbsolute.height };
@@ -254,16 +258,16 @@ var Scene = function(renderer, renderToElement, size, cellSize) {
 		renderer.write(elements, renderToElement);
 	}
 
-	function getElementByDomElement(domElement) {
-		if(!domElement) return;
-		var elements = ElementCollection.getAsArray(); 
-		for(var i in elements) {
-			if(domElement.id == 'element_' + elements[i].property("id")) {
-				// Elements that are locked should not be selectable
-				if(!elements[i].property('locked')) return elements[i];
-			}
-		}
-	}
+	// function getElementByDomElement(domElement) {
+	// 	if(!domElement) return;
+	// 	var elements = ElementCollection.getAsArray(); 
+	// 	for(var i in elements) {
+	// 		if(domElement.id == 'element_' + elements[i].property("id")) {
+	// 			// Elements that are locked should not be selectable
+	// 			if(!elements[i].property('locked')) return elements[i];
+	// 		}
+	// 	}
+	// }
 
 	return me;
 }

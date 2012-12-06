@@ -8,6 +8,8 @@ var ElementCollection = (function(me) {
 		return new Element(properties);
 	}
 
+	me.on = function(query, cb) { $(me).on(query, cb); }
+
 	// add an element to the collection. isGhost can be specified to keep
 	// track of which ID:s are drag&drop ghosts which will simplify removal of these 
 	// temporary elements. could be generalized later to some kind of 'delete by tag' 
@@ -18,8 +20,18 @@ var ElementCollection = (function(me) {
 			ghostId = element.property('id');
 			element.template = Templates.ElementGhost;
 		}
+		$(element).on('propertyChange', function(e) { me.onElementPropertyChanged(e) });
 		$(element).on('layoutInvalidated', function() { me.invalidateLayout() });
+		me.collectionChanged();
 		me.invalidateLayout();
+	}
+
+	me.collectionChanged = function() {
+		$(me).trigger('collectionChange');
+	}
+
+	me.onElementPropertyChanged = function(e) {
+		$(me).trigger(e);
 	}
 
 	me.invalidateLayout = function() {
@@ -38,7 +50,8 @@ var ElementCollection = (function(me) {
 		// We need to update the results of hasGhost if user removed 
 		// the ghost by other means than removeGhost
 		if(element.id == ghostId) ghostId = null;
-			
+
+		me.collectionChanged();
 		me.invalidateLayout();
 	}
 
@@ -50,7 +63,8 @@ var ElementCollection = (function(me) {
 	me.convertGhostToElement = function() {
 		var ghost = elements[ghostId];
 		ghostId = null;
-		ghost.property('contentType', ghost.property('contentType'));
+		me.collectionChanged();
+		//ghost.property('contentType', ghost.property('contentType'));
 	}
 
 	me.getGhost = function() {

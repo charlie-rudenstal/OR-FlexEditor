@@ -3,17 +3,22 @@ function Layers(renderer) {
 	var renderToElement;
 	var loadedElements;
 
+	ElementCollection.on('selection collectionChange propertyChange', function() {
+		this.render(ElementCollection.getAsArray());
+	}.bind(this));
+
 	this.load = function(elementContainer) {
 		// The renderer work on pure elements not wrapped by jQuery
 		if(elementContainer instanceof jQuery) elementContainer = elementContainer.get(0);
 		renderToElement = elementContainer;
-		
+
+		registerKeyHandler();
+
 		// Check for mouse down on items
 		var mouseInput = new MouseInput(renderToElement, null, true);
 		mouseInput.start();
 		$(mouseInput).on('mousedown', onItemDown.bind(this));
 
-		registerKeyHandler();
 
 		// And render it (currently with no elements)
 		this.render([]);
@@ -28,12 +33,8 @@ function Layers(renderer) {
 			ElementCollection.select(element);
 		} else if($target.closest('.attribute-locked').length > 0) {
 			element.toggleProperty('locked');
-		} else if($target.closest('.attribute-position').length > 0) {
-				
+		} else if($target.closest('.attribute-position').length > 0) {				
 			var cell = element.getCell();
-
-			console.log(cell);
-
 			element.property('positionType', (element.property('positionType') == 'absolute') 
 				? 'relative' 
 				: 'absolute');

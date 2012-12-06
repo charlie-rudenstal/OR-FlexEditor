@@ -15,6 +15,7 @@ Library.elements = Library.elements || [];
         var elm = ElementCollection.create();
         
         elm.property('contentType', 'Button');  
+        elm.property('icon', '');  
         elm.property('background', 'blue');  
         elm.property('text', 'Test');  
 

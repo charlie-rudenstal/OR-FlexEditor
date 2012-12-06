@@ -47,6 +47,7 @@ function Main(options) {
 
 		// Add the default Background layer
         var elm = Library.elements.Background.createElement(elmEditor);
+        elm.property('text', 'Background');
         ElementCollection.add(elm);
 	};
 
@@ -58,7 +59,7 @@ function Main(options) {
 		var elements = ElementCollection.getAsArray();
 		var rootElements = ElementCollection.getRootChildrenAsArray();
 		scene.render(rootElements);
-		layers.render(elements);
+		//layers.render(elements);
 	}
 
 	// Render the grid

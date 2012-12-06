@@ -5,8 +5,8 @@ Library.elements = Library.elements || [];
 
 
     me.key = "Background";
-    me.title = 'Background';
-    me.description = 'Import an image you have already created from a URL';
+    me.title = 'Container';
+    me.description = 'Can contains and position other Elements';
     me.lockedX = true;
     me.lockedY = true;
 
@@ -21,8 +21,8 @@ Library.elements = Library.elements || [];
         elm.property('valign', 'top');
         elm.property('halign', 'left');
         elm.property('stretch', 'width');
-        elm.property('text', "Background");
-        elm.property('locked', false);
+        elm.property('text', "Container");
+        elm.property('locked', true);
         elm.property('children', []);
         elm.property('x', 0);
         elm.property('y', 0);

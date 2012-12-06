@@ -12,6 +12,10 @@ Templates.Raw.PropertiesButton = '
 				<div class="property-input"><input type="text" value="{{=it.element.property("text")}}" data-property="text" /></div>
 			</div>			
 			<div class="property">
+				<div class="property-label">Icon</div>
+				<div class="property-input"><input type="text" value="{{=it.element.property("icon")}}" data-property="icon" /></div>
+			</div>			
+			<div class="property">
 				<div class="property-label">Bg</div>
 				<div class="property-input"><input type="text" value="{{=it.element.property("background")}}" data-property="background" /></div>
 			</div>

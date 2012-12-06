@@ -10,7 +10,6 @@ function Element(properties) {
 
 	if(this.hasProperty('contentType')) this.onContentTypeChanged();
 	$(this).on('contentTypeChange', this.onContentTypeChanged);
-
 	$(this).on('xChange yChange widthChange heightChange positionTypeChange', this.onLayoutChanged);
 };
 
@@ -84,6 +83,7 @@ Element.prototype.property = function(key, value) {
 			if(value == 'true') value = true;
 			if(value == 'false') value = false;
 			this.properties[key] = value;
+			$(this).trigger({type: 'propertyChange', property: key, newValue: value});
 			$(this).trigger(key + 'Change'); // widthChange, paddingChange etc
 		}
 	}
