@@ -49,6 +49,11 @@
 		// Add the default Background layer
         var elm = Library.elements.Background.createElement(elmEditor);
         elm.property('text', 'Background');
+        elm.property('locked', true);
+        elm.property('width', 100);
+        elm.property('height', 100);
+        elm.property('centerx', true);
+        elm.property('autosize', true);
         ElementCollection.add(elm);
 	};
 
@@ -1753,8 +1758,7 @@ Library.elements = Library.elements || [];
     me.key = "Background";
     me.title = 'Container';
     me.description = 'Can contains and position other Elements';
-    me.lockedX = true;
-    me.lockedY = true;
+
 
 	function me() {
 		
@@ -1768,20 +1772,20 @@ Library.elements = Library.elements || [];
         elm.property('halign', 'left');
         elm.property('stretch', 'width');
         elm.property('text', "Container");
-        elm.property('locked', true);
+        elm.property('locked', false);
         elm.property('children', []);
         elm.property('x', 0);
         elm.property('y', 0);
         elm.property('positionType', 'relative');
-        elm.property('centerx', true);
+        elm.property('centerx', false);
         elm.property('centery', false);
-        elm.property('width', 100);
-        elm.property('height', 100);
+        elm.property('width', 50);
+        elm.property('height', 50);
 
         $(elm).on('imageChange', onImageChange);
         $(elm).on('autosizeChange', onAutosizeChanged);
         $(elm).on('widthChange heightChange', onSizeChange);
-        elm.property('autosize', true);
+        elm.property('autosize', false);
 
         return elm;
     }

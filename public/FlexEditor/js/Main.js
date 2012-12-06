@@ -48,6 +48,11 @@ function Main(options) {
 		// Add the default Background layer
         var elm = Library.elements.Background.createElement(elmEditor);
         elm.property('text', 'Background');
+        elm.property('locked', true);
+        elm.property('width', 100);
+        elm.property('height', 100);
+        elm.property('centerx', true);
+        elm.property('autosize', true);
         ElementCollection.add(elm);
 	};
 
