@@ -1,4 +1,4 @@
 OR-FlexEditor
-=============
+Javascript WYSIWYG editor for creating iOS/Android GUIs
 
-Flexible Editor for Open Ratio
+The restructre branch is ahead of master with some major refactorizations
