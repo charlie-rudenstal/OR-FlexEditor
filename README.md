@@ -1,4 +1,4 @@
 OR-FlexEditor
 =============
 
-Flexible Editor for Open Ratio
+Javascript WYSIWYG editor for creating iOS/Android GUIs 
